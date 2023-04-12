@@ -11,7 +11,7 @@ interface Props {
 export const useFuels = ( url: string, config: SWRConfiguration = {} ) => {
 
     // const { data, error, isLoading } = useSWR<Props>(`http://localhost:8000/api${ url }`, fetcher, config);
-    const { data, error, isLoading } = useSWR<Props>(`http://localhost:8000/api${ url }`, config);
+    const { data, error, isLoading } = useSWR<Props>(`http://192.168.1.16:8000/api${ url }`, config);
 
     return{
         fuels: data?.abastecimientos || [],
