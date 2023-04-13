@@ -1,10 +1,14 @@
 import { FC, useEffect, useReducer } from 'react';
-
 import axios from 'axios';
-
 import { FuelContext, fuelReducer } from './';
 import { posApi } from '../../api';
+import { render, Printer, Text } from 'react-thermal-printer';
 
+declare global {
+    interface Navigator {
+        serial: any;
+    }
+}
 export interface FuelState {
     children?: React.ReactNode;
     isLoaded: boolean;
@@ -14,6 +18,7 @@ export interface FuelState {
 const CART_INITIAL_STATE: FuelState = {
     isLoaded: false,
 }
+
 type Props = { children?: React.ReactNode };
 
 export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
@@ -36,6 +41,23 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             console.log("entro a create order de provider")            
             const { data } = await posApi.post('http://192.168.1.16:8000/api/comprobantes', body);
 
+            console.log(data);
+
+
+            const masdata = await render(
+            <Printer type="epson">
+                <Text>Hello World</Text>
+            </Printer>
+            );
+            
+            const port = await navigator.serial.requestPort();
+            await port.open({ baudRate: 9600 });
+
+            const writer = port.writable?.getWriter();
+            if (writer != null) {
+                await writer.write(masdata);
+                writer.releaseLock();
+            }
 
             return {
                 hasError: false,
@@ -52,7 +74,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             }
             return {
                 hasError: true,
-                message : 'Error no controlado, hable con el administrador'
+                message : 'Error no controlado, hable con el administrador ' + error
             }
         }
 
