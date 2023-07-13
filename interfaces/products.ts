@@ -3,6 +3,8 @@ export interface IFuel {
     registro: number;
     pistola: number;
     codigoCombustible: number;
+    descripcionCombustible?: string;
+    styleCombustible?: string;
     valorTotal: number;
     volTotal: number;
     precioUnitario: number;
@@ -24,6 +26,10 @@ export interface IProduct {
     type: IType;
     gender: 'men'|'women'|'kid'|'unisex'
 }
+
+export interface IKeyValue {
+    [key: string]: string;
+ }
 
 export type ISize = 'XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL';
 export type IType = 'shirts'|'pants'|'hoodies'|'hats';

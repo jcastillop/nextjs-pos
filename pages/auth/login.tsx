@@ -1,40 +1,120 @@
-import NextLink from 'next/link'
+import React, { useEffect, useState } from 'react'
+import { signIn, getSession, getProviders } from 'next-auth/react';
 import { AuthLayout } from '@/components/layouts'
-import { Box, Button, Grid,Link,TextField,Typography } from '@mui/material'
-import React from 'react'
+import { Box, Button, Chip, Grid,Link,TextField,ToggleButton,ToggleButtonGroup,Typography } from '@mui/material'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { ErrorOutline } from '@mui/icons-material'
+import { GetServerSideProps } from 'next';
+
+type FormData = {
+    user: string,
+    password: string
+};
+
 
 const LoginPage = () => {
-  return (
-    <AuthLayout title={'Ingresar'}>
-        <Box sx={{width:350, padding:'10px 20px'}}>
-            <Grid container spacing={2}>
-                <Grid item xs={12}>
-                    <Typography variant='h1' component='h1'>Iniciar sesion</Typography>
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField label='Correo' variant='filled' fullWidth/>
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField label='Contraseña' type='password' variant='filled' fullWidth/>
-                </Grid>
-                <Grid item xs={12}>
-                    <Button color='secondary' className='circular-btn' size='large' fullWidth>
-                        Ingresar
-                    </Button>
-                </Grid>
-                <Grid item xs={12} display='flex' justifyContent='end'>
-                    <NextLink href='/auth/register' passHref legacyBehavior>
-                        <Link underline='always'>
-                            Crear cuenta
-                        </Link>
-                    </NextLink>
-                </Grid>
 
+    const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+    const [ showError, setShowError ] = useState(false);
+    const [providers, setProviders] = useState<any>({});
 
-            </Grid>
-        </Box>
-    </AuthLayout>
-  )
+    useEffect(() => {
+        getProviders().then( prov => {
+          // console.log({prov});
+          setProviders(prov)
+        })
+      }, [])    
+
+    const onSubmit  = async ({ user, password }: FormData) =>{
+        setShowError(false);
+        await signIn('credentials',{ user, password });
+      }
+
+    return (
+        <AuthLayout title={'Ingresar'}>
+            <form  onSubmit={ handleSubmit(onSubmit) } noValidate>
+            <Box sx={{width:350, padding:'50% 20px'}}>
+                <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                        <Typography variant='h1' component='h1'>FUEL-HUB</Typography>
+                        <Chip 
+                            label="No reconocemos ese usuario / contraseña"
+                            color="error"
+                            icon={ <ErrorOutline /> }
+                            className="fadeIn"
+                            sx={{ display: showError ? 'flex': 'none' }}
+                        />                        
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            type="text"
+                            label="Usuario"
+                            variant="filled"
+                            fullWidth 
+                            { ...register('user', {
+                                required: 'Este campo es requerido'
+                                
+                            })}
+                            error={ !!errors.user }
+                            helperText={ errors.user?.message }
+                        />
+                    </Grid>                    
+                    <Grid item xs={12}>
+                        <TextField 
+                            label='Codigo' 
+                            type='password' 
+                            //inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} 
+                            variant='filled' 
+                            fullWidth 
+                            { ...register('password', {
+                                required: 'Este campo es requerido',
+                                minLength: { value: 4, message: 'Mínimo 4 caracteres' }
+                            })}
+                            error={ !!errors.password }
+                            helperText={ errors.password?.message }                            
+                            />
+                    </Grid>
+                    <Grid item xs={12}
+                        container
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="center"                   
+                    >
+                      
+                    </Grid>
+                    <Grid item xs={12}>
+                            <Button
+                                type="submit"
+                                color="secondary"
+                                className='circular-btn'
+                                size='large'
+                                fullWidth>
+                                Ingresar
+                            </Button>
+                        </Grid>                    
+                </Grid>
+            </Box>
+            </form>
+        </AuthLayout>
+    )
 }
 
+export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
+
+    const session = await getSession({ req });
+
+    const { p = '/'} = query
+
+    if(session){
+        return {
+            redirect: {
+                destination: p.toString(),
+                permanent: false
+            }
+        }
+    }
+    return{
+        props: {}
+    }
+}
 export default LoginPage

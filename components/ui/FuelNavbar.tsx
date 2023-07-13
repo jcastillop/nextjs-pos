@@ -2,10 +2,14 @@ import NextLink from "next/link";
 import { AppBar, Badge, Box, Button, IconButton, Link, Toolbar, Typography } from "@mui/material";
 import { SearchOutlined, ShoppingCartOutlined } from "@mui/icons-material";
 import { useRouter } from "next/router";
+import { UseDate } from "./UseDate";
+import { useContext } from "react";
+import { UiContext } from "@/context";
 
 export const FuelNavbar = () => {
 
   const { asPath } = useRouter();
+  const { toggleSideMenu } = useContext( UiContext );
 
   return (
     <AppBar>
@@ -19,6 +23,7 @@ export const FuelNavbar = () => {
             </NextLink>
 
             <Box flex={1}/>
+
             <Box sx={{ display: { xs:'none', sm:'block' } }}>
               <NextLink href={'/'} passHref legacyBehavior>
                 <Link >
@@ -30,14 +35,16 @@ export const FuelNavbar = () => {
                   <Button color={ asPath === '/historico'?'primary':'info' }>Histórico</Button>
                 </Link>
               </NextLink>       
-              </Box>
+            </Box>
+            
             <Box flex={1}/>
+            
             <Box>
-            <NextLink href='/' passHref legacyBehavior>
-            <Link display={"flex"} alignItems='center'>
-                <Typography sx={{ ml:0.5 }}>12:14</Typography>
+              <NextLink href='/' passHref legacyBehavior>
+                <Link display={"flex"} alignItems='center'>
+                  {/* <UseDate /> */}
                 </Link>
-            </NextLink>
+              </NextLink>
             </Box>
 
 
@@ -55,7 +62,7 @@ export const FuelNavbar = () => {
               </Link>
             </NextLink>   
 
-            <Button>
+            <Button onClick={ toggleSideMenu }>
               Menu
             </Button>
 

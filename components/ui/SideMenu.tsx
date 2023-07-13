@@ -1,33 +1,55 @@
-import { Box, Divider, Drawer, IconButton, Input, InputAdornment, List, ListItem, ListItemIcon, ListItemText, ListSubheader } from "@mui/material"
-import { AccountCircleOutlined, AdminPanelSettings, CategoryOutlined, ConfirmationNumberOutlined, EscalatorWarningOutlined, FemaleOutlined, LoginOutlined, MaleOutlined, SearchOutlined, VpnKeyOutlined } from "@mui/icons-material"
+import React from "react";
+import { useContext } from "react";
+import { AuthContext, UiContext } from "@/context";
+import { AccountCircleOutlined, AdminPanelSettings, CategoryOutlined, CloseOutlined, ConfirmationNumberOutlined, EscalatorWarningOutlined, FemaleOutlined, LoginOutlined, MaleOutlined, SearchOutlined, VpnKeyOutlined } from "@mui/icons-material"
+import { Box, Divider, Drawer, IconButton, Input, InputAdornment, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, ToggleButton, ToggleButtonGroup } from "@mui/material"
+import { useRouter } from "next/router";
 
 
 export const SideMenu = () => {
+
+    const router = useRouter();
+    const { isMenuOpen, toggleSideMenu, filterDispensers, setFilterDispensers } = useContext( UiContext );
+    const { user, isLoggedIn, logout } = useContext(  AuthContext );
+
+    const handleFormat = (_event: any, newFormats: React.SetStateAction<never[]>) => {
+        setFilterDispensers(newFormats);
+    };    
+  
   return (
     <Drawer
-        open={ false }
+        open={ isMenuOpen }
         anchor='right'
         sx={{ backdropFilter: 'blur(4px)', transition: 'all 0.5s ease-out' }}
     >
         <Box sx={{ width: 250, paddingTop: 5 }}>
             
             <List>
+                <ListItemButton onClick={ toggleSideMenu }>
+                    <ListItemIcon>
+                        <CloseOutlined/>
+                    </ListItemIcon>
+                    <ListItemText primary={'Salir'} />
+                </ListItemButton>                  
+                <Divider />
+                <ListSubheader>Filtro de pistolas</ListSubheader>
 
                 <ListItem>
-                    <Input
-                        type='text'
-                        placeholder="Buscar..."
-                        endAdornment={
-                            <InputAdornment position="end">
-                                <IconButton
-                                aria-label="toggle password visibility"
-                                >
-                                 <SearchOutlined />
-                                </IconButton>
-                            </InputAdornment>
-                        }
-                    />
+                    <ToggleButtonGroup
+                        value={filterDispensers}
+                        onChange={handleFormat}
+                        aria-label="text formatting"
+                        >
+                        <ToggleButton value="1">1</ToggleButton>
+                        <ToggleButton value="2">2</ToggleButton>
+                        <ToggleButton value="3">3</ToggleButton>
+                        <ToggleButton value="4">4</ToggleButton>
+                        <ToggleButton value="5">5</ToggleButton>
+                    </ToggleButtonGroup>  
                 </ListItem>
+
+                <Divider />
+                <ListSubheader>Aministración</ListSubheader>
 
                 <ListItem button>
                     <ListItemIcon>
@@ -35,14 +57,6 @@ export const SideMenu = () => {
                     </ListItemIcon>
                     <ListItemText primary={'Perfil'} />
                 </ListItem>
-
-                <ListItem button>
-                    <ListItemIcon>
-                        <ConfirmationNumberOutlined/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Mis Ordenes'} />
-                </ListItem>
-
 
                 <ListItem button sx={{ display: { xs: '', sm: 'none' } }}>
                     <ListItemIcon>
@@ -65,45 +79,12 @@ export const SideMenu = () => {
                     <ListItemText primary={'Niños'} />
                 </ListItem>
 
-
-                <ListItem button>
-                    <ListItemIcon>
-                        <VpnKeyOutlined/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Ingresar'} />
-                </ListItem>
-
-                <ListItem button>
+                <ListItemButton onClick={ logout }>
                     <ListItemIcon>
                         <LoginOutlined/>
                     </ListItemIcon>
-                    <ListItemText primary={'Salir'} />
-                </ListItem>
-
-
-                {/* Admin */}
-                <Divider />
-                <ListSubheader>Admin Panel</ListSubheader>
-
-                <ListItem button>
-                    <ListItemIcon>
-                        <CategoryOutlined/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Productos'} />
-                </ListItem>
-                <ListItem button>
-                    <ListItemIcon>
-                        <ConfirmationNumberOutlined/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Ordenes'} />
-                </ListItem>
-
-                <ListItem button>
-                    <ListItemIcon>
-                        <AdminPanelSettings/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Usuarios'} />
-                </ListItem>
+                    <ListItemText primary={'Cerrar sesión'} />
+                </ListItemButton>              
             </List>
         </Box>
     </Drawer>

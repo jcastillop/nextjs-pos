@@ -2,66 +2,67 @@ import { FC, useEffect, useReducer } from 'react';
 import axios from 'axios';
 import { FuelContext, fuelReducer } from './';
 import { posApi } from '../../api';
-import { render, Printer, Text } from 'react-thermal-printer';
+import { IFuel, IReceptor } from '@/interfaces';
+import { initialReceptor } from '@/database/receptor';
 
-declare global {
-    interface Navigator {
-        serial: any;
-    }
-}
 export interface FuelState {
     children?: React.ReactNode;
     isLoaded: boolean;
-
 }
 
 const CART_INITIAL_STATE: FuelState = {
     isLoaded: false,
 }
 
-type Props = { children?: React.ReactNode };
+type Props = { 
+    children?: React.ReactNode;
+};
 
 export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
 
     const [state, dispatch] = useReducer( fuelReducer , CART_INITIAL_STATE );
 
-    const createOrder = async():Promise<{ hasError: boolean; message: string; }> => {
+    // useEffect(() => {
+        
+    //     const numeroComprobante = state.numeroComprobante;
+    //     const orderSummary = {
+    //         numeroComprobante
+    //     }
+    //     dispatch({ type: '[Cart] - Update order summary', payload: orderSummary });
+    // }, [state.numeroComprobante]);
 
+    const emptyOrder = async() => {
+        dispatch({ type: '[Cart] - Order complete' });
+    }
+        
+    const createOrder = async(tipo: string, receptor : IReceptor, placa: string, id?: number): Promise<{ hasError: boolean; respuesta: any; }> => {
         const body = {
-            "id": "13000",
-            "tipo": "01",
-            "receptor":0,
-            "numero_documento": "1042187637",
-            "razon_social": "Empresa de Jorge Castillo",
-            "direccion": "calle 5 mz m lote 26 los olivos",
-            "correo": "jorge.castillo.pe@gmail.com"
+            "id": id,
+            "tipo": tipo,
+            "tipo_documento": receptor.tipo_documento,
+            "numero_documento": receptor.numero_documento,
+            "razon_social": receptor.razon_social,
+            "direccion": receptor.direccion,
+            "correo": receptor.correo,
+            "placa": placa,
+            "usuario": 1,
         }        
 
         try {
-            console.log("entro a create order de provider")            
-            const { data } = await posApi.post('http://192.168.1.16:8000/api/comprobantes', body);
+            //OBTENIENDO INFO DEL COMPROBANTE
+            const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes`, body);
 
-            console.log(data);
-
-
-            const masdata = await render(
-            <Printer type="epson">
-                <Text>Hello World</Text>
-            </Printer>
-            );
-            
-            const port = await navigator.serial.requestPort();
-            await port.open({ baudRate: 9600 });
-
-            const writer = port.writable?.getWriter();
-            if (writer != null) {
-                await writer.write(masdata);
-                writer.releaseLock();
+            const orderSummary = {
+                numeroComprobante: data.correlativo,
+                codigoHash: data.factura.response.codigo_hash,
+                codigoQr: data.factura.response.cadena_para_codigo_qr
             }
+
+            dispatch({ type: '[Cart] - Update order summary', payload: orderSummary })
 
             return {
                 hasError: false,
-                message: data
+                respuesta: data
             }
 
 
@@ -69,23 +70,38 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             if ( axios.isAxiosError(error) ) {
                 return {
                     hasError: true,
-                    message: error.response?.data.message
+                    respuesta: error.response?.data.message
                 }
             }
             return {
                 hasError: true,
-                message : 'Error no controlado, hable con el administrador ' + error
+                respuesta : 'Error no controlado, hable con el administrador ' + error
             }
         }
 
     }
 
+    const findRuc = async (valor: string): Promise<{ hasError: boolean; receptores: IReceptor[]; }> => {
+
+        const body = {
+            "valor": valor
+        }               
+
+        const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/receptores`, body);
+
+        return {
+            hasError: true,
+            receptores : data.receptores
+        }
+    }
 
     return (
         <FuelContext.Provider value={{
             ...state,
             // Orders
             createOrder,
+            emptyOrder,
+            findRuc
         }}>
             { children }
         </FuelContext.Provider>

@@ -3,7 +3,6 @@ import NextLink from 'next/link';
 import { Box, Card, CardActionArea, CardMedia, Chip, Grid, Link, Typography } from '@mui/material'
 import React, { FC, useMemo, useState } from 'react'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
-import { FuelSelectInvoiceType } from './FuelSelectInvoiceType';
 
 interface Props{
     fuel? : IFuel;
@@ -56,13 +55,14 @@ interface Props{
 
 export const FuelCard: FC<Props> = ({ fuel }) => {
 
-  const [isHovered, setIsHovered] = useState(false);
+  //const [isHovered, setIsHovered] = useState(false);
 
 //   const productImage = useMemo(() => {
 //     return isHovered
 //       ? `products/${ product.images[1] }`
 //       : `products/${ product.images[0] }`
 //   }, [isHovered, product.images])
+
 
   return (
     <Grid item 
@@ -71,14 +71,46 @@ export const FuelCard: FC<Props> = ({ fuel }) => {
     //   onMouseEnter={ () => setIsHovered(true) }
     //   onMouseLeave={ () => setIsHovered(false) }
     >     
-    <Card>
+    <Card style={{
+      padding: '30px 20px',
+      //backgroundColor: '#121212',
+      //borderTop:'2px solid #f9b234',
+      borderTop: `2px solid ${fuel?.styleCombustible}`
+      //border-top: 3px solid var(--red);
+    }}>
       <NextLink href={`/fuel/${fuel?.idAbastecimiento}`} passHref prefetch={false} legacyBehavior>
       <Link>
+        <div style={{
+          position:'relative',
+        }}>
+        <div style={{
+          height: '156px',
+          width: '156px',
+          backgroundColor:`${fuel?.styleCombustible}`,
+          zIndex:1,
+          position:'absolute',
+          top: '-130px',
+          right: '-130px',
+          borderRadius: '50%',
+          WebkitTransition:'all .5s ease',
+          transition:'all .5s ease'
+        }}></div>
         <Box sx={{mt: 1}} className='fadeIn'>
-        <Typography fontWeight={700}>S/.{ '123.123' }</Typography>
-          <Typography fontWeight={700}>{ fuel?.valorTotal }</Typography>
-          <Typography fontWeight={500}>{ fuel?.volTotal }</Typography>
+        <Typography fontWeight={700} style={{
+          //minHeight:'50px',
+          margin:'0 0 15px',
+          overflow: 'hidden',
+          fontWeight: 'bold',
+          fontSize:'30px',
+          //color:'#fff',
+          zIndex:2,
+          position:'relative'
+        }}>S/.{ fuel?.valorTotal }</Typography>
+        <Typography fontWeight={500}>PU : { fuel?.precioUnitario }</Typography>
+          <Typography fontWeight={500}>Galones : { fuel?.volTotal }</Typography>
+          <Typography fontWeight={700}>Producto: { fuel?.descripcionCombustible }</Typography>
         </Box>
+        </div>
       </Link>
       </NextLink>
       {/* <FuelSelectInvoiceType/> */}

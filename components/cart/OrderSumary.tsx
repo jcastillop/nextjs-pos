@@ -10,6 +10,12 @@ export const OrderSumary: FC<Props> = ({ fuel }) => {
   return (
     <Grid container>
         <Grid item xs={6}>
+            <Typography>Producto</Typography>
+        </Grid>
+        <Grid item xs={6} display='flex' justifyContent='end'>
+            <Typography>{ fuel?.descripcionCombustible }</Typography>
+        </Grid>        
+        <Grid item xs={6}>
             <Typography>Cantidad</Typography>
         </Grid>
         <Grid item xs={6} display='flex' justifyContent='end'>
