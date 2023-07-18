@@ -1,9 +1,10 @@
-import { FC, useEffect, useReducer } from 'react';
+import { FC, useReducer } from 'react';
 import axios from 'axios';
 import { FuelContext, fuelReducer } from './';
 import { posApi } from '../../api';
 import { IFuel, IReceptor } from '@/interfaces';
-import { initialReceptor } from '@/database/receptor';
+import { getSession } from 'next-auth/react';
+
 
 export interface FuelState {
     children?: React.ReactNode;
@@ -36,6 +37,9 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
     }
         
     const createOrder = async(tipo: string, receptor : IReceptor, placa: string, id?: number): Promise<{ hasError: boolean; respuesta: any; }> => {
+        
+        const session = await getSession();
+        
         const body = {
             "id": id,
             "tipo": tipo,
@@ -45,7 +49,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             "direccion": receptor.direccion,
             "correo": receptor.correo,
             "placa": placa,
-            "usuario": 1,
+            "usuario": session?.user.id,
         }        
 
         try {
@@ -53,12 +57,11 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes`, body);
 
             const orderSummary = {
-                numeroComprobante: data.correlativo,
-                codigoHash: data.factura.response.codigo_hash,
-                codigoQr: data.factura.response.cadena_para_codigo_qr
+                receptor: data.receptor,
+                comprobante: data.comprobante
             }
 
-            dispatch({ type: '[Cart] - Update order summary', payload: orderSummary })
+            await dispatch({ type: '[Cart] - Update order summary', payload: orderSummary })
 
             return {
                 hasError: false,
@@ -81,18 +84,25 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
 
     }
 
-    const findRuc = async (valor: string): Promise<{ hasError: boolean; receptores: IReceptor[]; }> => {
+    const findRuc = async (valor: string): Promise<{ hasError: boolean; receptores?: IReceptor[]; error: any}> => {
 
-        const body = {
-            "valor": valor
-        }               
-
-        const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/receptores`, body);
-
-        return {
-            hasError: true,
-            receptores : data.receptores
+        try {
+            const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/receptores`, { "valor": valor });
+            return {
+                hasError: false,
+                receptores : data.receptores,
+                error: ''
+            }
+        } catch (error) {
+            return {
+                hasError: true,
+                error: ''
+            }
         }
+
+        
+
+
     }
 
     return (

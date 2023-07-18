@@ -31,7 +31,7 @@ export const SideMenu = () => {
                     </ListItemIcon>
                     <ListItemText primary={'Salir'} />
                 </ListItemButton>                  
-                <Divider />
+                {/* <Divider />
                 <ListSubheader>Filtro de pistolas</ListSubheader>
 
                 <ListItem>
@@ -46,19 +46,14 @@ export const SideMenu = () => {
                         <ToggleButton value="4">4</ToggleButton>
                         <ToggleButton value="5">5</ToggleButton>
                     </ToggleButtonGroup>  
-                </ListItem>
+                </ListItem> */}
 
                 <Divider />
                 <ListSubheader>Aministración</ListSubheader>
 
-                <ListItem button>
-                    <ListItemIcon>
-                        <AccountCircleOutlined/>
-                    </ListItemIcon>
-                    <ListItemText primary={'Perfil'} />
-                </ListItem>
 
-                <ListItem button sx={{ display: { xs: '', sm: 'none' } }}>
+
+                {/* <ListItem button sx={{ display: { xs: '', sm: 'none' } }}>
                     <ListItemIcon>
                         <MaleOutlined/>
                     </ListItemIcon>
@@ -77,7 +72,7 @@ export const SideMenu = () => {
                         <EscalatorWarningOutlined/>
                     </ListItemIcon>
                     <ListItemText primary={'Niños'} />
-                </ListItem>
+                </ListItem> */}
 
                 <ListItemButton onClick={ logout }>
                     <ListItemIcon>

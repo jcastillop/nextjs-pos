@@ -47,7 +47,7 @@ export const FuelNavbar = () => {
               </NextLink>
             </Box>
 
-
+{/* 
             <IconButton>
               <SearchOutlined/>
             </IconButton>
@@ -60,7 +60,7 @@ export const FuelNavbar = () => {
                   </Badge>
                 </IconButton>
               </Link>
-            </NextLink>   
+            </NextLink>    */}
 
             <Button onClick={ toggleSideMenu }>
               Menu

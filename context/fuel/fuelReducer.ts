@@ -1,5 +1,6 @@
-import { IFuel } from '@/interfaces';
+import { IFuel, IReceptor } from '@/interfaces';
 import { FuelState } from '.';
+import { IComprobante } from '@/interfaces/comprobante';
 
 type FuelActionType = 
    | { type: '[Cart] - LoadCart from cookies | storage' } 
@@ -7,9 +8,8 @@ type FuelActionType =
    | { 
       type: '[Cart] - Update order summary', 
       payload: {
-         numeroComprobante: string;
-         codigoHash: string;
-         codigoQr: string;
+         receptor: IReceptor;
+         comprobante: IComprobante;
       }
    }
    | { type: '[Cart] - Order complete' }

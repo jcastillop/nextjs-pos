@@ -8,7 +8,7 @@ import { FullScreenLoading } from '@/components/ui';
 import LoginPage from './auth/login';
 import { AuthContext } from '@/context';
 import { useContext } from 'react';
-import { useSession  } from 'next-auth/react';
+import { getSession, useSession  } from 'next-auth/react';
 
 const HomePage: NextPage = () => {
 
@@ -16,14 +16,12 @@ const HomePage: NextPage = () => {
   const { fuels, isLoading, isError } = useFuels('/abastecimientos',null,null,{ refreshInterval: 3}, '0', '100')
   const { data: session, status } = useSession()
 
-  //console.log(session);
-
   return (
     <>
-      {
+      {/* {
         status === "unauthenticated"?
           <LoginPage/>
-        :
+        : */}
         <FuelLayout title={'Pos - Shop'} pageDescription={'Productos de POS'} imageFullUrl={''}>
              {/* <Typography variant='h1' component = 'h1'>Tienda</Typography> */}
              <Typography variant='h6' sx={{ mb:1 }}>TERMINAL: {session?.user.grifo} - USUARIO: {session?.user.usuario} - ISLA: {session?.user.isla} - JORNADA: {session?.user.jornada}</Typography>
@@ -33,9 +31,27 @@ const HomePage: NextPage = () => {
                : <FuelList fuels={fuels}/>
              }
         </FuelLayout>        
-       }    
+       {/* }     */}
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
+
+  const session = await getSession({ req });
+  const { p = '/auth/login'} = query
+
+  if(!session){
+      return {
+          redirect: {
+              destination: p.toString(),
+              permanent: false
+          }
+      }
+  }
+  return{
+      props: {}
+  }
 }
 
 export default HomePage;

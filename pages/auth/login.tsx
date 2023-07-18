@@ -5,6 +5,7 @@ import { Box, Button, Chip, Grid,Link,TextField,ToggleButton,ToggleButtonGroup,T
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { ErrorOutline } from '@mui/icons-material'
 import { GetServerSideProps } from 'next';
+import router from 'next/router';
 
 type FormData = {
     user: string,
@@ -17,17 +18,22 @@ const LoginPage = () => {
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
     const [ showError, setShowError ] = useState(false);
     const [providers, setProviders] = useState<any>({});
+    //const callbackUrl = (router.query?.callbackUrl as string) ?? "/";    
 
     useEffect(() => {
         getProviders().then( prov => {
-          // console.log({prov});
           setProviders(prov)
         })
       }, [])    
 
     const onSubmit  = async ({ user, password }: FormData) =>{
         setShowError(false);
-        await signIn('credentials',{ user, password });
+        const result = await signIn('credentials',{ user, password, redirect: false });
+        if (result?.error) {
+            console.log("error")
+          } else {
+            router.push("/");
+          }
       }
 
     return (
@@ -99,22 +105,4 @@ const LoginPage = () => {
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
-
-    const session = await getSession({ req });
-
-    const { p = '/'} = query
-
-    if(session){
-        return {
-            redirect: {
-                destination: p.toString(),
-                permanent: false
-            }
-        }
-    }
-    return{
-        props: {}
-    }
-}
 export default LoginPage

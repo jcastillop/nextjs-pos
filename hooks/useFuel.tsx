@@ -5,7 +5,6 @@ import useSWR, { SWRConfiguration } from "swr"
 
 export const useFuel = ( url: string, config: SWRConfiguration = {} ) => {
 
-    // const { data, error, isLoading } = useSWR<Props>(`http://localhost:8000/api${ url }`, fetcher, config);
     const { data, error, isLoading } = useSWR<IFuel>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/abastecimientos${ url }`, config);
 
     let arrTiposCombustible:IKeyValue = {};

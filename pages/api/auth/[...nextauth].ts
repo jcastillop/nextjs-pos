@@ -36,6 +36,8 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: '/auth/login',
+    // error: '/auth/login',
+    // signOut: '/auth/login',
   },  
   jwt: {
     // secret: process.env.JWT_SECRET_SEED, // deprecated
@@ -47,7 +49,6 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     session({ session, token, user }) {
-      //console.log({ session, token, user })
       session.user.id = String(token.id)
       session.user.usuario = String(token.usuario)
       session.user.nombre = String(token.nombre)

@@ -21,7 +21,6 @@ export default function handler(
   }
 }
 const createOrder = async(req: NextApiRequest, res: NextApiResponse<Data>) => {
-  console.log("olis");
   res.status(201).json({ message: 'John Doe' })
 }
 

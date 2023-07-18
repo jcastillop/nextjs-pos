@@ -14,7 +14,6 @@ interface Props {
 
 export const useFuels = ( url: string, desde: string | null, hasta: string | null, config: SWRConfiguration = {}, offset: string = "0", limit: string = "10" ) => {
 
-    // const { data, error, isLoading } = useSWR<Props>(`http://localhost:8000/api${ url }`, fetcher, config);
     const { filterDispensers } = useContext( UiContext );
     const { data, error, isLoading } = useSWR<Props>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api${ url }?offset=${ offset }&limit=${ limit }${ filterDispensers?'&pistola=' + filterDispensers.toString():'' }${ desde?'&desde=' + desde:'' }${ hasta?'&hasta=' + hasta:'' }`, config);
 

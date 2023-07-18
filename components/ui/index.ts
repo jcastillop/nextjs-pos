@@ -1,3 +1,4 @@
+export * from './Alerta';
 export * from './FuelNavbar';
 export * from './SideMenu';
 export * from './ItemCounter';

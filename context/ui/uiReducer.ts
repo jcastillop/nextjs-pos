@@ -9,7 +9,7 @@ type UiActionType =
          filterDispensers: React.SetStateAction<never[]>;
       }
    }
-
+   | { type: '[UI] - ToggleAlert' } 
 
 export const uiReducer = ( state: UiState, action: UiActionType ): UiState => {
 
@@ -19,11 +19,16 @@ export const uiReducer = ( state: UiState, action: UiActionType ): UiState => {
             ...state,
             isMenuOpen: !state.isMenuOpen
         }
-        case '[UI] - FilterSumary':
+      case '[UI] - FilterSumary':
          return {
             ...state,
             ...action.payload
         }
+      case '[UI] - ToggleAlert':
+         return {
+            ...state,
+            isAlertOpen: !state.isAlertOpen
+        }        
        default:
           return state;
    }
