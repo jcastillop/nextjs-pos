@@ -1,4 +1,7 @@
+import { IReceptor } from "./receptor";
+
 export interface IComprobante {
+    Receptore: IReceptor;
     id: number;
     tipo_comprobante: string;
     fecha_emision: string;
@@ -7,6 +10,8 @@ export interface IComprobante {
     tipo_nota: string;
     tipo_documento_afectado: string;
     numeracion_documento_afectado: string;
+    pago_efectivo: number;
+    pago_tarjeta: number;
     motivo_documento_afectado: string;
     total_gravadas: string;
     total_igv: string;
@@ -17,4 +22,6 @@ export interface IComprobante {
     pdf_bytes: string;
     url: string;
     errors: string;
+    volumen: string;
+    dec_combustible: string;
 }

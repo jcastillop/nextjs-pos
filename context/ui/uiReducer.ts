@@ -1,4 +1,6 @@
+import { IAlerta } from '@/interfaces';
 import { UiState } from './';
+import { Constantes } from '@/helpers';
 
 
 type UiActionType = 
@@ -9,7 +11,8 @@ type UiActionType =
          filterDispensers: React.SetStateAction<never[]>;
       }
    }
-   | { type: '[UI] - ToggleAlert' } 
+   | { type: '[UI] - ShowAlert', payload: IAlerta } 
+   | { type: '[UI] - HideAlert'} 
 
 export const uiReducer = ( state: UiState, action: UiActionType ): UiState => {
 
@@ -24,11 +27,25 @@ export const uiReducer = ( state: UiState, action: UiActionType ): UiState => {
             ...state,
             ...action.payload
         }
-      case '[UI] - ToggleAlert':
+      case '[UI] - ShowAlert':
          return {
             ...state,
-            isAlertOpen: !state.isAlertOpen
-        }        
+            alerta: {
+               mensaje: action.payload.mensaje,
+               severity: action.payload.severity,
+               status: true,
+               time: action.payload.time?action.payload.time:Constantes.ALERT_DEFAULT_TIMER
+           }
+        }      
+        case '[UI] - HideAlert':  
+        return {
+         ...state,
+         alerta: {
+            mensaje: state.alerta.mensaje,
+            severity: state.alerta.severity,
+            status: false,
+        }
+     }         
        default:
           return state;
    }

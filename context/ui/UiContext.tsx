@@ -1,16 +1,17 @@
 
 
+import { IAlerta } from '@/interfaces';
 import { createContext } from 'react';
 
 
 interface ContextProps {
     isMenuOpen: boolean;
-    isAlertOpen: boolean;
     filterDispensers?: string[];
-    // Methods
+    alerta: IAlerta;
     setFilterDispensers:(newFormats: React.SetStateAction<never[]>) => void;
     toggleSideMenu: () => void;
-    toggleAlert: () => void;
+    showAlert: (alerta: IAlerta) => void;
+    hideAlert: () => void;
 }
 
 

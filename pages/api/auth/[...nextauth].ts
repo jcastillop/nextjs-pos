@@ -1,5 +1,4 @@
 import { posApi } from "@/api"
-import { AuthContext } from "@/context"
 import { log4js } from "@/helpers/log4js"
 import NextAuth, { NextAuthOptions } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
@@ -23,9 +22,9 @@ export const authOptions: NextAuthOptions = {
             "password": Buffer.from(credentials!.password, 'binary').toString('base64')
           }
 
-          const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/usuarios`, body);
+          const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/usuarios/login`, body);
           if(data){
-            return { id: data.usuario.id, usuario: data.usuario.usuario, correo: data.usuario.correo, nombre: data.usuario.nombre, rol: data.usuario.rol, grifo: data.usuario.grifo, isla: data.usuario.isla, jornada: data.usuario.jornada };
+            return { id: data.usuario.login.UsuarioId, usuario: data.usuario.usuario.usuario, correo: data.usuario.usuario.correo, nombre: data.usuario.usuario.nombre, rol: data.usuario.usuario.rol, grifo: data.usuario.login.terminal, isla: data.usuario.login.isla, jornada: data.usuario.login.jornada };
           }else{
             //return null;
             log4js( "NexthAuthCredentials",data, 'error');
@@ -48,7 +47,7 @@ export const authOptions: NextAuthOptions = {
     updateAge: 86400//cada dia
   },
   callbacks: {
-    session({ session, token, user }) {
+    async session({ session, token, user }) {
       session.user.id = String(token.id)
       session.user.usuario = String(token.usuario)
       session.user.nombre = String(token.nombre)

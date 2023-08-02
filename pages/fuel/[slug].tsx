@@ -1,19 +1,20 @@
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router';
 import { useReactToPrint } from 'react-to-print';
-import { Box, Button, Card, CardContent, Divider, Grid, TextField, Typography, MenuItem, Snackbar, Alert, AlertColor } from '@mui/material'
+import { Box, Button, Card, CardContent, Divider, Grid, TextField, Typography, ToggleButtonGroup, ToggleButton, InputAdornment, IconButton } from '@mui/material'
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+import PaymentsIcon from '@mui/icons-material/Payments';
 
-import { FuelContext } from '@/context'
+import { FuelContext, UiContext } from '@/context'
 import { FuelLayout } from '@/components/layouts'
 import { PrintPos } from '@/components/print/PrintPos'
 import { OrderSumary } from '@/components/cart';
 import { useFuel } from '@/hooks/useFuel';
-import { IReceptor } from '@/interfaces';
 import { getSession } from 'next-auth/react';
 
-
+import { IReceptor } from '@/interfaces';
 
 type FormData = {
     numeroDocumento: string;
@@ -21,38 +22,37 @@ type FormData = {
     direccion: string;
     correo: string;
     placa: string;
-    tipoDocumento: string;
+    comentario: string;
+    tarjeta: number;
+    efectivo: number;
 }
-interface AlertState {
-    state: boolean;
-    mensaje: string;
-    severity: AlertColor;
-    time: number;
-}
+
 const InvoicePage : NextPage = () => {
 
-    const { register, reset, handleSubmit, setValue, formState: { errors } }  = useForm<FormData>({
+    const router = useRouter();
+    const componentRef = useRef();
+    const { showAlert } = useContext( UiContext );
+
+    const { fuel, isLoading, isError } = useFuel(`/${ router.query.slug }`,{ refreshInterval: 0});
+    const { createOrder, findRuc, comprobante, receptor, emptyOrder, cleanOrder, isLoaded } = useContext(FuelContext)
+
+    const { register, reset, handleSubmit, trigger, setValue, getValues, formState: { errors } }  = useForm<FormData>({
         defaultValues: {
             numeroDocumento: '',
             razonSocial: '',
             direccion: '',
             correo: '',
             placa: '',
-            tipoDocumento: '03'
+            comentario: '',
+            tarjeta: 0,
+            efectivo: 0
         }
     });
 
-    const router = useRouter();
-    const { fuel, isLoading, isError } = useFuel(`/${ router.query.slug }`,{ refreshInterval: 0});
-    const { createOrder, comprobante, receptor, emptyOrder, findRuc } = useContext(FuelContext)
-    const [alerta, setAlerta] = useState<AlertState>({state: false, mensaje: '', severity: 'success', time: 3000});
-    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-        if (reason === 'clickaway') {
-          return;
-        }
-        setAlerta({state: false, mensaje: '', severity: 'success', time: 3000})
-    };
-    const componentRef = useRef();
+    useEffect(() => {
+        setValue("efectivo", fuel?.valorTotal||0, { shouldValidate: true });
+    }, [fuel?.valorTotal, setValue])    
+
     const handlePrint = useReactToPrint({
         pageStyle: "@page { size: auto;  margin: 0mm; } @media print { body { -webkit-print-color-adjust: exact; } }",        
         content: () => componentRef.current || null,
@@ -61,142 +61,258 @@ const InvoicePage : NextPage = () => {
             emptyOrder();
             router.push('/');
           }        
-    });    
+    });
+
+    const handleClickMedioPago = () => {
+        const tmpTarjeta = getValues("tarjeta");
+        const tmpEfectivo = getValues("efectivo");
+
+        setValue("efectivo", tmpTarjeta, { shouldValidate: true });
+        setValue("tarjeta", tmpEfectivo, { shouldValidate: true });
+    }
 
     const onSubmitFuel = async (data: FormData) => {
         const receptorForm: IReceptor = {
+            id_receptor: 0,
             numero_documento: data.numeroDocumento,
             tipo_documento: data.numeroDocumento.length===11?6:0,
             razon_social: data.razonSocial,
             direccion: data.direccion,
-            correo: data.correo
+            correo: data.correo,
+            placa: data.placa,
         }     
-        const { hasError, respuesta } = await createOrder(data.tipoDocumento, receptorForm, data.placa, fuel?.idAbastecimiento); 
-        console.log(hasError, respuesta);
 
-        if(!hasError && !respuesta?.factura?.response?.errors){
-            setAlerta({state: true, mensaje: 'Comprobante guardado y enviado a SUNAT', severity: 'success', time: 3000});
+        const { hasError, respuesta } = await createOrder(tipoComprobante, receptorForm, data.comentario, fuel?.descripcionCombustible || "", data.tarjeta, data.efectivo, fuel?.idAbastecimiento); 
+
+        if(!hasError){
+            showAlert({mensaje: respuesta, time: 1500})           
             await setTimeout(function(){      
                 handlePrint();
             }, 2000);
+            
         }else{
-            setAlerta({state: true, mensaje: respuesta?.factura?.response?.errors, severity: 'error', time: 7000});
+            emptyOrder();
+            showAlert({mensaje: respuesta, severity: 'error', time: 7000})
         }
+
     }    
     const checkKeyDown = async (e: React.KeyboardEvent<HTMLFormElement>) => {
         if (e.key === 'Enter'){
             e.preventDefault();
-            const data = await findRuc((e.target as HTMLInputElement).value);
-            if(data.receptores && !data.hasError && data.receptores.length > 0){
-                reset({ razonSocial: '', direccion: '', correo: '', placa: ''});
-                setAlerta({state: true, mensaje: 'Cliente encontrado', severity: 'success', time: 3000});
-                setValue("numeroDocumento", data.receptores[0].numero_documento, { shouldValidate: true });
-                setValue("razonSocial", data.receptores[0].razon_social, { shouldValidate: true });
-                setValue("direccion", data.receptores[0].direccion, { shouldValidate: true });
-            }else{
-                setAlerta({state: true, mensaje: 'Cliente NO encontrado, se registrará un nuevo cliente', severity: 'warning', time: 3000});
+            const bTrigger: boolean = await trigger("numeroDocumento")
+            if(bTrigger){
+                const data = await findRuc((e.target as HTMLInputElement).value);
+                if(data.receptores && !data.hasError && data.receptores.length > 0){
+                    reset({ razonSocial: '', direccion: '', correo: '', placa: ''});
+                    showAlert({mensaje: 'Cliente encontrado'})
+                    setValue("numeroDocumento", data.receptores[0].numero_documento, { shouldValidate: true });
+                    setValue("razonSocial", data.receptores[0].razon_social, { shouldValidate: true });
+                    setValue("direccion", data.receptores[0].direccion, { shouldValidate: true });
+                }else{
+                    showAlert({mensaje: 'Cliente NO encontrado, se registrará un nuevo cliente', severity: 'warning', time: 3000})
+                }
             }
-        }
+            }
+
     };    
 
+    const [tipoComprobante, setTipoComprobante] = useState<string>('03');
+
+    const handleTipoDocumento = (
+      event: React.MouseEvent<HTMLElement>,
+      nuevoTipoDocumento: string,
+    ) => {
+        reset({ numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: ''});
+        setTipoComprobante(nuevoTipoDocumento);
+    };
+
+    const handleTarjetaValueChange = (event: { target: { value: any; }; }) => {
+        const newTarjetaValue = +event.target.value
+        setValue("efectivo", +(((fuel?.valorTotal||0) - newTarjetaValue).toFixed(2)), { shouldValidate: true });
+    };
+
+    const handleEfectivoValueChange = (event: { target: { value: any; }; }) => {
+        const newEfectivoValue = +event.target.value
+        setValue("tarjeta", +(((fuel?.valorTotal||0) - newEfectivoValue).toFixed(2)), { shouldValidate: true });
+    };    
+
+
+
+    // const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    //     const value: number = +event.target.value
+    //     const otherValue: number = +getValues("efectivo")
+    //     const finalValue: number = +(fuel?.valorTotal||0)
+    //     console.log(value);
+    //     console.log(otherValue);
+    //     //if(isNaN(value) && isNaN(otherValue)){
+    //         console.log("entro");
+    //         setValue("efectivo", (finalValue - value), { shouldValidate: true });
+    //         /**
+    //          * 
+    //          *         setValue("efectivo", tmpTarjeta, { shouldValidate: true });
+    //     setValue("tarjeta", tmpEfectivo, { shouldValidate: true });
+    //          */
+    //     //}
+    // }
+
      return (
-         <FuelLayout title='Resumen de compra' pageDescription={'Resumen de la compra'}>
-            <Snackbar open={alerta.state} autoHideDuration={alerta.time} onClose={handleClose}>
-                <Alert onClose={handleClose} variant="filled" severity={alerta.severity} sx={{ width: '100%' }}>
-                    {alerta.mensaje}
-                </Alert>
-            </Snackbar>                                
-             <Typography variant='h1' component='h1'>Detalle de la orden</Typography>
-             <>
-                <div style={{ display: "none" }}>
-                    <PrintPos ref={componentRef} receptor={receptor?receptor:''} comprobante={comprobante?comprobante:''}/>
-                </div>      
+        <FuelLayout title='Resumen de compra' pageDescription={'Resumen de la compra'}>
+            <Typography variant='h1' component='h1'>Detalle de la orden</Typography>
+            <>
+                <PrintPos ref={componentRef} receptor={receptor} comprobante={comprobante}/>
                 <form onSubmit={ handleSubmit( onSubmitFuel ) } onKeyDown={(e) => checkKeyDown(e)}>
                     <Grid container  spacing={2}>
                         <Grid item xs={12} sm={7}>
                             <Card className='sumary-card'>
                                 <CardContent>
-                                    <Typography variant='h2'>Datos del cliente</Typography>
+                                    {/* <Typography variant='h2'>Datos del cliente</Typography>
 
-                                    <Divider sx={{mt: 2}}/>
-                                <Grid container spacing={2} sx={{ mt: 1}}>
-                                    
-                                        <Grid item xs={12} sm={6}>
-                                            <TextField
-                                                //value={valueTipo}
-                                                //onChange={handleChange}
-                                                variant='filled' 
-                                                label='Tipo documento'
-                                                defaultValue={ '03' }
-                                                select
-                                                style={{ width: '100%' }}
-                                                fullWidth
-                                                { ...register('tipoDocumento', {
-                                                    required: 'Este campo es requerido'
-                                                    
-                                                })}                                                
-                                                error={ !!errors.tipoDocumento }
-                                            >
-                                                <MenuItem value={'03'}>Boleta</MenuItem>
-                                                <MenuItem value={'01'}>Factura</MenuItem>
-                                            </TextField>
-                                        </Grid>
+                                    <Divider sx={{mt: 2}}/> */}
+                                    <Grid 
+                                        container
+                                        spacing={0}
+                                        direction="column"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                    >
+                                        <ToggleButtonGroup
+                                            value={tipoComprobante}
+                                            exclusive
+                                            onChange={handleTipoDocumento}
+                                            aria-label="Tipo de documento"        
+                                            sx={{ mt: 1}}                                       
+                                        >
+                                            <ToggleButton value="03">BOLETA</ToggleButton>
+                                            <ToggleButton value="01">FACTURA</ToggleButton>
+                                            <ToggleButton value="50">NOTA DESPACHO</ToggleButton>
+                                            <ToggleButton value="51">CALIBRACION</ToggleButton>
+                                        </ToggleButtonGroup>    
+                                    </Grid>
+                                    <Grid container spacing={2} sx={{ mt: 1}}>
+                                        {/* <Grid item xs={12} sm={6} display={{ xs: (tipoComprobante=='51')?"none":"block" }}> */}
                                         <Grid item xs={12} sm={6}>
                                             <TextField 
-                                                label='RUC' 
-                                                variant='filled' 
-                                                //value={valueRazonSocial} 
-                                                //onChange={handleChangeRazonSocial} 
+                                                label={(tipoComprobante=='03'||tipoComprobante=='51')?'DNI':'RUC'}
+                                                variant='standard' 
                                                 fullWidth
                                                 { ...register('numeroDocumento', {
-                                                    required: 'Este campo es requerido'
-                                                    
+                                                    validate:{
+                                                        required: value => {
+                                                            if (!value) return 'Este campo es requerido';
+                                                            return true;
+                                                          },
+                                                    },
+                                                    pattern: {
+                                                        value: (tipoComprobante=='03'||tipoComprobante=='51')?/^([0-9]{8}|0)$/:/^([0-9]{11})$/,
+                                                        message: `El ${ (tipoComprobante=='03'||tipoComprobante=='51')?'DNI':'RUC' } ingresado es incorrecto`
+                                                      }
                                                 })}
-
-                                                error={ !!errors.razonSocial }
-                                                helperText={ errors.razonSocial?.message }
+                                                InputLabelProps={{ shrink: true }} 
+                                                error={ !!errors.numeroDocumento }
+                                                helperText={ errors.numeroDocumento?.message }
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
                                             <TextField 
-                                                label='Razón social' 
-                                                variant='filled' 
-                                                //value={valueRazonSocial} 
-                                                //onChange={handleChangeRazonSocial} 
+                                                label={(tipoComprobante=='03'||tipoComprobante=='51')?'Nombres':'Razón social'}
+                                                variant='standard' 
                                                 fullWidth
                                                 { ...register('razonSocial', {
                                                     required: 'Este campo es requerido'
                                                     
                                                 })}
+                                                InputLabelProps={{ shrink: true }}
                                                 error={ !!errors.razonSocial }
                                                 helperText={ errors.razonSocial?.message }
                                             />
                                         </Grid>
-                                        <Grid item xs={12} sm={6}>
+                                        <Grid item xs={12} sm={6} display={{ xs: (tipoComprobante=='03'||tipoComprobante=='51')?"none":"block" }}>
                                             <TextField 
                                                 label='Direccion' 
-                                                variant='filled' 
-                                                //value={valueDireccion} 
-                                                //onChange={handleChangeDireccion} 
+                                                variant='standard' 
+                                                InputLabelProps={{ shrink: true }} 
                                                 fullWidth
                                                 { ...register('direccion')}
                                                 error={ !!errors.direccion }
                                                 helperText={ errors.direccion?.message }
                                             />
                                         </Grid>                                 
-                                        <Grid item xs={12} sm={6}>
+                                        <Grid item xs={12} sm={6} display={{ xs: (tipoComprobante=='03'||tipoComprobante=='51')?"none":"block" }}>
                                             <TextField 
-                                                label='Placa del vehículo' 
-                                                variant='filled' 
-                                                //value={valuePlaca} 
-                                                //onChange={handleChangePlaca} 
+                                                label='Placa' 
+                                                variant='standard' 
+                                                InputLabelProps={{ shrink: true }} 
                                                 fullWidth
                                                 { ...register('placa')}
                                                 error={ !!errors.placa }
                                                 helperText={ errors.placa?.message }                                            
                                             />
                                         </Grid>
-
+                                        <Grid item xs={12} sm={12}>
+                                            <TextField 
+                                                label='Comentarios' 
+                                                variant='standard' 
+                                                InputLabelProps={{ shrink: true }} 
+                                                fullWidth
+                                                { ...register('comentario')}
+                                                error={ !!errors.comentario }
+                                                helperText={ errors.comentario?.message }                                            
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6} sm={6}>
+                                            <TextField
+                                                label="Tarjeta"
+                                                variant="standard"
+                                                type='number'
+                                                fullWidth
+                                                { ...register('tarjeta')}
+                                                error={ !!errors.tarjeta }
+                                                helperText={ errors.tarjeta?.message }
+                                                onChange={handleTarjetaValueChange}
+                                                inputProps={{
+                                                    maxLength: 5,
+                                                    step: 0.01
+                                                }}
+                                                InputProps={{
+                                                    startAdornment: (
+                                                        <InputAdornment position="start">
+                                                            <IconButton aria-label="toggle password visibility" onClick={handleClickMedioPago}>
+                                                                <CreditCardIcon color="secondary"/>
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />                                         
+                                        </Grid>
+                                        <Grid item xs={6} sm={6}>
+                                            <TextField
+                                                label="Efectivo"
+                                                variant='standard' 
+                                                type='number'
+                                                fullWidth
+                                                { ...register('efectivo')}
+                                                error={ !!errors.efectivo }
+                                                helperText={ errors.efectivo?.message }  
+                                                onChange={handleEfectivoValueChange}
+                                                inputProps={{
+                                                    maxLength: 5,
+                                                    step: 0.01
+                                                }}                                                                                           
+                                                InputProps={{
+                                                    startAdornment: (
+                                                        <InputAdornment position="start">
+                                                            <IconButton
+                                                                aria-label="toggle password visibility"
+                                                                onClick={handleClickMedioPago}
+                                                            >
+                                                                <PaymentsIcon color="success"/>
+                                                            </IconButton>                                                            
+                                                            
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />  
+                                        </Grid>
                                     </Grid>
                             </CardContent>
                             </Card>
@@ -205,9 +321,7 @@ const InvoicePage : NextPage = () => {
                             <Card className='sumary-card'>
                                 <CardContent>
                                     <Typography variant='h2'>Resumen</Typography>
-
                                     <Divider sx={{mt: 2, mb: 2}}/>
-
                                     <OrderSumary fuel={fuel}/>
                                 </CardContent>
                             </Card>
@@ -218,15 +332,28 @@ const InvoicePage : NextPage = () => {
                             color='secondary'
                             className='circular-btn'
                             fullWidth
-                            //onClick={ onCreateInvoice }
+                            disabled={isLoaded}
                             type='submit'
-                        >
+                        >                           
                             Confirmar orden
                         </Button>
                     </Box>
                 </form>
+                {/* <Button
+                    onClick={() =>{
+                        console.log("inicio");
+                        showAlert({
+                            mensaje: 'olis',
+                            severity: 'error',
+                        })
+                    }}                
+                    color='success'
+                    className='circular-btn'
+                    type='button'
+                >                           
+                    Test
+                </Button> */}
             </>
-
          </FuelLayout>
        )
 }

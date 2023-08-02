@@ -1,14 +1,12 @@
 import { GetServerSideProps, NextPage } from 'next'
-import { Card, Grid, Typography, CardActionArea, CardMedia } from '@mui/material';
+import { Typography } from '@mui/material';
 
+import { FullScreenLoading } from '@/components/ui';
 import { FuelLayout } from '@/components/layouts';
 import { FuelList } from '@/components/fuel/FuelList';
-import { useFuels } from '@/hooks';
-import { FullScreenLoading } from '@/components/ui';
-import LoginPage from './auth/login';
-import { AuthContext } from '@/context';
-import { useContext } from 'react';
+
 import { getSession, useSession  } from 'next-auth/react';
+import { useFuels } from '@/hooks';
 
 const HomePage: NextPage = () => {
 
@@ -18,13 +16,8 @@ const HomePage: NextPage = () => {
 
   return (
     <>
-      {/* {
-        status === "unauthenticated"?
-          <LoginPage/>
-        : */}
         <FuelLayout title={'Pos - Shop'} pageDescription={'Productos de POS'} imageFullUrl={''}>
-             {/* <Typography variant='h1' component = 'h1'>Tienda</Typography> */}
-             <Typography variant='h6' sx={{ mb:1 }}>TERMINAL: {session?.user.grifo} - USUARIO: {session?.user.usuario} - ISLA: {session?.user.isla} - JORNADA: {session?.user.jornada}</Typography>
+             <Typography variant='h6' sx={{ mb:1 }}>{session?.user.grifo} - {session?.user.isla} - {session?.user.usuario} - {session?.user.jornada}</Typography>
             {
                isLoading
                ? <FullScreenLoading/>

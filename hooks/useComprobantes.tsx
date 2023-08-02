@@ -1,5 +1,6 @@
+import { posApi } from '@/api';
 import { UiContext } from '@/context';
-import { IFuel, IKeyValue } from '@/interfaces';
+import { IComprobante, IFuel, IKeyValue } from '@/interfaces';
 import { useContext } from 'react';
 import useSWR, { SWRConfiguration } from "swr"
 
@@ -7,16 +8,21 @@ interface Props {
   comprobantes: any;
 }
 
-// const fetcher = (...args: [key: string]) => fetch(...args).then(res => res.json())
-// eslint-disable-next-line react-hooks/rules-of-hooks
+export const listarHistorico = async(idUsuario: number):Promise<{ hasError: boolean; comprobantes?: IComprobante[]; }> => {
+  try {
+      const body = {
+          "idUsuario": idUsuario
+      }
+      const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/historico`, body);
+      return {
+          hasError: false,
+          comprobantes: data.comprobantes
+      }
 
-//const { data } = await posApi.get(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes`);
-export const useComprobantes = ( config: SWRConfiguration = {}) => {
-
-    const { data } = useSWR<Props>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes`, config);
-
-    return{
-      comprobantes: data
-    }
+  } catch (error) {
+      return {
+          hasError: true
+      }
+  }
 
 }

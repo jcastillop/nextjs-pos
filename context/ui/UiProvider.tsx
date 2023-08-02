@@ -1,9 +1,17 @@
 import { FC, ReactNode, useReducer } from 'react';
 import { UiContext, uiReducer } from './';
+import { AlertColor } from '@mui/material';
+import { IAlerta } from '@/interfaces';
+import { Constantes } from '@/helpers';
 
 export interface UiState {
     isMenuOpen: boolean;
+    alerta: IAlerta;
+    /*
     isAlertOpen: boolean;
+    messageAlert: string;
+    severityAlert: AlertColor;
+    */
 }
 
 interface Props{
@@ -12,7 +20,19 @@ interface Props{
 
 const UI_INITIAL_STATE: UiState = {
     isMenuOpen: false,
-    isAlertOpen: false
+    alerta: {
+        mensaje: '',
+        severity: 'success',
+        status: false,
+        time: Constantes.ALERT_DEFAULT_TIMER
+    }
+
+
+    /*
+    isAlertOpen: false,
+    messageAlert: '',
+    severityAlert: 'success'
+    */
 }
 
 export const UiProvider:FC<Props> = ({ children }) => {
@@ -23,9 +43,13 @@ export const UiProvider:FC<Props> = ({ children }) => {
         dispatch({ type: '[UI] - ToggleMenu' });
     }
 
-    const toggleAlert = () => {
-        dispatch({ type: '[UI] - ToggleAlert' });
+    const showAlert = (alerta: IAlerta) => {
+        dispatch({ type: '[UI] - ShowAlert', payload: alerta });
     }
+
+    const hideAlert = () => {
+        dispatch({ type: '[UI] - HideAlert' });
+    }    
 
     const setFilterDispensers = (newFormats: React.SetStateAction<never[]>) => {
         const filterDispensers = newFormats 
@@ -41,7 +65,8 @@ export const UiProvider:FC<Props> = ({ children }) => {
             // Methods
             setFilterDispensers,
             toggleSideMenu,
-            toggleAlert,
+            showAlert,
+            hideAlert,
         }}>
             { children }
         </UiContext.Provider>

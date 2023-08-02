@@ -19,25 +19,6 @@ export const useFuels = ( url: string, desde: string | null, hasta: string | nul
 
     const fuels = data?.abastecimientos || [];
 
-    let arrTiposCombustible:IKeyValue = {};
-    let arrStylesCombustible:IKeyValue = {};
-
-    if(process.env.NEXT_PUBLIC_COD_COMBUSTIBLE && process.env.NEXT_PUBLIC_DESC_COMBUSTIBLE && process.env.NEXT_PUBLIC_STYLE_COMBUSTIBLE){
-        const LIST_COD = JSON.parse(process.env.NEXT_PUBLIC_COD_COMBUSTIBLE)
-        const LIST_DES = JSON.parse(process.env.NEXT_PUBLIC_DESC_COMBUSTIBLE)
-        const LIST_STYLE = JSON.parse(process.env.NEXT_PUBLIC_STYLE_COMBUSTIBLE)
-        var i:number = 0;
-        for (let i = 0; i < LIST_COD.length; i++) {
-            arrTiposCombustible[LIST_COD[i]] = LIST_DES[i]; 
-            arrStylesCombustible[LIST_COD[i]] = LIST_STYLE[i]; 
-        }
-    }
-
-    fuels.map( fuel => (
-        fuel.descripcionCombustible = arrTiposCombustible[fuel.codigoCombustible],
-        fuel.styleCombustible= arrStylesCombustible[fuel.codigoCombustible]
-    ) )
-
     return{
         fuels: fuels,
         isLoading,

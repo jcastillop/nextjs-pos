@@ -5,6 +5,7 @@ import type { AppProps } from 'next/app'
 import { SWRConfig } from 'swr'
 import { AuthProvider, FuelProvider, UiProvider } from '../context'
 import { SessionProvider } from 'next-auth/react'
+import { Alerta } from '@/components/ui'
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -15,16 +16,17 @@ export default function App({ Component, pageProps }: AppProps) {
     }}>
       
       <SessionProvider>
-        <AuthProvider>
+        {/* <AuthProvider> */}
           <FuelProvider isLoaded={false}>
             <UiProvider>
               <ThemeProvider theme={ lightTheme }>
                 <CssBaseline/>
+                <Alerta/>
                 <Component {...pageProps} />
               </ThemeProvider>
             </UiProvider>
           </FuelProvider>
-        </AuthProvider>
+        {/* </AuthProvider> */}
       </SessionProvider>
       
     </SWRConfig>

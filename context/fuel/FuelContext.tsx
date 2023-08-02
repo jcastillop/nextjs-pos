@@ -1,14 +1,19 @@
 import { createContext } from 'react';
-import { IFuel, IReceptor } from '@/interfaces';
-import { IComprobante } from '@/interfaces/comprobante';
-
+import { IComprobante, IReceptor, IUser } from '@/interfaces';
 interface ContextProps {
     isLoaded: boolean;
-    receptor?: IReceptor;
-    comprobante?: IComprobante;
-    createOrder: (tipo: string, receptor: IReceptor, placa: string, id?:number) => Promise<{ hasError: boolean; respuesta: any; }>;
+    receptor: IReceptor;
+    comprobante: IComprobante;
+    createOrder: (tipo: string, receptor: IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, id?:number) => Promise<{ hasError: boolean; respuesta: any; }>;
     emptyOrder: any;
+    cleanOrder: any;
     findRuc: (valor: string) => Promise<{ hasError: boolean; receptores?: IReceptor[]; error: any; }>;
+    createCierre: (id: number, fecha : Date) => Promise<{ hasError: boolean; message: string; }>;
+    listarHistorico: (idUsuario: number) => Promise<{ hasError: boolean; comprobantes?: IComprobante[] }>;
+    listarUsuarios: () => Promise<{ hasError: boolean; usuarios?: IUser[] }>;
+    guardarUsuario: (usuario: IUser) => Promise<{ hasError: boolean; message: string; usuario?: IUser[]; }>;
+    reiniciarPassword: (usuario: IUser) => Promise<{ hasError: boolean; message: string; }>;
+    cambiarPassword: (id: number, password: string) => Promise<{ hasError: boolean; message: string; }>;
 }
 
 

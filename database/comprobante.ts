@@ -18,5 +18,16 @@ export const initialComprobante: IComprobante = {
     codigo_hash: "",
     pdf_bytes: "",
     url: "",
-    errors: ""
+    errors: "",
+    Receptore: {
+        id_receptor: 0,
+        tipo_documento: 0,
+        numero_documento: "",
+        razon_social: "",
+        direccion: "",
+        correo: "",
+        placa: ""
+    },
+    pago_efectivo: 0,
+    pago_tarjeta: 0
 }

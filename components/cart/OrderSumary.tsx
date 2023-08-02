@@ -1,5 +1,5 @@
 import { IFuel } from "@/interfaces"
-import { Grid, Typography } from "@mui/material"
+import { Divider, Grid, Typography } from "@mui/material"
 import { FC } from "react"
 
 interface Props{
@@ -12,19 +12,19 @@ export const OrderSumary: FC<Props> = ({ fuel }) => {
         <Grid item xs={6}>
             <Typography>Producto</Typography>
         </Grid>
-        <Grid item xs={6} display='flex' justifyContent='end'>
-            <Typography>{ fuel?.descripcionCombustible }</Typography>
+        <Grid item xs={6} display='flex' justifyContent='end' sx={{ mb: 2}}>
+            <Typography variant='h5'>{ fuel?.descripcionCombustible }</Typography>
         </Grid>        
         <Grid item xs={6}>
             <Typography>Cantidad</Typography>
         </Grid>
-        <Grid item xs={6} display='flex' justifyContent='end'>
+        <Grid item xs={6} display='flex' justifyContent='end' sx={{ mb: 2}}>
             <Typography>{ fuel?.volTotal }</Typography>
         </Grid>
         <Grid item xs={6}>
             <Typography>Precio</Typography>
         </Grid>
-        <Grid item xs={6} display='flex' justifyContent='end'>
+        <Grid item xs={6} display='flex' justifyContent='end' sx={{ mb: 2}}>
             <Typography>{ fuel?.precioUnitario }</Typography>
         </Grid>        
         <Grid item xs={6}>
@@ -33,10 +33,13 @@ export const OrderSumary: FC<Props> = ({ fuel }) => {
         <Grid item xs={6} display='flex' justifyContent='end'>
             <Typography>{ (((fuel?fuel.valorTotal:0)/1.18)*0.18).toFixed(2) }</Typography>
         </Grid>
-        <Grid item xs={6} sx={{ mt:2 }}>
+        <Grid item xs={12}>
+            <Divider sx={{mt: 2, mb: 2}}/>
+        </Grid>
+        <Grid item xs={6}>
             <Typography variant="subtitle1">Total:</Typography>
         </Grid>
-        <Grid item xs={6} sx={{ mt:2 }} display='flex' justifyContent='end'>
+        <Grid item xs={6} display='flex' justifyContent='end'>
             <Typography variant="subtitle1">{ fuel?.valorTotal }</Typography>
         </Grid>
     </Grid>

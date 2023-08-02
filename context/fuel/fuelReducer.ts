@@ -1,9 +1,9 @@
 import { IFuel, IReceptor } from '@/interfaces';
-import { FuelState } from '.';
+import { FuelState, RECEPTOR_INITIAL } from '.';
 import { IComprobante } from '@/interfaces/comprobante';
 
 type FuelActionType = 
-   | { type: '[Cart] - LoadCart from cookies | storage' } 
+   | { type: '[Cart] - LoadCart fuel' } 
    | { type: '[Cart] - Update fuel', payload: IFuel }
    | { 
       type: '[Cart] - Update order summary', 
@@ -12,7 +12,9 @@ type FuelActionType =
          comprobante: IComprobante;
       }
    }
-   | { type: '[Cart] - Order complete' }
+   | { type: '[Cart] - Fuel complete' }
+   | { type: '[Cart] - Fuel processing' }
+   | { type: '[Cart] - Fuel clean' }
 
 export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelState => {
 
@@ -27,10 +29,21 @@ export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelSta
                ...state,
                ...action.payload
             }         
-         case '[Cart] - Order complete':
+         case '[Cart] - Fuel complete':
             return {
-               ...state
+               ...state,
+               isLoaded: false        
             }
+         case '[Cart] - Fuel clean':
+            return {
+               ...state,
+               receptor: RECEPTOR_INITIAL        
+            }            
+         case '[Cart] - Fuel processing':
+            return {
+               ...state,
+               isLoaded: true
+            }            
       
        default:
           return state;

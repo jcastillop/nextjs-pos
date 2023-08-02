@@ -55,7 +55,8 @@ const LoginPage = () => {
                         <TextField
                             type="text"
                             label="Usuario"
-                            variant="filled"
+                            variant="outlined"
+                            InputLabelProps={{ shrink: true }} 
                             fullWidth 
                             { ...register('user', {
                                 required: 'Este campo es requerido'
@@ -69,8 +70,8 @@ const LoginPage = () => {
                         <TextField 
                             label='Codigo' 
                             type='password' 
-                            //inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} 
-                            variant='filled' 
+                            InputLabelProps={{ shrink: true }} 
+                            variant='outlined' 
                             fullWidth 
                             { ...register('password', {
                                 required: 'Este campo es requerido',

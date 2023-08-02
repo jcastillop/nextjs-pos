@@ -18,5 +18,6 @@ declare module "next-auth" {
         grifo?: string;
         isla?: string;
         jornada?: string;
+        otro?: string;
     }
   }
