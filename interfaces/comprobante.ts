@@ -24,4 +24,8 @@ export interface IComprobante {
     errors: string;
     volumen: string;
     dec_combustible: string;
+    codigo_combustible: string;
+    placa: string;
+    billete: number;
+    producto_precio: string;
 }

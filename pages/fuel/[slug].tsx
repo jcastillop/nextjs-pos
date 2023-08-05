@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router';
 import { useReactToPrint } from 'react-to-print';
-import { Box, Button, Card, CardContent, Divider, Grid, TextField, Typography, ToggleButtonGroup, ToggleButton, InputAdornment, IconButton } from '@mui/material'
+import { Box, Button, Card, CardContent, Divider, Grid, TextField, Typography, ToggleButtonGroup, ToggleButton, InputAdornment, IconButton, Dialog, DialogActions, DialogTitle, DialogContentText, DialogContent } from '@mui/material'
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import PaymentsIcon from '@mui/icons-material/Payments';
 
@@ -15,6 +15,8 @@ import { useFuel } from '@/hooks/useFuel';
 import { getSession } from 'next-auth/react';
 
 import { IReceptor } from '@/interfaces';
+import constantes from '@/helpers/constantes';
+import { AutorizacionDialog } from '@/components/admin/AutorizacionDialog';
 
 type FormData = {
     numeroDocumento: string;
@@ -27,6 +29,11 @@ type FormData = {
     efectivo: number;
 }
 
+type CalibracionData = {
+    open: boolean;
+    state: boolean;
+}
+
 const InvoicePage : NextPage = () => {
 
     const router = useRouter();
@@ -34,24 +41,30 @@ const InvoicePage : NextPage = () => {
     const { showAlert } = useContext( UiContext );
 
     const { fuel, isLoading, isError } = useFuel(`/${ router.query.slug }`,{ refreshInterval: 0});
+
     const { createOrder, findRuc, comprobante, receptor, emptyOrder, cleanOrder, isLoaded } = useContext(FuelContext)
 
     const { register, reset, handleSubmit, trigger, setValue, getValues, formState: { errors } }  = useForm<FormData>({
         defaultValues: {
-            numeroDocumento: '',
-            razonSocial: '',
-            direccion: '',
-            correo: '',
-            placa: '',
-            comentario: '',
-            tarjeta: 0,
-            efectivo: 0
+            numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: '', tarjeta: 0, efectivo: 0
         }
     });
 
     useEffect(() => {
         setValue("efectivo", fuel?.valorTotal||0, { shouldValidate: true });
     }, [fuel?.valorTotal, setValue])    
+
+    const [tipoComprobante, setTipoComprobante] = useState<string>('03');
+
+    const [openAlertaCalibracion, setOpenAlertaCalibracion] = useState<CalibracionData>({open: false, state: false});
+
+    useEffect(() => {
+        if(openAlertaCalibracion.state){
+            setTipoComprobante(constantes.TipoComprobante.Calibracion);
+            reset({ numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: ''});
+        }
+    }, [openAlertaCalibracion, reset])
+    
 
     const handlePrint = useReactToPrint({
         pageStyle: "@page { size: auto;  margin: 0mm; } @media print { body { -webkit-print-color-adjust: exact; } }",        
@@ -85,7 +98,7 @@ const InvoicePage : NextPage = () => {
         const { hasError, respuesta } = await createOrder(tipoComprobante, receptorForm, data.comentario, fuel?.descripcionCombustible || "", data.tarjeta, data.efectivo, fuel?.idAbastecimiento); 
 
         if(!hasError){
-            showAlert({mensaje: respuesta, time: 1500})           
+            showAlert({mensaje: respuesta, time: 1500})         
             await setTimeout(function(){      
                 handlePrint();
             }, 2000);
@@ -96,6 +109,7 @@ const InvoicePage : NextPage = () => {
         }
 
     }    
+    
     const checkKeyDown = async (e: React.KeyboardEvent<HTMLFormElement>) => {
         if (e.key === 'Enter'){
             e.preventDefault();
@@ -116,14 +130,17 @@ const InvoicePage : NextPage = () => {
 
     };    
 
-    const [tipoComprobante, setTipoComprobante] = useState<string>('03');
-
     const handleTipoDocumento = (
       event: React.MouseEvent<HTMLElement>,
       nuevoTipoDocumento: string,
     ) => {
-        reset({ numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: ''});
-        setTipoComprobante(nuevoTipoDocumento);
+        
+        if(nuevoTipoDocumento == constantes.TipoComprobante.Calibracion){
+            setOpenAlertaCalibracion({open: true, state: false});
+        }else{
+            setTipoComprobante(nuevoTipoDocumento);
+            reset({ numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: ''});
+        }        
     };
 
     const handleTarjetaValueChange = (event: { target: { value: any; }; }) => {
@@ -136,28 +153,10 @@ const InvoicePage : NextPage = () => {
         setValue("tarjeta", +(((fuel?.valorTotal||0) - newEfectivoValue).toFixed(2)), { shouldValidate: true });
     };    
 
-
-
-    // const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    //     const value: number = +event.target.value
-    //     const otherValue: number = +getValues("efectivo")
-    //     const finalValue: number = +(fuel?.valorTotal||0)
-    //     console.log(value);
-    //     console.log(otherValue);
-    //     //if(isNaN(value) && isNaN(otherValue)){
-    //         console.log("entro");
-    //         setValue("efectivo", (finalValue - value), { shouldValidate: true });
-    //         /**
-    //          * 
-    //          *         setValue("efectivo", tmpTarjeta, { shouldValidate: true });
-    //     setValue("tarjeta", tmpEfectivo, { shouldValidate: true });
-    //          */
-    //     //}
-    // }
-
-     return (
+    return (
         <FuelLayout title='Resumen de compra' pageDescription={'Resumen de la compra'}>
             <Typography variant='h1' component='h1'>Detalle de la orden</Typography>
+            <AutorizacionDialog open={openAlertaCalibracion} setOpen={setOpenAlertaCalibracion}/>
             <>
                 <PrintPos ref={componentRef} receptor={receptor} comprobante={comprobante}/>
                 <form onSubmit={ handleSubmit( onSubmitFuel ) } onKeyDown={(e) => checkKeyDown(e)}>
@@ -237,7 +236,7 @@ const InvoicePage : NextPage = () => {
                                                 helperText={ errors.direccion?.message }
                                             />
                                         </Grid>                                 
-                                        <Grid item xs={12} sm={6} display={{ xs: (tipoComprobante=='03'||tipoComprobante=='51')?"none":"block" }}>
+                                        <Grid item xs={12} sm={6} display={{ xs: (tipoComprobante=='51')?"none":"block" }}>
                                             <TextField 
                                                 label='Placa' 
                                                 variant='standard' 
@@ -339,23 +338,9 @@ const InvoicePage : NextPage = () => {
                         </Button>
                     </Box>
                 </form>
-                {/* <Button
-                    onClick={() =>{
-                        console.log("inicio");
-                        showAlert({
-                            mensaje: 'olis',
-                            severity: 'error',
-                        })
-                    }}                
-                    color='success'
-                    className='circular-btn'
-                    type='button'
-                >                           
-                    Test
-                </Button> */}
             </>
          </FuelLayout>
-       )
+    )
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{

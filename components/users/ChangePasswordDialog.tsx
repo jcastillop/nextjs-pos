@@ -6,11 +6,7 @@ import { FuelContext, UiContext } from '@/context';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 
-interface Props{
-    user? : IUser;
-}
-
-export const ChangePasswordDialog: FC<Props> = ({ }) => {
+export const ChangePasswordDialog = ({ }) => {
     
     const { cambiarPassword } = useContext(FuelContext)
     const { showAlert } = useContext( UiContext );
@@ -32,8 +28,7 @@ export const ChangePasswordDialog: FC<Props> = ({ }) => {
         const { hasError, message } = await cambiarPassword(id, data.password);
         showAlert({mensaje: message, severity: hasError? 'error':'success', time: 1500})
         handleClose();
-        router.push('/perfil');   
-
+        router.push('/perfil');
     }
 
     const [open, setOpen] = useState(false);
@@ -49,16 +44,15 @@ export const ChangePasswordDialog: FC<Props> = ({ }) => {
     return (
         <div>
         <Button color="secondary" onClick={handleClickOpen} >
-            Reiniciar
+            Cambiar
         </Button>   
      
         <Dialog open={open} onClose={handleClose}>
             <form onSubmit={ handleSubmit( onSubmitUser ) }>
-            <DialogTitle>{`Reinicio de contraseña`}</DialogTitle>
+            <DialogTitle>{`Cambio de contraseña`}</DialogTitle>
             <DialogContent>
-                <DialogContentText>
                 <TextField 
-                    label={'Nombres'}
+                    label={'Contraseña'}
                     type='password' 
                     variant='standard' 
                     fullWidth
@@ -73,7 +67,6 @@ export const ChangePasswordDialog: FC<Props> = ({ }) => {
                 <Typography variant="subtitle2"  style={{color: 'blue'}}>
                     Usted no podrá revertir esta operación.
                 </Typography>
-                </DialogContentText>
             </DialogContent>
             <DialogActions>
             <Button

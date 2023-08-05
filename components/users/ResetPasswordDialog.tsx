@@ -58,10 +58,11 @@ export const ResetPasswordDialog: FC<Props> = ({ user }) => {
             <DialogContent>
                 <DialogContentText>
                 Esta creiniciando la contraseña del usuario {user?.usuario}. Esta seguro ?
+                </DialogContentText>
                 <Typography variant="subtitle2"  style={{color: 'blue'}}>
                     Usted no podrá revertir esta operación.
                 </Typography>
-                </DialogContentText>
+                
             </DialogContent>
             <DialogActions>
             <Button

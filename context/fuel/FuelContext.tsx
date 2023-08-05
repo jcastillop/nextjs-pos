@@ -8,12 +8,15 @@ interface ContextProps {
     emptyOrder: any;
     cleanOrder: any;
     findRuc: (valor: string) => Promise<{ hasError: boolean; receptores?: IReceptor[]; error: any; }>;
-    createCierre: (id: number, fecha : Date) => Promise<{ hasError: boolean; message: string; }>;
+    createCierre: (id: number, fecha : Date, turno : string, isla : string, efectivo: number, tarjeta: number) => Promise<{ hasError: boolean; message: string; }>;
+    createCierreDia: (id: number) => Promise<{ hasError: boolean; message: string; }>;
     listarHistorico: (idUsuario: number) => Promise<{ hasError: boolean; comprobantes?: IComprobante[] }>;
     listarUsuarios: () => Promise<{ hasError: boolean; usuarios?: IUser[] }>;
     guardarUsuario: (usuario: IUser) => Promise<{ hasError: boolean; message: string; usuario?: IUser[]; }>;
     reiniciarPassword: (usuario: IUser) => Promise<{ hasError: boolean; message: string; }>;
     cambiarPassword: (id: number, password: string) => Promise<{ hasError: boolean; message: string; }>;
+    validarAdministrador: (password: string) => Promise<{ hasSuccess: boolean; message: string; }>;
+    obtenerCierres: (fecha : Date) => Promise<{ total: number; cierres: any;}>;
 }
 
 

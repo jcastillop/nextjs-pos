@@ -4,7 +4,7 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } fro
 
 import { FuelLayout } from '@/components/layouts'
 import { GetServerSideProps, NextPage } from 'next'
-import { getSession } from 'next-auth/react'
+import { getSession, useSession } from 'next-auth/react'
 import { useReactToPrint } from 'react-to-print'
 import { useRouter } from 'next/router'
 import { IPrintPosProps, PrintPos } from '@/components/print/PrintPos'
@@ -17,6 +17,7 @@ import { posApi } from '@/api'
 import { FuelContext } from '@/context'
 import { initialData } from '../../database/products';
 import constantes from '@/helpers/constantes'
+import { Print } from '@/components/print/Pint'
 
 interface TotalizadoresState {
   totalEfectivo: number;
@@ -33,10 +34,11 @@ const HistoricoPage: NextPage = () => {
   const { listarHistorico } = useContext(FuelContext)
   const [totalizadores, setTotalizadores] = useState(TOTAL_INITIAL_STATE)
   const [comprobantes, setComprobantes] = useState<any[]>()
+  const { data: session, status } = useSession()
 
   useEffect(() => {
     const callAPI = async () => {
-      const session = await getSession();
+
       const idUsuario: number = +(session?.user.id||0)
       const { hasError, comprobantes} = await listarHistorico(idUsuario);
       const { totalEfectivo, totalTarjeta } : TotalizadoresState = comprobantes?.filter(({tipo_comprobante}) => (tipo_comprobante == constantes.TipoComprobante.Factura || tipo_comprobante == constantes.TipoComprobante.Boleta)).map(comprobante => ({ totalEfectivo: comprobante.pago_efectivo, totalTarjeta: comprobante.pago_tarjeta })).reduce((a, b) => {
@@ -49,7 +51,7 @@ const HistoricoPage: NextPage = () => {
       setTotalizadores({ totalEfectivo, totalTarjeta }) 
     }
     callAPI()
-  }, [listarHistorico]);
+  }, [listarHistorico, session]);
   
   const [printObject, setPrintObject] = useState<IPrintPosProps>({receptor: initialReceptor, comprobante: initialComprobante})
 
@@ -122,6 +124,10 @@ const HistoricoPage: NextPage = () => {
                   tipo_moneda:"",
                   dec_combustible:params.row.combustible,
                   volumen:params.row.volumen,
+                  placa:params.row.placa,
+                  billete:0,
+                  producto_precio:params.row.precio,
+                  codigo_combustible:params.row.codcombustible,
                   Receptore: {
                     id_receptor: 0,
                     tipo_documento: 0,
@@ -173,7 +179,10 @@ const HistoricoPage: NextPage = () => {
       documento   : comprobante["Receptore.numero_documento"],
       tipo        : comprobante.tipo_comprobante,
       volumen     : comprobante.volumen,
-      combustible : comprobante.dec_combustible
+      combustible : comprobante.dec_combustible,
+      placa       : comprobante.placa,
+      precio      : comprobante.producto_precio,
+      codcombustible: comprobante.codigo_combustible,
   }));
 
   
@@ -182,7 +191,16 @@ const HistoricoPage: NextPage = () => {
     <>
       <FuelLayout title={'Pos - Shop'} pageDescription={'Productos de POS'} imageFullUrl={''}>
         <Typography variant='h1' component = 'h1'>Histórico de ventas</Typography>
-        <Typography  variant="subtitle1" style={{ color: 'blue' }}>Tarjeta S/ {totalizadores.totalTarjeta.toFixed(2)} - Efectivo S/ {totalizadores.totalEfectivo.toFixed(2)}</Typography>
+        
+        {
+          session?.user.rol == 'USER_ROLE' &&  (
+            <>
+              <Typography  variant="subtitle1" style={{ color: 'blue' }}>Tarjeta S/ {totalizadores.totalTarjeta.toFixed(2)} - Efectivo S/ {totalizadores.totalEfectivo.toFixed(2)}</Typography>
+              <Print comprobantes={comprobantes}/> 
+            </>
+          )
+        }
+        
         <div style={{ display: "none" }}>
             <PrintPos ref={componentRef} receptor={printObject.receptor} comprobante={printObject.comprobante}/>
         </div>
@@ -204,8 +222,7 @@ const HistoricoPage: NextPage = () => {
                   pageSizeOptions={[5, 10, 25]}
               />
           </Grid>
-        </Grid>
-
+        </Grid>    
       </FuelLayout>
     </>
   )

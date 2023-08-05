@@ -118,16 +118,18 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
 
     }
 
-    const createCierre = async(id: number, fecha : Date):Promise<{ hasError: boolean; message: string; }> => {
+    const createCierre = async(id: number, fecha : Date, turno : string, isla : string, efectivo: number, tarjeta: number):Promise<{ hasError: boolean; message: string; }> => {
 
         const body = {
             "session": id,
-            "fecha": fecha
+            "fecha": fecha,
+            "turno": turno,
+            "isla": isla,
+            "efectivo": efectivo,
+            "tarjeta": tarjeta
         }    
         try {
             const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/cerrarturno`, body);
-
-            //dispatch({ type: '[Cierre] - Cierre complete' });
 
             return {
                 hasError: false,
@@ -150,6 +152,60 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
         }
 
     } 
+
+    const createCierreDia = async(id: number):Promise<{ hasError: boolean; message: string; }> => {
+
+        const body = {
+            "session": id
+        }    
+        try {
+            const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/cerrardia`, body);
+
+            return {
+                hasError: false,
+                message: data? 'Cierre dia procesado correctamente':'Error durante el proceso de cierre'
+            }
+
+
+        } catch (error) {
+            
+            if ( axios.isAxiosError(error) ) {
+                return {
+                    hasError: true,
+                    message: error.response?.data.message
+                }
+            }
+            return {
+                hasError: true,
+                message : 'Error no controlado, hable con el administrador'
+            }
+        }
+
+    }     
+
+    const obtenerCierres = async(fecha : Date):Promise<{ total: number; cierres: any; }> => {
+
+        const body = {
+            "fecha": fecha
+        }    
+        try {
+            const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/listarturnos`, body);
+
+            return {
+                total: 0,
+                cierres: data
+            }
+
+
+        } catch (error) {
+            
+            return {
+                total: 0,
+                cierres: error
+            }
+        }
+
+    }     
 
     const listarHistorico = async(idUsuario: number):Promise<{ hasError: boolean; comprobantes?: IComprobante[]; }> => {
         try {
@@ -260,11 +316,34 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
         }        
     }    
 
+    const validarAdministrador = async(password: string):Promise<{ hasSuccess: boolean; message: string; }> => {
+
+        const body = {
+            "password": password
+        }
+
+        try {
+            const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/usuarios/authorize`, body);
+
+            return {
+                hasSuccess: data.hasSuccess,
+                message: data.message
+            }
+
+        } catch (error: any) {
+            return {
+                hasSuccess: false,
+                message: error.toString()
+            }
+        }        
+    }    
+
     return (
         <FuelContext.Provider value={{
             ...state,
             // Orders
             createCierre,
+            createCierreDia,
             createOrder,
             emptyOrder,
             cleanOrder,
@@ -273,6 +352,8 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             guardarUsuario,
             reiniciarPassword,
             cambiarPassword,
+            validarAdministrador,
+            obtenerCierres,
             findRuc
         }}>
             { children }

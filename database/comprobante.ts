@@ -29,5 +29,11 @@ export const initialComprobante: IComprobante = {
         placa: ""
     },
     pago_efectivo: 0,
-    pago_tarjeta: 0
+    pago_tarjeta: 0,
+    volumen: "",
+    dec_combustible: "",
+    placa: "",
+    billete: 0,
+    producto_precio: "",
+    codigo_combustible: ""
 }

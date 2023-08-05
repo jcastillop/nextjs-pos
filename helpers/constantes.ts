@@ -5,7 +5,14 @@ const constantes = Object.freeze({
         Boleta:         "03",
         NotaDespacho:   "50",
         Calibracion:    "51"
-    }    
+    },
+    CodigoCombustible : {
+        DB5S50:         "5",
+        GPREMIUM1:      "3",
+        GPREMIUM2:      "4",
+        GREGULAR:       "2",
+        GLP:            "7"
+    }
 });
 
 export default constantes;
