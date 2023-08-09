@@ -11,20 +11,11 @@ import { FuelContext } from '@/context';
 import { formatDateSQL } from '@/helpers/util';
 import { IUser } from '@/interfaces';
 import { CierreDiaDialog } from '@/components/cierre/CierreDiaDialog';
+import { ICierreTurno } from '@/interfaces/cierreturno';
 
 
 
 
-export interface ICierre {
-    id: number;
-    total: number;
-    fecha: Date;
-    turno: string;
-    isla: string;
-    efectivo: number;
-    tarjeta: number;
-    usuario: IUser;
-}
 const initialUser: IUser = {
     id: 0,
     rol: 'USER_ROLE',
@@ -35,15 +26,15 @@ const initialUser: IUser = {
     img: '',
     EmisorId: 0
 }
-const initialCierre: ICierre = {
+const initialCierre: ICierreTurno = {
     id: 0,
     total: 0,
-    fecha: new Date(),
     turno: '',
     isla: '',
     efectivo: 0,
     tarjeta: 0,
-    usuario: initialUser
+    estado: 1,
+    Usuario: initialUser
 }
 
 const CierrePage: NextPage = () => {
@@ -80,7 +71,7 @@ const CierrePage: NextPage = () => {
                     <Typography variant='h2'>Información de cierre</Typography>
                     {
                         cierres.length > 0?<>
-                            <CierreDiaDialog idUser={session?+session.user.id:0}/>
+                            <CierreDiaDialog idUser={session?+session.user.id:0} cierreTurnos={ cierres }/>
                             <Divider sx={{mt: 2, mb: 2}}/>
                             <Grid container spacing={1}>
                                 {

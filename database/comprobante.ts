@@ -8,6 +8,7 @@ export const initialComprobante: IComprobante = {
     tipo_operacion: "",
     tipo_nota: "",
     tipo_documento_afectado: "",
+    numeracion_comprobante: "",
     numeracion_documento_afectado: "",
     motivo_documento_afectado: "",
     total_gravadas: "",

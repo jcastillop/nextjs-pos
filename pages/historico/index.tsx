@@ -63,18 +63,20 @@ const HistoricoPage: NextPage = () => {
   });
 
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 2 },
-    { field: 'fecha', headerName: 'Fecha', width: 150 },
-    { field: 'cliente', headerName: 'Cliente', width: 220 },
-    { field: 'comprobante', headerName: 'Comprobante', width: 150 },
-    { field: 'gravadas', headerName: 'Subtotal', width: 150 },
-    { field: 'igv', headerName: 'IGV', width: 150 },
+    { field: 'id', headerName: 'ID', width: 2, disableColumnMenu: true },
+    { field: 'fecha', headerName: 'Fecha', width: 150, sortable: false },
+    { field: 'cliente', headerName: 'Cliente', width: 220, sortable: false },
+    { field: 'comprobante', headerName: 'Comprobante', width: 150, sortable: false },
+    { field: 'gravadas', headerName: 'Subtotal', width: 150, sortable: false, filterable: false },
+    { field: 'igv', headerName: 'IGV', width: 150, sortable: false, filterable: false },
     { 
       field: 'total', 
       headerName: 'Total', 
       type: 'number',
       width: 150,
       groupable: false,
+      sortable: false,
+      filterable: false,
       valueFormatter: ({ value }) => {
         if (!value) {
           return value;
@@ -82,10 +84,13 @@ const HistoricoPage: NextPage = () => {
         return currencyFormatter.format(value);
       },      
     },
+    { field: 'isla', headerName: 'Isla', width: 150, sortable: false },
+    { field: 'turno', headerName: 'Turno', width: 150, sortable: false },
+    { field: 'usuario', headerName: 'Usuario', width: 150, sortable: false },    
     {
         field: 'sunat',
         headerName: 'SUNAT',
-  
+        disableColumnMenu: true,
         renderCell: (params: GridRenderCellParams<String>) => {
             return <Chip variant='filled' label="Correcto" color="success" />
         }, width: 150
@@ -94,6 +99,9 @@ const HistoricoPage: NextPage = () => {
     {
         field: 'imprimir',
         headerName: 'Re-imprimir',
+        sortable: false,
+        filterable: false,
+        disableColumnMenu: true,
         renderCell: (params: GridRenderCellParams<any>) => {
             return (
               <Button
@@ -113,7 +121,8 @@ const HistoricoPage: NextPage = () => {
                   id:0,tipo_operacion:"",tipo_nota:"",tipo_documento_afectado:"",motivo_documento_afectado:"",monto_letras:"",pdf_bytes:"",url:"",errors:"",
                   tipo_comprobante:params.row.tipo,
                   fecha_emision:params.row.fecha,
-                  numeracion_documento_afectado:params.row.comprobante,
+                  numeracion_comprobante:params.row.comprobante,
+                  numeracion_documento_afectado:params.row.numeracion_documento_afectado,
                   pago_efectivo: 0,
                   pago_tarjeta: 0,
                   total_gravadas:params.row.gravadas,
@@ -147,16 +156,17 @@ const HistoricoPage: NextPage = () => {
             )
         }, width: 150  
     },
-    { field: 'hash', headerName: 'Hash', width: 150 },
-    { field: 'documento', headerName: 'Documento', width: 150 }
+    { field: 'hash', headerName: 'Hash', width: 150, sortable: false, filterable: false },
+    { field: 'documento', headerName: 'Documento', width: 150, sortable: false, filterable: false }
   ];
 
   const router = useRouter();
-  const componentRef = useRef();
+  const componentRef = useRef(null);
   const handlePrint = useReactToPrint({
     pageStyle: "@page { size: auto;  margin: 0mm; } @media print { body { -webkit-print-color-adjust: exact; } }",        
-    content: () => componentRef.current || null,
+    content: () => componentRef.current,
     onAfterPrint: () => {
+        console.log("test")
         // Reset the Promise resolve so we can print again
         //emptyOrder();
         //router.push('/');
@@ -169,7 +179,7 @@ const HistoricoPage: NextPage = () => {
       id          : comprobante.id,
       fecha       : comprobante.fecha_emision,
       cliente     : comprobante["Receptore.razon_social"],
-      comprobante : comprobante.numeracion_documento_afectado,
+      comprobante : comprobante.numeracion_comprobante,
       gravadas    : comprobante.total_gravadas,
       igv         : comprobante.total_igv,
       total       : comprobante.total_venta,
@@ -183,6 +193,9 @@ const HistoricoPage: NextPage = () => {
       placa       : comprobante.placa,
       precio      : comprobante.producto_precio,
       codcombustible: comprobante.codigo_combustible,
+      isla        : comprobante["Cierreturno.isla"],
+      turno       : comprobante["Cierreturno.turno"],
+      usuario     : comprobante["Usuario.usuario"],
   }));
 
   
@@ -216,6 +229,11 @@ const HistoricoPage: NextPage = () => {
                       columnVisibilityModel: {
                         hash: false,
                         documento: false,
+                        gravadas: session?.user.rol == 'USER_ROLE',
+                        igv: session?.user.rol == 'USER_ROLE',
+                        isla: session?.user.rol == 'ADMIN_ROLE',
+                        turno: session?.user.rol == 'ADMIN_ROLE',
+                        usuario: session?.user.rol == 'ADMIN_ROLE',
                       }
                     },
                   }}

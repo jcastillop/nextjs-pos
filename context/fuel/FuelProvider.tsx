@@ -208,6 +208,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
     }     
 
     const listarHistorico = async(idUsuario: number):Promise<{ hasError: boolean; comprobantes?: IComprobante[]; }> => {
+        
         try {
             const body = {
                 "idUsuario": idUsuario

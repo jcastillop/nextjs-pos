@@ -183,7 +183,9 @@ export const Print: React.FC<Props> = ({comprobantes}) => {
     return (
         <div>
             <PrintCierre ref={componentRef} totalizadores={totalizadores} />
-            <button onClick={handleClickOpen}>CERRAR TURNO</button>
+            <Button color="secondary" onClick={handleClickOpen} >
+                CERRAR TURNO
+            </Button>               
 
             <Dialog open={isOpenDialog} onClose={handleClose}>
             <DialogTitle>

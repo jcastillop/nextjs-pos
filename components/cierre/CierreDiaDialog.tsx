@@ -1,18 +1,22 @@
 import { FuelContext, UiContext } from "@/context";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import { FC, useContext, useState } from "react";
+import { FC, useContext, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { PrintCierreDia } from "../print/PrintCierreDia";
+import { ICierreTurno } from "@/interfaces/cierreturno";
+import { useReactToPrint } from "react-to-print";
 
 interface Props{
     idUser : number;
+    cierreTurnos : ICierreTurno[];
 }
 
 interface ICierreDia{
     id: number
 }
 
-export const CierreDiaDialog: FC<Props> = ({ idUser }) => {
+export const CierreDiaDialog: FC<Props> = ({ idUser, cierreTurnos }) => {
 
     const router = useRouter();
 
@@ -36,18 +40,32 @@ export const CierreDiaDialog: FC<Props> = ({ idUser }) => {
         setOpen(false);
     };
 
+    const componentRef = useRef();
+
+    const handlePrint = useReactToPrint({
+        pageStyle: "@page { size: auto;  margin: 0mm; } @media print { body { -webkit-print-color-adjust: exact; } }",        
+        content: () => componentRef.current || null,
+        onAfterPrint: () => {
+            // Reset the Promise resolve so we can print again
+            //emptyOrder();
+            //router.push('/');
+          }        
+    });   
+
     const onSubmitUser = async (data: ICierreDia) => {
 
         const { hasError, message } = await createCierreDia(data.id);
         showAlert({mensaje: message, severity: hasError? 'error':'success', time: 1500})
         handleClose();
+        handlePrint();
         router.push('/');
-    }
+    }      
 
     return(
         <div>
+            <PrintCierreDia ref={ componentRef } cierreTurnos={ cierreTurnos }/>
             <Button color="secondary" onClick={handleClickOpen} >
-                Cerrar día
+                CERRAR DIA
             </Button>   
         
             <Dialog open={open} onClose={handleClose}>

@@ -9,6 +9,7 @@ export interface IComprobante {
     tipo_operacion: string;
     tipo_nota: string;
     tipo_documento_afectado: string;
+    numeracion_comprobante: string;
     numeracion_documento_afectado: string;
     pago_efectivo: number;
     pago_tarjeta: number;

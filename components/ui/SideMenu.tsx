@@ -38,26 +38,22 @@ export const SideMenu = () => {
                     </ListItemIcon>
                     <ListItemText primary={'Mi perfil'} />
                 </ListItemButton>
+                <Divider />
+                <ListSubheader>Admin Panel</ListSubheader>
+                <ListItemButton LinkComponent={Link} href="/cierre">
+                    <ListItemIcon>
+                        <InsertInvitationOutlined/>
+                    </ListItemIcon>
+                    <ListItemText primary={'Cerrar día'} />
+                </ListItemButton>                            
                 {
                     session?.user.rol == "ADMIN_ROLE" && (
-                        <>
-                            <Divider />
-                            <ListSubheader>Admin Panel</ListSubheader>
-
-                            <ListItemButton LinkComponent={Link} href="/users">
-                                <ListItemIcon>
-                                    <ManageAccountsOutlined/>
-                                </ListItemIcon>
-                                <ListItemText primary={'Usuarios'} />
-                            </ListItemButton>
-
-                            <ListItemButton LinkComponent={Link} href="/cierre">
-                                <ListItemIcon>
-                                    <InsertInvitationOutlined/>
-                                </ListItemIcon>
-                                <ListItemText primary={'Cerrar día'} />
-                            </ListItemButton>                            
-                        </>
+                        <ListItemButton LinkComponent={Link} href="/users">
+                            <ListItemIcon>
+                                <ManageAccountsOutlined/>
+                            </ListItemIcon>
+                            <ListItemText primary={'Usuarios'} />
+                        </ListItemButton>
                     )
                 }
 

@@ -33,7 +33,7 @@ export const PrintPos = forwardRef((props: IPrintPosProps, ref) => {
                 {(comprobante.tipo_comprobante==constantes.TipoComprobante.Factura)?'FACTURA':'BOLETA'} ELECTRONICA
               </Grid>
               <Grid item xs={6} style={{paddingTop: 0}}>
-                {comprobante.numeracion_documento_afectado}
+                {comprobante.numeracion_comprobante}
               </Grid>              
               <Grid item xs={6} style={{paddingTop: 0}}>
                 {(comprobante.tipo_comprobante==constantes.TipoComprobante.Factura)?'RAZON SOCIAL ':'CLIENTE '}
@@ -101,7 +101,7 @@ export const PrintPos = forwardRef((props: IPrintPosProps, ref) => {
                 NOTA DE DESPACHO
               </Grid>
               <Grid item xs={6} style={{paddingTop: 0}}>
-                {comprobante.numeracion_documento_afectado}
+                {comprobante.numeracion_comprobante}
               </Grid>              
               <Grid item xs={6} style={{paddingTop: 0}}>
                 RAZON SOCIAL
@@ -159,7 +159,7 @@ export const PrintPos = forwardRef((props: IPrintPosProps, ref) => {
                 CALIBRACION
               </Grid>
               <Grid item xs={6} style={{paddingTop: 0}}>
-                {comprobante.numeracion_documento_afectado}
+                {comprobante.numeracion_comprobante}
               </Grid>              
               <Grid item xs={6} style={{paddingTop: 0}}>
                 CLIENTE
