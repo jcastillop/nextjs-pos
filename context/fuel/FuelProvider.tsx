@@ -46,7 +46,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
         dispatch({ type: '[Cart] - Fuel clean' });
     }
         
-    const createOrder = async(tipo: string, receptor : IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, id?: number): Promise<{ hasError: boolean; respuesta: any; }> => {
+    const createOrder = async(tipo: string, receptor : IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, id?: number): Promise<{ hasError: boolean; respuesta: any; }> => {
 
         dispatch({ type: '[Cart] - Fuel processing' });
         
@@ -65,7 +65,10 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             "producto": producto,
             "tarjeta": tarjeta,
             "efectivo": efectivo,
-            "comentario":comentario
+            "comentario":comentario,
+            "tipo_afectado":tipo_afectado,
+            "numeracion_afectado":numeracion_afectado,
+            "fecha_afectado":fecha_afectado
         }        
 
         try {

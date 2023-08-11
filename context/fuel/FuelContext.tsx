@@ -4,7 +4,7 @@ interface ContextProps {
     isLoaded: boolean;
     receptor: IReceptor;
     comprobante: IComprobante;
-    createOrder: (tipo: string, receptor: IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, id?:number) => Promise<{ hasError: boolean; respuesta: any; }>;
+    createOrder: (tipo: string, receptor: IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, id?:number) => Promise<{ hasError: boolean; respuesta: any; }>;
     emptyOrder: any;
     cleanOrder: any;
     findRuc: (valor: string) => Promise<{ hasError: boolean; receptores?: IReceptor[]; error: any; }>;

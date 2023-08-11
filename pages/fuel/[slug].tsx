@@ -95,7 +95,7 @@ const InvoicePage : NextPage = () => {
             placa: data.placa,
         }     
 
-        const { hasError, respuesta } = await createOrder(tipoComprobante, receptorForm, data.comentario, fuel?.descripcionCombustible || "", data.tarjeta, data.efectivo, fuel?.idAbastecimiento); 
+        const { hasError, respuesta } = await createOrder(tipoComprobante, receptorForm, data.comentario, fuel?.descripcionCombustible || "", data.tarjeta, data.efectivo,"","","", fuel?.idAbastecimiento); 
 
         if(!hasError){
             showAlert({mensaje: respuesta, time: 1500})         

@@ -17,7 +17,7 @@ export const PrintPos = forwardRef((props: IPrintPosProps, ref) => {
   const { data: session, status } = useSession()
 
   const renderSwitch = (receptor: IReceptor, comprobante: IComprobante) => {
-    
+
     switch(comprobante.tipo_comprobante) {
       case constantes.TipoComprobante.Factura:
       case constantes.TipoComprobante.Boleta:
