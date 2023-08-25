@@ -81,11 +81,22 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             }
 
             await dispatch({ type: '[Cart] - Update order summary', payload: orderSummary })
-            
-            return {
-                hasError: data.hasError,
-                respuesta: data.respuesta
+
+            const comprobante: IComprobante = data.comprobante;
+
+            if(comprobante.errors){
+                return {
+                    hasError: true,
+                    respuesta: comprobante.errors
+                }                
+            }else{
+                return {
+                    hasError: data.hasError,
+                    respuesta: data.respuesta
+                }
             }
+            
+
 
 
         } catch (error) {

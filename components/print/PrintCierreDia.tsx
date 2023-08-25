@@ -34,7 +34,7 @@ export const PrintCierreDia = forwardRef((props: IPrintCierreDiaProps, ref) => {
                     <Grid container spacing={1} sx={{ mt: 0}}>
                         {
                             cierreTurnos.map( (cierres: any) =>(
-                                <>
+                                <div key={ cierres.id }>
                                 <Grid item xs={12} style={{paddingTop: 0, fontWeight: 'bold', marginTop: 2, fontSize:15}}>
                                     { cierres.turno } - { cierres.isla } - { cierres.Usuario.usuario }
                                 </Grid>
@@ -42,7 +42,7 @@ export const PrintCierreDia = forwardRef((props: IPrintCierreDiaProps, ref) => {
                                 <Grid item xs={6} style={{paddingTop: 0}}>S/ { cierres.efectivo.toFixed(2) }</Grid>
                                 <Grid item xs={6} style={{paddingTop: 0}}>TARJETA</Grid>
                                 <Grid item xs={6} style={{paddingTop: 0}}>S/ { cierres.tarjeta.toFixed(2) }</Grid>
-                                </>
+                                </div>
                             ))
                         }
                         <Grid item xs={6} style={{paddingTop: 0}}>TOTAL EFECTIVO</Grid>

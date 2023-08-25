@@ -106,6 +106,7 @@ const InvoicePage : NextPage = () => {
         }else{
             emptyOrder();
             showAlert({mensaje: respuesta, severity: 'error', time: 7000})
+            router.push('/');
         }
 
     }    

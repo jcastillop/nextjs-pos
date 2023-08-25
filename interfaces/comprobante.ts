@@ -29,4 +29,5 @@ export interface IComprobante {
     placa: string;
     billete: number;
     producto_precio: string;
+    id_abastecimiento: number;
 }

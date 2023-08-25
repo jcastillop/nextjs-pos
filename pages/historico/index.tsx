@@ -3,7 +3,7 @@ import { Button, Chip, Grid, Typography } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid'
 
 import { FuelLayout } from '@/components/layouts'
-import { GetServerSideProps, NextPage } from 'next'
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next'
 import { getSession, useSession } from 'next-auth/react'
 import { useReactToPrint } from 'react-to-print'
 import { useRouter } from 'next/router'
@@ -13,11 +13,12 @@ import { initialReceptor } from '@/database/receptor';
 import { IComprobante } from '@/interfaces/comprobante'
 import { initialComprobante } from '@/database/comprobante'
 import { useState } from 'react';
-import { posApi } from '@/api'
-import { FuelContext } from '@/context'
-import { initialData } from '../../database/products';
+
 import constantes from '@/helpers/constantes'
 import { Print } from '@/components/print/Pint'
+import Link from 'next/link'
+import { Constantes } from '@/helpers'
+import { listarHistorico } from '@/hooks'
 
 interface TotalizadoresState {
   totalEfectivo: number;
@@ -29,29 +30,16 @@ const TOTAL_INITIAL_STATE: TotalizadoresState = {
   totalTarjeta: 0
 }
 
-const HistoricoPage: NextPage = () => {
+const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
 
-  const { listarHistorico } = useContext(FuelContext)
-  const [totalizadores, setTotalizadores] = useState(TOTAL_INITIAL_STATE)
-  const [comprobantes, setComprobantes] = useState<any[]>()
   const { data: session, status } = useSession()
-
-  useEffect(() => {
-    const callAPI = async () => {
-
-      const idUsuario: number = +(session?.user.id||0)
-      const { hasError, comprobantes} = await listarHistorico(idUsuario);
-      const { totalEfectivo, totalTarjeta } : TotalizadoresState = comprobantes?.filter(({tipo_comprobante}) => (tipo_comprobante == constantes.TipoComprobante.Factura || tipo_comprobante == constantes.TipoComprobante.Boleta)).map(comprobante => ({ totalEfectivo: comprobante.pago_efectivo, totalTarjeta: comprobante.pago_tarjeta })).reduce((a, b) => {
-        return ({
-          totalEfectivo: a.totalEfectivo + b.totalEfectivo || 0,
-          totalTarjeta: a.totalTarjeta + b.totalTarjeta || 0
-        });
-      }, {totalEfectivo: 0, totalTarjeta: 0})||TOTAL_INITIAL_STATE;
-      setComprobantes(comprobantes);
-      setTotalizadores({ totalEfectivo, totalTarjeta }) 
-    }
-    callAPI()
-  }, [listarHistorico, session]);
+  const typeComprobante = comprobantes as IComprobante[]
+  const { totalEfectivo, totalTarjeta } : TotalizadoresState = typeComprobante?.filter(({tipo_comprobante}) => (tipo_comprobante == constantes.TipoComprobante.Factura || tipo_comprobante == constantes.TipoComprobante.Boleta)).map(comprobante => ({ totalEfectivo: comprobante.pago_efectivo, totalTarjeta: comprobante.pago_tarjeta })).reduce((a, b) => {
+    return ({
+      totalEfectivo: a.totalEfectivo + b.totalEfectivo || 0,
+      totalTarjeta: a.totalTarjeta + b.totalTarjeta || 0
+    });
+  }, {totalEfectivo: 0, totalTarjeta: 0})||TOTAL_INITIAL_STATE;
   
   const [printObject, setPrintObject] = useState<IPrintPosProps>({receptor: initialReceptor, comprobante: initialComprobante})
 
@@ -66,14 +54,35 @@ const HistoricoPage: NextPage = () => {
     { field: 'id', headerName: 'ID', width: 2, disableColumnMenu: true },
     { field: 'fecha', headerName: 'Fecha', width: 150, sortable: false },
     { field: 'cliente', headerName: 'Cliente', width: 220, sortable: false },
-    { field: 'comprobante', headerName: 'Comprobante', width: 150, sortable: false },
+    { 
+      field: 'tipo', 
+      headerName: 'Tipo', 
+      width: 150, 
+      sortable: false, 
+      filterable: false, 
+      renderCell: (params: GridRenderCellParams<any>) => {
+        switch (params.row.tipo) {
+          case Constantes.TipoComprobante.Boleta:
+              return "Boleta"
+          case Constantes.TipoComprobante.Factura:
+              return "Factura"
+          case Constantes.TipoComprobante.NotaCredito:
+              return "Nota credito"
+          case Constantes.TipoComprobante.NotaDespacho:
+              return "Nota despacho"
+          case Constantes.TipoComprobante.Calibracion:
+            return "Calibracion" 
+        }
+      }
+    },
+    { field: 'comprobante', headerName: 'Comprobante', width: 120, sortable: false },
     { field: 'gravadas', headerName: 'Subtotal', width: 150, sortable: false, filterable: false },
     { field: 'igv', headerName: 'IGV', width: 150, sortable: false, filterable: false },
     { 
       field: 'total', 
       headerName: 'Total', 
       type: 'number',
-      width: 150,
+      width: 100,
       groupable: false,
       sortable: false,
       filterable: false,
@@ -84,16 +93,25 @@ const HistoricoPage: NextPage = () => {
         return currencyFormatter.format(value);
       },      
     },
-    { field: 'isla', headerName: 'Isla', width: 150, sortable: false },
-    { field: 'turno', headerName: 'Turno', width: 150, sortable: false },
-    { field: 'usuario', headerName: 'Usuario', width: 150, sortable: false },    
+    { field: 'isla', headerName: 'Isla', width: 100, sortable: false },
+    { field: 'turno', headerName: 'Turno', width: 100, sortable: false },
+    { field: 'usuario', headerName: 'Usuario', width: 100, sortable: false },    
     {
         field: 'sunat',
         headerName: 'SUNAT',
         disableColumnMenu: true,
-        renderCell: (params: GridRenderCellParams<String>) => {
-            return <Chip variant='filled' label="Correcto" color="success" />
-        }, width: 150
+        renderCell: (params: GridRenderCellParams<any>) => {
+          if(params.row.tipo == constantes.TipoComprobante.Factura || params.row.tipo == constantes.TipoComprobante.Boleta || params.row.tipo == constantes.TipoComprobante.NotaCredito){
+            if(params.row.error){
+              return <Chip variant='filled' label="Error SUNAT" color="error" />
+            }else{
+              return <Chip variant='filled' label="Correcto" color="success" />
+            }
+            
+          }else{
+            return(<></>)
+          }
+        }, width: 120
   
     },
     {
@@ -103,6 +121,9 @@ const HistoricoPage: NextPage = () => {
         filterable: false,
         disableColumnMenu: true,
         renderCell: (params: GridRenderCellParams<any>) => {
+          if(params.row.error){
+            return (<></>)
+          }else{
             return (
               <Button
               variant="contained"
@@ -137,6 +158,7 @@ const HistoricoPage: NextPage = () => {
                   billete:0,
                   producto_precio:params.row.precio,
                   codigo_combustible:params.row.codcombustible,
+                  id_abastecimiento:params.row.abastecimiento,
                   Receptore: {
                     id_receptor: 0,
                     tipo_documento: 0,
@@ -154,10 +176,43 @@ const HistoricoPage: NextPage = () => {
               Imprimir
             </Button>
             )
-        }, width: 150  
+          }
+
+        }, width: 100  
     },
     { field: 'hash', headerName: 'Hash', width: 150, sortable: false, filterable: false },
-    { field: 'documento', headerName: 'Documento', width: 150, sortable: false, filterable: false }
+    { field: 'documento', headerName: 'Documento', width: 150, sortable: false, filterable: false },
+    { 
+      field: 'abastecimiento', 
+      headerName: 'N. Credito',
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params: GridRenderCellParams<any>) => {
+        if(params.row.tipo == constantes.TipoComprobante.Factura){
+          return (
+            <Link
+              href={{
+                pathname: '/historico/notacredito',
+                query: {
+                  id: params.row.abastecimiento,
+                  numero_documento: params.row.documento,
+                  razon_social: params.row.cliente,
+                  descripcion: params.row.combustible,
+                  tipo_afectado: params.row.tipo,
+                  numeracion_afectado: params.row.comprobante,
+                  fecha_afectado: params.row.fecha,
+                }
+              }}
+            >
+              <Button variant="contained" color="secondary">Generar</Button>
+            </Link>
+          )
+        }else{
+          return(<></>)
+        }
+      }, width: 100  
+    }
   ];
 
   const router = useRouter();
@@ -175,7 +230,7 @@ const HistoricoPage: NextPage = () => {
 
   if ( !comprobantes ) return (<></>);
     
-  const rows = comprobantes.map( (comprobante) => ({
+  const rows = comprobantes.map( (comprobante : any) => ({
       id          : comprobante.id,
       fecha       : comprobante.fecha_emision,
       cliente     : comprobante["Receptore.razon_social"],
@@ -196,6 +251,8 @@ const HistoricoPage: NextPage = () => {
       isla        : comprobante["Cierreturno.isla"],
       turno       : comprobante["Cierreturno.turno"],
       usuario     : comprobante["Usuario.usuario"],
+      abastecimiento: comprobante.id_abastecimiento,
+      error       : comprobante.errors
   }));
 
   
@@ -208,7 +265,7 @@ const HistoricoPage: NextPage = () => {
         {
           session?.user.rol == 'USER_ROLE' &&  (
             <>
-              <Typography  variant="subtitle1" style={{ color: 'blue' }}>Tarjeta S/ {totalizadores.totalTarjeta.toFixed(2)} - Efectivo S/ {totalizadores.totalEfectivo.toFixed(2)}</Typography>
+              <Typography  variant="subtitle1" style={{ color: 'blue' }}>Tarjeta S/ {totalTarjeta.toFixed(2)} - Efectivo S/ {totalEfectivo.toFixed(2)}</Typography>
               <Print comprobantes={comprobantes}/> 
             </>
           )
@@ -234,8 +291,12 @@ const HistoricoPage: NextPage = () => {
                         isla: session?.user.rol == 'ADMIN_ROLE',
                         turno: session?.user.rol == 'ADMIN_ROLE',
                         usuario: session?.user.rol == 'ADMIN_ROLE',
+                        abastecimiento: session?.user.rol == 'ADMIN_ROLE',
                       }
                     },
+                    sorting:{
+                      sortModel: [{ field: 'id', sort: 'desc' }],
+                    }
                   }}
                   pageSizeOptions={[5, 10, 25]}
               />
@@ -246,10 +307,14 @@ const HistoricoPage: NextPage = () => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
+export const getServerSideProps: GetServerSideProps<{ comprobantes: any }> = async ({ req, query})=>{
 
-  const session = await getSession({ req });
+  const session: any = await getSession({ req });
   const { p = '/auth/login'} = query
+
+  var returnComprobante: any = [ initialComprobante ];
+  
+  
 
   if(!session){
       return {
@@ -258,9 +323,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
               permanent: false
           }
       }
+  }else{
+    const { hasError, comprobantes} = await listarHistorico(session.user.id || 0);
+    returnComprobante = comprobantes;
   }
   return{
-      props: {}
+      props: { comprobantes: returnComprobante }
   }
 }
 
