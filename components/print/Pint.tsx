@@ -10,6 +10,7 @@ import { formatDateSQL, getActualDate } from "@/helpers/util";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Link, Typography } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { useFuels } from '@/hooks';
 
 interface PrintTotalizadoresState {
     totDiesel:  {gal: number, sol: number};
@@ -17,7 +18,7 @@ interface PrintTotalizadoresState {
     totRegular: {gal: number, sol: number};
     totGlp:     {gal: number, sol: number};
     totGalones:     {gal: number, sol: number};
-    tot:        {efectivo: number, tarjeta: number};
+    tot:        {efectivo: number, tarjeta: number, yape: number};
     totDespacho: number;
     totCerafin: number;
     Total: number;
@@ -29,7 +30,7 @@ const TOT_GALONES_INITIAL_STATE: PrintTotalizadoresState = {
     totRegular: {gal: 0, sol: 0},
     totGlp:     {gal: 0, sol: 0},
     totGalones:     {gal: 0, sol: 0},
-    tot:        {efectivo: 0, tarjeta: 0},
+    tot:        {efectivo: 0, tarjeta: 0, yape: 0},
     totDespacho:0,
     totCerafin:0,
     Total:0,
@@ -42,6 +43,7 @@ type Props = {
 
 export const Print: React.FC<Props> = ({comprobantes}) => {
 
+    var totalizadores = TOT_GALONES_INITIAL_STATE;
     const componentRef = useRef(null);
     const { createCierre } = useContext(FuelContext)
     const { showAlert } = useContext( UiContext );
@@ -52,23 +54,30 @@ export const Print: React.FC<Props> = ({comprobantes}) => {
         pageStyle: "@page { size: auto;  margin: 0mm; } @media print { body { -webkit-print-color-adjust: exact; } }",        
         content: () => componentRef.current,
         onAfterPrint: () => {
+            totalizadores = TOT_GALONES_INITIAL_STATE;
             router.push("/");
         }
     });
+    const { fuels, isLoading, isError } = useFuels('/abastecimientos/count/total',null,null,{ refreshInterval: 3}, '0', '100')
 
     const handleAceptar = async () => {
-        if(comprobantes.length > 0){
-            const session = await getSession();
-            const data = await createCierre(parseInt(session?.user.id?session?.user.id:"0"), new Date(formatDateSQL(value)), session?.user.jornada || '', session?.user.isla || '',totalEfectivo,totalTarjeta);            
-            if(!data.hasError){
-                handlePrint();                
-                showAlert({mensaje: 'Turno cerrado satisfactoriamente', severity: 'success'})                
-            }else{
-                showAlert({mensaje: data.message.toString(), severity: 'error'})
-            }
+        if(fuels.length > 0){
+            showAlert({mensaje: `Tiene abastecimientos pendientes por liquidar: ${ fuels.length }, no puede cerrar turno`, severity: 'error'})
         }else{
-            showAlert({mensaje: 'No tiene cuenta por liquidar', severity: 'error'})
+            if(comprobantes.length > 0){
+                const session = await getSession();
+                const data = await createCierre(parseInt(session?.user.id?session?.user.id:"0"), new Date(formatDateSQL(value)), session?.user.jornada || '', session?.user.isla || '',totalEfectivo, totalTarjeta, totalYape);            
+                if(!data.hasError){
+                    handlePrint();                
+                    showAlert({mensaje: 'Turno cerrado satisfactoriamente', severity: 'success'})                
+                }else{
+                    showAlert({mensaje: data.message.toString(), severity: 'error'})
+                }
+            }else{
+                showAlert({mensaje: 'No tiene cuenta por liquidar', severity: 'error'})
+            }
         }
+
     }
 
     const [isOpenDate, setOpenDate] = useState(false);
@@ -85,7 +94,7 @@ export const Print: React.FC<Props> = ({comprobantes}) => {
         setOpenDate((isOpenDate) => !isOpenDate);
     }
 
-    var totalizadores = TOT_GALONES_INITIAL_STATE;
+    
 
     const { totalDieselSol, totalDieselGal } = comprobantes
         .filter((comprobante)=>(comprobante.codigo_combustible == constantes.CodigoCombustible.DB5S50))
@@ -154,15 +163,16 @@ export const Print: React.FC<Props> = ({comprobantes}) => {
                 });
         },{totalCalibracion: 0 }) 
         
-    const { totalEfectivo, totalTarjeta, total } = comprobantes
-        .map(comprobante=>({totalEfectivo: +comprobante.pago_efectivo, totalTarjeta: +comprobante.pago_tarjeta, total: +comprobante.total_venta}))
+    const { totalEfectivo, totalTarjeta, totalYape, total } = comprobantes
+        .map(comprobante=>({totalEfectivo: +comprobante.pago_efectivo, totalTarjeta: +comprobante.pago_tarjeta, totalYape: +comprobante.pago_yape, total: +comprobante.total_venta}))
         .reduce((a, b) => {
             return ({
                 totalEfectivo: a.totalEfectivo + b.totalEfectivo || 0,
                 totalTarjeta: a.totalTarjeta + b.totalTarjeta || 0,
+                totalYape: a.totalYape + b.totalYape || 0,
                 total: a.total + b.total || 0,
                 });
-        },{totalEfectivo: 0, totalTarjeta: 0, total: 0 })      
+        },{totalEfectivo: 0, totalTarjeta: 0, totalYape: 0, total: 0 })      
 
     totalizadores.totDiesel.gal = totalDieselGal
     totalizadores.totDiesel.sol = totalDieselSol
@@ -178,6 +188,7 @@ export const Print: React.FC<Props> = ({comprobantes}) => {
     totalizadores.totCerafin = totalCalibracion
     totalizadores.tot.efectivo = totalEfectivo
     totalizadores.tot.tarjeta = totalTarjeta
+    totalizadores.tot.yape = totalYape
     totalizadores.Total = +total
 
     return (
@@ -185,7 +196,7 @@ export const Print: React.FC<Props> = ({comprobantes}) => {
             <PrintCierre ref={componentRef} totalizadores={totalizadores} />
             <Button color="secondary" onClick={handleClickOpen} >
                 CERRAR TURNO
-            </Button>               
+            </Button>    
 
             <Dialog open={isOpenDialog} onClose={handleClose}>
             <DialogTitle>

@@ -3,12 +3,12 @@ import { IComprobante } from "@/interfaces/comprobante";
 export const initialComprobante: IComprobante = {
     id: 0,
     tipo_comprobante: "",
+    numeracion_comprobante: "",
     fecha_emision: "",
     tipo_moneda: "",
     tipo_operacion: "",
     tipo_nota: "",
     tipo_documento_afectado: "",
-    numeracion_comprobante: "",
     numeracion_documento_afectado: "",
     motivo_documento_afectado: "",
     total_gravadas: "",

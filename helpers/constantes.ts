@@ -1,5 +1,6 @@
 const constantes = Object.freeze({
     ALERT_DEFAULT_TIMER: 3000, //Valor por defecto para el tiempo de las alertas
+    ALPHA_NUMERIC_REGEX: /^[a-zA-Z0-9]+$/,
     TipoComprobante: {
         Factura:        "01",
         Boleta:         "03",

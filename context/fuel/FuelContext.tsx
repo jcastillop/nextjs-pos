@@ -4,11 +4,12 @@ interface ContextProps {
     isLoaded: boolean;
     receptor: IReceptor;
     comprobante: IComprobante;
-    createOrder: (tipo: string, receptor: IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, id?:number) => Promise<{ hasError: boolean; respuesta: any; }>;
+    createOrder: (tipo: string, receptor: IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, yape: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, prefijo: string, id?:number) => Promise<{ hasError: boolean; respuesta: any; }>;
+    modifyOrder: (correlativo: string, id_comprobante: string, tipo: string, receptor: IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, prefijo: string, id?:number) => Promise<{ hasError: boolean; respuesta: any; }>;
     emptyOrder: any;
     cleanOrder: any;
     findRuc: (valor: string) => Promise<{ hasError: boolean; receptores?: IReceptor[]; error: any; }>;
-    createCierre: (id: number, fecha : Date, turno : string, isla : string, efectivo: number, tarjeta: number) => Promise<{ hasError: boolean; message: string; }>;
+    createCierre: (id: number, fecha : Date, turno : string, isla : string, efectivo: number, tarjeta: number, yape: number) => Promise<{ hasError: boolean; message: string; }>;
     createCierreDia: (id: number) => Promise<{ hasError: boolean; message: string; }>;
     listarHistorico: (idUsuario: number) => Promise<{ hasError: boolean; comprobantes?: IComprobante[] }>;
     listarUsuarios: () => Promise<{ hasError: boolean; usuarios?: IUser[] }>;

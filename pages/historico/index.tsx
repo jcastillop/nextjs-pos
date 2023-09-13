@@ -18,28 +18,35 @@ import constantes from '@/helpers/constantes'
 import { Print } from '@/components/print/Pint'
 import Link from 'next/link'
 import { Constantes } from '@/helpers'
-import { listarHistorico } from '@/hooks'
+import { useHistorico } from '@/hooks'
 
 interface TotalizadoresState {
   totalEfectivo: number;
   totalTarjeta: number;
+  totalYape: number;
 }
 
 const TOTAL_INITIAL_STATE: TotalizadoresState = {
   totalEfectivo: 0,
-  totalTarjeta: 0
+  totalTarjeta: 0,
+  totalYape: 0
 }
 
-const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const HistoricoPage = () => {
 
   const { data: session, status } = useSession()
-  const typeComprobante = comprobantes as IComprobante[]
-  const { totalEfectivo, totalTarjeta } : TotalizadoresState = typeComprobante?.filter(({tipo_comprobante}) => (tipo_comprobante == constantes.TipoComprobante.Factura || tipo_comprobante == constantes.TipoComprobante.Boleta)).map(comprobante => ({ totalEfectivo: comprobante.pago_efectivo, totalTarjeta: comprobante.pago_tarjeta })).reduce((a, b) => {
+
+  const { comprobantes, isLoading, hasError } = useHistorico(session?.user.id || "",{ refreshInterval: 0});
+
+  const { totalEfectivo, totalTarjeta, totalYape } : TotalizadoresState = 
+    comprobantes?.filter(
+      ({tipo_comprobante}) => (tipo_comprobante == constantes.TipoComprobante.Factura || tipo_comprobante == constantes.TipoComprobante.Boleta)).map(comprobante => ({ totalEfectivo: comprobante.pago_efectivo, totalTarjeta: comprobante.pago_tarjeta, totalYape: comprobante.pago_yape })).reduce((a, b) => {
     return ({
       totalEfectivo: a.totalEfectivo + b.totalEfectivo || 0,
-      totalTarjeta: a.totalTarjeta + b.totalTarjeta || 0
+      totalTarjeta: a.totalTarjeta + b.totalTarjeta || 0,
+      totalYape: a.totalYape + b.totalYape || 0
     });
-  }, {totalEfectivo: 0, totalTarjeta: 0})||TOTAL_INITIAL_STATE;
+  }, {totalEfectivo: 0, totalTarjeta: 0, totalYape: 0})||TOTAL_INITIAL_STATE;
   
   const [printObject, setPrintObject] = useState<IPrintPosProps>({receptor: initialReceptor, comprobante: initialComprobante})
 
@@ -76,8 +83,7 @@ const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getS
       }
     },
     { field: 'comprobante', headerName: 'Comprobante', width: 120, sortable: false },
-    { field: 'gravadas', headerName: 'Subtotal', width: 150, sortable: false, filterable: false },
-    { field: 'igv', headerName: 'IGV', width: 150, sortable: false, filterable: false },
+    { field: 'combustible', headerName: 'Producto', width: 150, sortable: false, filterable: false },
     { 
       field: 'total', 
       headerName: 'Total', 
@@ -101,11 +107,15 @@ const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getS
         headerName: 'SUNAT',
         disableColumnMenu: true,
         renderCell: (params: GridRenderCellParams<any>) => {
+
           if(params.row.tipo == constantes.TipoComprobante.Factura || params.row.tipo == constantes.TipoComprobante.Boleta || params.row.tipo == constantes.TipoComprobante.NotaCredito){
             if(params.row.error){
-              return <Chip variant='filled' label="Error SUNAT" color="error" />
+              return <Chip key={ params.row.id } variant='filled' label="Error SUNAT" color="error" component={ Link } href={`/fueledit/${params.row.abastecimiento}?id=${params.row.id}&tipo=${params.row.tipo}&correlativo=${params.row.comprobante}`} clickable/>
+            }else if(!params.row.hash){
+              return <Chip key={ params.row.id } variant='filled' label="Regularizar" color="warning" component={ Link } href={`/fueledit/${params.row.abastecimiento}?id=${params.row.id}&tipo=${params.row.tipo}&correlativo=${params.row.comprobante}`} clickable/>
             }else{
               return <Chip variant='filled' label="Correcto" color="success" />
+              //return <Chip key={ params.row.id } variant='filled' label="Correcto" color="success" component={ Link } href={`/fueledit/${params.row.abastecimiento}?id=${params.row.id}&tipo=${params.row.tipo}&correlativo=${params.row.comprobante}`} clickable/>
             }
             
           }else{
@@ -146,6 +156,7 @@ const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getS
                   numeracion_documento_afectado:params.row.numeracion_documento_afectado,
                   pago_efectivo: 0,
                   pago_tarjeta: 0,
+                  pago_yape:0,
                   total_gravadas:params.row.gravadas,
                   total_igv:params.row.igv,
                   total_venta:params.row.total,
@@ -159,6 +170,7 @@ const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getS
                   producto_precio:params.row.precio,
                   codigo_combustible:params.row.codcombustible,
                   id_abastecimiento:params.row.abastecimiento,
+                  fecha_abastecimiento:params.row.fecha_abastecimiento,
                   Receptore: {
                     id_receptor: 0,
                     tipo_documento: 0,
@@ -177,7 +189,6 @@ const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getS
             </Button>
             )
           }
-
         }, width: 100  
     },
     { field: 'hash', headerName: 'Hash', width: 150, sortable: false, filterable: false },
@@ -189,25 +200,29 @@ const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getS
       filterable: false,
       disableColumnMenu: true,
       renderCell: (params: GridRenderCellParams<any>) => {
-        if(params.row.tipo == constantes.TipoComprobante.Factura){
-          return (
-            <Link
-              href={{
-                pathname: '/historico/notacredito',
-                query: {
-                  id: params.row.abastecimiento,
-                  numero_documento: params.row.documento,
-                  razon_social: params.row.cliente,
-                  descripcion: params.row.combustible,
-                  tipo_afectado: params.row.tipo,
-                  numeracion_afectado: params.row.comprobante,
-                  fecha_afectado: params.row.fecha,
-                }
-              }}
-            >
-              <Button variant="contained" color="secondary">Generar</Button>
-            </Link>
-          )
+        if(params.row.tipo == constantes.TipoComprobante.Factura || params.row.tipo == constantes.TipoComprobante.Boleta){
+          if(params.row.motivo){
+            return(<Button variant="contained" color="secondary" disabled>Generar</Button>)
+          }else{
+            return (
+              <Link
+                href={{
+                  pathname: '/historico/notacredito',
+                  query: {
+                    id: params.row.abastecimiento,
+                    numero_documento: params.row.documento,
+                    razon_social: params.row.cliente,
+                    descripcion: params.row.combustible,
+                    tipo_afectado: params.row.tipo,
+                    numeracion_afectado: params.row.comprobante,
+                    fecha_afectado: params.row.fecha_emision,
+                  }
+                }}
+              >
+                <Button variant="contained" color="secondary">Generar</Button>
+              </Link>
+            )
+          }
         }else{
           return(<></>)
         }
@@ -230,9 +245,9 @@ const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getS
 
   if ( !comprobantes ) return (<></>);
     
-  const rows = comprobantes.map( (comprobante : any) => ({
+  const rows = comprobantes.map( (comprobante: { [x: string]: any; id: any; fecha_emision: any; numeracion_comprobante: any; total_gravadas: any; total_igv: any; total_venta: any; tipo_moneda: any; tipo_operacion: any; codigo_hash: any; tipo_comprobante: any; volumen: any; dec_combustible: any; placa: any; producto_precio: any; codigo_combustible: any; id_abastecimiento: any }) => ({
       id          : comprobante.id,
-      fecha       : comprobante.fecha_emision,
+      fecha       : new Date(comprobante.fecha_abastecimiento).toLocaleString('es-PE', { timeZone: 'UTC' }),
       cliente     : comprobante["Receptore.razon_social"],
       comprobante : comprobante.numeracion_comprobante,
       gravadas    : comprobante.total_gravadas,
@@ -250,9 +265,11 @@ const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getS
       codcombustible: comprobante.codigo_combustible,
       isla        : comprobante["Cierreturno.isla"],
       turno       : comprobante["Cierreturno.turno"],
-      usuario     : comprobante["Usuario.usuario"],
+      usuario     : comprobante["Usuario.nombre"],
       abastecimiento: comprobante.id_abastecimiento,
-      error       : comprobante.errors
+      error       : comprobante.errors,
+      fecha_emision       : comprobante.fecha_emision,
+      fecha_abastecimiento       : comprobante.fecha_abastecimiento
   }));
 
   
@@ -265,7 +282,7 @@ const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getS
         {
           session?.user.rol == 'USER_ROLE' &&  (
             <>
-              <Typography  variant="subtitle1" style={{ color: 'blue' }}>Tarjeta S/ {totalTarjeta.toFixed(2)} - Efectivo S/ {totalEfectivo.toFixed(2)}</Typography>
+              <Typography  variant="subtitle1" style={{ color: 'blue' }}>Tarjeta S/ {totalTarjeta.toFixed(2)} - Efectivo S/ {totalEfectivo.toFixed(2)} - Yape/Plin S/ {totalYape.toFixed(2)}</Typography>
               <Print comprobantes={comprobantes}/> 
             </>
           )
@@ -307,14 +324,10 @@ const HistoricoPage = ({ comprobantes }: InferGetServerSidePropsType<typeof getS
   )
 }
 
-export const getServerSideProps: GetServerSideProps<{ comprobantes: any }> = async ({ req, query})=>{
+export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
 
-  const session: any = await getSession({ req });
+  const session = await getSession({ req });  
   const { p = '/auth/login'} = query
-
-  var returnComprobante: any = [ initialComprobante ];
-  
-  
 
   if(!session){
       return {
@@ -323,15 +336,11 @@ export const getServerSideProps: GetServerSideProps<{ comprobantes: any }> = asy
               permanent: false
           }
       }
-  }else{
-    const { hasError, comprobantes} = await listarHistorico(session.user.id || 0);
-    returnComprobante = comprobantes;
   }
   return{
-      props: { comprobantes: returnComprobante }
+      props: {}
   }
 }
-
 
 export default HistoricoPage
 

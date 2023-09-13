@@ -18,7 +18,6 @@ import { IReceptor } from '@/interfaces';
 import constantes from '@/helpers/constantes';
 import { AutorizacionDialog } from '@/components/admin/AutorizacionDialog';
 import { Constantes } from '@/helpers';
-import { PhoneAndroid } from '@mui/icons-material';
 
 type FormData = {
     numeroDocumento: string;
@@ -29,7 +28,6 @@ type FormData = {
     comentario: string;
     tarjeta: number;
     efectivo: number;
-    yape: number;
 }
 
 type CalibracionData = {
@@ -39,36 +37,28 @@ type CalibracionData = {
 
 const InvoicePage : NextPage = () => {
 
+    
+
     const router = useRouter();
     const componentRef = useRef();
     const { showAlert } = useContext( UiContext );
 
+    console.log("get data");
+    console.log(router.query.id);
+    console.log(router.query.tipo);
+
     const { fuel, isLoading, isError } = useFuel(`/${ router.query.slug }`,{ refreshInterval: 0});
 
-    const { createOrder, findRuc, comprobante, receptor, emptyOrder, cleanOrder, isLoaded } = useContext(FuelContext)
+    const { modifyOrder, findRuc, comprobante, receptor, emptyOrder, cleanOrder, isLoaded } = useContext(FuelContext)
 
-    const { register, reset, watch, handleSubmit, trigger, setValue, getValues, formState: { errors } }  = useForm<FormData>({
+    const { register, reset, handleSubmit, trigger, setValue, getValues, formState: { errors } }  = useForm<FormData>({
         defaultValues: {
-            numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: '', tarjeta: 0, efectivo: 0, yape: 0
+            numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: '', tarjeta: 0, efectivo: 0
         }
     });
 
-    const isTotalValid = () => {
-        const validateTarjeta = +getValues("tarjeta")
-        const validateEfectivo = +getValues("efectivo")
-        const validateYape = +getValues("yape")
-        const total = fuel?.valorTotal||0
-
-        if (total != ( validateTarjeta + validateEfectivo + validateYape )){
-            return `El monto no coincide con el total: ${total}`
-        }else{
-            return true
-        }
-    };
-
     useEffect(() => {
         setValue("efectivo", fuel?.valorTotal||0, { shouldValidate: true });
-        console.log("cambio")
     }, [fuel?.valorTotal, setValue])    
 
     const [tipoComprobante, setTipoComprobante] = useState<string>('03');
@@ -78,7 +68,7 @@ const InvoicePage : NextPage = () => {
     useEffect(() => {
         if(openAlertaCalibracion.state){
             setTipoComprobante(constantes.TipoComprobante.Calibracion);
-            reset({ numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: '', tarjeta: 0, efectivo: 0, yape: 0});
+            reset({ numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: ''});
         }
     }, [openAlertaCalibracion, reset])
     
@@ -93,11 +83,12 @@ const InvoicePage : NextPage = () => {
           }        
     });
 
-    const handleClickMedioPago = (formValue : 'tarjeta'|'efectivo'|'yape') => {
-        setValue('tarjeta', 0, { shouldValidate: true });
-        setValue('efectivo', 0, { shouldValidate: true });
-        setValue('yape', 0, { shouldValidate: true });
-        setValue(formValue, fuel?.valorTotal||0, { shouldValidate: true });
+    const handleClickMedioPago = () => {
+        const tmpTarjeta = getValues("tarjeta");
+        const tmpEfectivo = getValues("efectivo");
+
+        setValue("efectivo", tmpTarjeta, { shouldValidate: true });
+        setValue("tarjeta", tmpEfectivo, { shouldValidate: true });
     }
 
     const onSubmitFuel = async (data: FormData) => {
@@ -111,8 +102,8 @@ const InvoicePage : NextPage = () => {
             placa: data.placa,
         }     
 
-        const { hasError, respuesta } = await createOrder(tipoComprobante, receptorForm, data.comentario, fuel?.descripcionCombustible || "", data.tarjeta, data.efectivo, data.yape,"","","","", fuel?.idAbastecimiento); 
-        console.log(respuesta);
+        const { hasError, respuesta } = await modifyOrder(router.query.correlativo?.toString() || "", router.query.id?.toString() || "", tipoComprobante, receptorForm, data.comentario, fuel?.descripcionCombustible || "", data.tarjeta, data.efectivo,"","","","", fuel?.idAbastecimiento); 
+
         if(!hasError){
             showAlert({mensaje: respuesta, time: 1500})         
             await setTimeout(function(){      
@@ -161,17 +152,15 @@ const InvoicePage : NextPage = () => {
         }        
     };
 
-    // const handleTarjetaValueChange = (event: { target: { value: any; }; }) => {
-    //     const newTarjetaValue = +event.target.value
-    //     setValue("efectivo", +(((fuel?.valorTotal||0) - newTarjetaValue).toFixed(2)), { shouldValidate: true });
-    // };
+    const handleTarjetaValueChange = (event: { target: { value: any; }; }) => {
+        const newTarjetaValue = +event.target.value
+        setValue("efectivo", +(((fuel?.valorTotal||0) - newTarjetaValue).toFixed(2)), { shouldValidate: true });
+    };
 
-    // const handleEfectivoValueChange = (event: { target: { value: any; }; }) => {
-    //     const newEfectivoValue = +event.target.value
-    //     setValue("tarjeta", +(((fuel?.valorTotal||0) - newEfectivoValue).toFixed(2)), { shouldValidate: true });
-    // };    
-
-
+    const handleEfectivoValueChange = (event: { target: { value: any; }; }) => {
+        const newEfectivoValue = +event.target.value
+        setValue("tarjeta", +(((fuel?.valorTotal||0) - newEfectivoValue).toFixed(2)), { shouldValidate: true });
+    };    
 
     return (
         <FuelLayout title='Resumen de compra' pageDescription={'Resumen de la compra'}>
@@ -284,18 +273,16 @@ const InvoicePage : NextPage = () => {
                                                 helperText={ errors.comentario?.message }                                            
                                             />
                                         </Grid>
-                                        <Grid item xs={4} sm={4}>
+                                        <Grid item xs={6} sm={6}>
                                             <TextField
                                                 label="Tarjeta"
                                                 variant="standard"
                                                 type='number'
                                                 fullWidth
-                                                { ...register('tarjeta', {
-                                                    validate: isTotalValid
-                                                })}
+                                                { ...register('tarjeta')}
                                                 error={ !!errors.tarjeta }
                                                 helperText={ errors.tarjeta?.message }
-                                                // onChange={handleTarjetaValueChange}
+                                                onChange={handleTarjetaValueChange}
                                                 inputProps={{
                                                     maxLength: 5,
                                                     step: 0.01
@@ -303,7 +290,7 @@ const InvoicePage : NextPage = () => {
                                                 InputProps={{
                                                     startAdornment: (
                                                         <InputAdornment position="start">
-                                                            <IconButton aria-label="toggle password visibility" onClick={() => handleClickMedioPago('tarjeta')}>
+                                                            <IconButton aria-label="toggle password visibility" onClick={handleClickMedioPago}>
                                                                 <CreditCardIcon color="secondary"/>
                                                             </IconButton>
                                                         </InputAdornment>
@@ -311,18 +298,16 @@ const InvoicePage : NextPage = () => {
                                                 }}
                                             />                                         
                                         </Grid>
-                                        <Grid item xs={4} sm={4}>
+                                        <Grid item xs={6} sm={6}>
                                             <TextField
                                                 label="Efectivo"
                                                 variant='standard' 
                                                 type='number'
                                                 fullWidth
-                                                { ...register('efectivo', {
-                                                    validate: isTotalValid
-                                                })}
+                                                { ...register('efectivo')}
                                                 error={ !!errors.efectivo }
                                                 helperText={ errors.efectivo?.message }  
-                                                // onChange={handleEfectivoValueChange}
+                                                onChange={handleEfectivoValueChange}
                                                 inputProps={{
                                                     maxLength: 5,
                                                     step: 0.01
@@ -332,7 +317,7 @@ const InvoicePage : NextPage = () => {
                                                         <InputAdornment position="start">
                                                             <IconButton
                                                                 aria-label="toggle password visibility"
-                                                                onClick={() => handleClickMedioPago('efectivo')}
+                                                                onClick={handleClickMedioPago}
                                                             >
                                                                 <PaymentsIcon color="success"/>
                                                             </IconButton>                                                            
@@ -342,37 +327,6 @@ const InvoicePage : NextPage = () => {
                                                 }}
                                             />  
                                         </Grid>
-                                        <Grid item xs={4} sm={4}>
-                                            <TextField
-                                                label="Yape/Plin"
-                                                variant='standard' 
-                                                type='number'
-                                                fullWidth
-                                                { ...register('yape', {
-                                                    validate: isTotalValid
-                                                })}
-                                                error={ !!errors.yape }
-                                                helperText={ errors.yape?.message }  
-                                                // onChange={handleEfectivoValueChange}
-                                                inputProps={{
-                                                    maxLength: 5,
-                                                    step: 0.01
-                                                }}                                                                                           
-                                                InputProps={{
-                                                    startAdornment: (
-                                                        <InputAdornment position="start">
-                                                            <IconButton
-                                                                aria-label="toggle password visibility"
-                                                                onClick={() => handleClickMedioPago('yape')}
-                                                            >
-                                                                <PhoneAndroid color="warning"/>
-                                                            </IconButton>                                                            
-                                                            
-                                                        </InputAdornment>
-                                                    ),
-                                                }}
-                                            />  
-                                        </Grid>                                        
                                     </Grid>
                             </CardContent>
                             </Card>

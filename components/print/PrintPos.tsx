@@ -51,14 +51,20 @@ export const PrintPos = forwardRef((props: IPrintPosProps, ref) => {
                   
                 {comprobante.placa? <>
                   <Grid item xs={6} style={{paddingTop: 0}}>PLACA</Grid>
-                  <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.placa }</Grid>              
+                  <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.placa.toUpperCase() }</Grid>              
                 </> : <></>}
 
                 <Grid item xs={6} style={{paddingTop: 0}}>FECHA</Grid>
-                <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.fecha_emision }</Grid>
+                <Grid item xs={6} style={{paddingTop: 0}}>{ new Date(comprobante.fecha_abastecimiento).toLocaleString('es-PE', { timeZone: 'UTC' }) }</Grid>
+
+                {receptor.direccion? <>
+                  <Grid item xs={6} style={{paddingTop: 0}}>DIRECCION:</Grid>
+                  <Grid item xs={6} style={{paddingTop: 0}}>{ receptor.direccion }</Grid>                
+                </>:<></>
+                }                                
 
                 <Grid item xs={3} style={{paddingTop: 0}}>Usuario: </Grid>
-                <Grid item xs={3} style={{paddingTop: 0}}>{session?.user.usuario}</Grid>
+                <Grid item xs={3} style={{paddingTop: 0}}>{session?.user.nombre}</Grid>
                 <Grid item xs={3} style={{paddingTop: 0, fontWeight: 'bold'}}>Producto: </Grid>
                 <Grid item xs={3} style={{paddingTop: 0, fontWeight: 'bold'}}>{ comprobante.dec_combustible.substring(0,9) }</Grid>
 
@@ -119,14 +125,14 @@ export const PrintPos = forwardRef((props: IPrintPosProps, ref) => {
                   
                 {comprobante.placa? <>
                   <Grid item xs={6} style={{paddingTop: 0}}>PLACA</Grid>
-                  <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.placa }</Grid>              
+                  <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.placa.toUpperCase() }</Grid>              
                 </> : <></>}
 
                 <Grid item xs={6} style={{paddingTop: 0}}>FECHA</Grid>
-                <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.fecha_emision }</Grid>
+                <Grid item xs={6} style={{paddingTop: 0}}>{ new Date(comprobante.fecha_abastecimiento).toLocaleString('es-PE', { timeZone: 'UTC' }) }</Grid>
 
                 <Grid item xs={3} style={{paddingTop: 0}}>Usuario: </Grid>
-                <Grid item xs={3} style={{paddingTop: 0}}>{session?.user.usuario}</Grid>
+                <Grid item xs={3} style={{paddingTop: 0}}>{session?.user.nombre}</Grid>
                 <Grid item xs={3} style={{paddingTop: 0, fontWeight: 'bold'}}>Producto: </Grid>
                 <Grid item xs={3} style={{paddingTop: 0, fontWeight: 'bold'}}>{ comprobante.dec_combustible.substring(0,9) }</Grid>
 
@@ -187,14 +193,14 @@ export const PrintPos = forwardRef((props: IPrintPosProps, ref) => {
                   
                 {comprobante.placa? <>
                   <Grid item xs={6} style={{paddingTop: 0}}>PLACA</Grid>
-                  <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.placa }</Grid>              
+                  <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.placa.toUpperCase() }</Grid>              
                 </> : <></>}
 
                 <Grid item xs={6} style={{paddingTop: 0}}>FECHA</Grid>
-                <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.fecha_emision }</Grid>
+                <Grid item xs={6} style={{paddingTop: 0}}>{ new Date(comprobante.fecha_abastecimiento).toLocaleString('es-PE', { timeZone: 'UTC' }) }</Grid>
 
                 <Grid item xs={3} style={{paddingTop: 0}}>Usuario: </Grid>
-                <Grid item xs={3} style={{paddingTop: 0}}>{session?.user.usuario}</Grid>
+                <Grid item xs={3} style={{paddingTop: 0}}>{session?.user.nombre}</Grid>
                 <Grid item xs={3} style={{paddingTop: 0, fontWeight: 'bold'}}>Producto: </Grid>
                 <Grid item xs={3} style={{paddingTop: 0, fontWeight: 'bold'}}>{ comprobante.dec_combustible.substring(0,9) }</Grid>
 
@@ -245,14 +251,14 @@ export const PrintPos = forwardRef((props: IPrintPosProps, ref) => {
                   
                 {comprobante.placa? <>
                   <Grid item xs={6} style={{paddingTop: 0}}>PLACA</Grid>
-                  <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.placa }</Grid>              
+                  <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.placa.toUpperCase() }</Grid>              
                 </> : <></>}
 
                 <Grid item xs={6} style={{paddingTop: 0}}>FECHA</Grid>
-                <Grid item xs={6} style={{paddingTop: 0}}>{ comprobante.fecha_emision }</Grid>
+                <Grid item xs={6} style={{paddingTop: 0}}>{ new Date(comprobante.fecha_abastecimiento).toLocaleString('es-PE', { timeZone: 'UTC' }) }</Grid>
 
                 <Grid item xs={3} style={{paddingTop: 0}}>Usuario: </Grid>
-                <Grid item xs={3} style={{paddingTop: 0}}>{session?.user.usuario}</Grid>
+                <Grid item xs={3} style={{paddingTop: 0}}>{session?.user.nombre}</Grid>
                 <Grid item xs={3} style={{paddingTop: 0, fontWeight: 'bold'}}>Producto: </Grid>
                 <Grid item xs={3} style={{paddingTop: 0, fontWeight: 'bold'}}>{ comprobante.dec_combustible.substring(0,8) }</Grid>
 

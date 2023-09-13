@@ -13,6 +13,7 @@ export interface IComprobante {
     numeracion_documento_afectado: string;
     pago_efectivo: number;
     pago_tarjeta: number;
+    pago_yape: number;
     motivo_documento_afectado: string;
     total_gravadas: string;
     total_igv: string;
@@ -30,4 +31,5 @@ export interface IComprobante {
     billete: number;
     producto_precio: string;
     id_abastecimiento: number;
+    fecha_abastecimiento: string;
 }

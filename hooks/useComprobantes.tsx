@@ -1,28 +1,18 @@
-import { posApi } from '@/api';
-import { UiContext } from '@/context';
-import { IComprobante, IFuel, IKeyValue } from '@/interfaces';
-import { useContext } from 'react';
 import useSWR, { SWRConfiguration } from "swr"
+import { IComprobante, IFuel, IKeyValue } from '@/interfaces';
 
 interface Props {
-  comprobantes: any;
+    comprobantes: IComprobante[];
+    total: number;
 }
 
-export const listarHistorico = async(idUsuario: number):Promise<{ hasError: boolean; comprobantes?: IComprobante[]; }> => {
-  try {
-      const body = {
-          "idUsuario": idUsuario
-      }
-      const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/historico`, body);
-      return {
-          hasError: false,
-          comprobantes: data.comprobantes
-      }
+export const useHistorico = ( idUsuario: string, config: SWRConfiguration = {} ) => {    
 
-  } catch (error) {
-      return {
-          hasError: true
-      }
-  }
+    const { data, error, isLoading } = useSWR<Props>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/historico?idUsuario=${idUsuario}`, config);
 
+    return {
+        hasError: error,
+        isLoading,
+        comprobantes: data?.comprobantes
+    }
 }

@@ -3,6 +3,7 @@ import { FuelLayout } from "@/components/layouts";
 import { PrintPos } from "@/components/print/PrintPos";
 import { ChangePasswordDialog } from "@/components/users/ChangePasswordDialog";
 import { FuelContext, UiContext } from "@/context";
+import { Constantes } from "@/helpers";
 import constantes from "@/helpers/constantes";
 import { useFuel } from "@/hooks/useFuel";
 import { IReceptor, IUser } from "@/interfaces";
@@ -63,8 +64,9 @@ const NotaCreditoPage: NextPage = () => {
         const numeracion_afectado: string = router.query.numeracion_afectado?.toString() || "";
         const fecha_afectado: string = router.query.fecha_afectado?.toString() || "";
         const producto: string = fuel?.descripcionCombustible || "";
+        const prefijo: string = tipo_afectado == Constantes.TipoComprobante.Boleta?"B":"F";
 
-        const { hasError, respuesta } = await createOrder(constantes.TipoComprobante.NotaCredito, receptorForm, "", producto, 0, 0, tipo_afectado, numeracion_afectado, fecha_afectado, idAbastecimiento); 
+        const { hasError, respuesta } = await createOrder(constantes.TipoComprobante.NotaCredito, receptorForm, "", producto, 0, 0, tipo_afectado, numeracion_afectado, fecha_afectado, prefijo, idAbastecimiento); 
         
         if(hasError){
             console.log("tiene errrores");

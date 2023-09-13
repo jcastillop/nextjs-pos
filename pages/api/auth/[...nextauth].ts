@@ -13,13 +13,19 @@ export const authOptions: NextAuthOptions = {
         name: 'Custom Login',
         credentials: {
             user: { label: 'Codigo:', type: 'text', placeholder: 'Codigo 4 digitos' },
-            password: { label: 'Password:', type: 'password', placeholder: 'Codigo 4 digitos' }
+            password: { label: 'Password:', type: 'password', placeholder: 'Codigo 4 digitos' },
+            turno: { label: 'Turno:', type: 'text', placeholder: 'Codigo 4 digitos' },
+            isla: { label: 'Isla:', type: 'text' },
+            terminal: { label: 'Terminal:', type: 'text' }            
         },
         async authorize (credentials) {
           //const { createOrder, numeroComprobante, codigoHash, codigoQr, emptyOrder, findRuc } = useContext(FuelContext)
           const body = {
             "user": credentials!.user,
-            "password": Buffer.from(credentials!.password, 'binary').toString('base64')
+            "password": Buffer.from(credentials!.password, 'binary').toString('base64'),
+            "turno": credentials!.turno,
+            "isla": credentials!.isla,
+            "terminal": credentials!.terminal
           }
 
           const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/usuarios/login`, body);

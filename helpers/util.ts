@@ -26,6 +26,15 @@ export const formatDate = (date: Date) =>{
     return `${day<10?`0${day}`:`${day}`}-${month<10?`0${month}`:`${month}`}-${year}`
 }
 
+export const formatDateUS = (date: Date) =>{
+
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+
+    return `${year}-${month<10?`0${month}`:`${month}`}-${day<10?`0${day}`:`${day}`}`
+}
+
 export const formatDateSQL = (date: Date) =>{
 
     let day = date.getDate();

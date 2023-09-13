@@ -46,7 +46,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
         dispatch({ type: '[Cart] - Fuel clean' });
     }
         
-    const createOrder = async(tipo: string, receptor : IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, id?: number): Promise<{ hasError: boolean; respuesta: any; }> => {
+    const createOrder = async(tipo: string, receptor : IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, yape: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, prefijo: string, id?: number): Promise<{ hasError: boolean; respuesta: any; }> => {
 
         dispatch({ type: '[Cart] - Fuel processing' });
         
@@ -68,7 +68,9 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             "comentario":comentario,
             "tipo_afectado":tipo_afectado,
             "numeracion_afectado":numeracion_afectado,
-            "fecha_afectado":fecha_afectado
+            "fecha_afectado":fecha_afectado,
+            "prefijo": prefijo,
+            "yape": yape
         }        
 
         try {
@@ -81,7 +83,76 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             }
 
             await dispatch({ type: '[Cart] - Update order summary', payload: orderSummary })
+            
+            const comprobante: IComprobante = data.comprobante;
 
+            if(comprobante && comprobante.errors){
+                return {
+                    hasError: true,
+                    respuesta: comprobante.errors
+                }                
+            }else{
+                return {
+                    hasError: data.hasError,
+                    respuesta: data.respuesta
+                }
+            }
+
+
+        } catch (error) {
+            if ( axios.isAxiosError(error) ) {
+                return {
+                    hasError: true,
+                    respuesta: error.response?.data.message
+                }
+            }
+            return {
+                hasError: true,
+                respuesta : 'Error no controlado, hable con el administrador ' + error
+            }
+        }
+
+    }
+
+    const modifyOrder = async(correlativo: string, id_comprobante: string, tipo: string, receptor : IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, prefijo: string, id?: number): Promise<{ hasError: boolean; respuesta: any; }> => {
+
+        dispatch({ type: '[Cart] - Fuel processing' });
+        
+        const session = await getSession();
+        
+        const body = {
+            "id": id,
+            "tipo": tipo,
+            "tipo_documento": receptor.tipo_documento,
+            "numero_documento": receptor.numero_documento,
+            "razon_social": receptor.razon_social,
+            "direccion": receptor.direccion,
+            "correo": receptor.correo,
+            "placa": receptor.placa,
+            "usuario": session?.user.id,
+            "producto": producto,
+            "tarjeta": tarjeta,
+            "efectivo": efectivo,
+            "comentario":comentario,
+            "tipo_afectado":tipo_afectado,
+            "numeracion_afectado":numeracion_afectado,
+            "fecha_afectado":fecha_afectado,
+            "prefijo": prefijo,
+            "correlativo": correlativo,
+            "id_comprobante": id_comprobante
+        }        
+
+        try {
+            //OBTENIENDO INFO DEL COMPROBANTE
+            const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/modifica`, body);
+            //hasError, receptor, comprobante, respuesta
+            const orderSummary = {
+                receptor: data.receptor,
+                comprobante: data.comprobante
+            }
+
+            await dispatch({ type: '[Cart] - Update order summary', payload: orderSummary })
+            
             const comprobante: IComprobante = data.comprobante;
 
             if(comprobante.errors){
@@ -95,8 +166,6 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
                     respuesta: data.respuesta
                 }
             }
-            
-
 
 
         } catch (error) {
@@ -132,7 +201,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
 
     }
 
-    const createCierre = async(id: number, fecha : Date, turno : string, isla : string, efectivo: number, tarjeta: number):Promise<{ hasError: boolean; message: string; }> => {
+    const createCierre = async(id: number, fecha : Date, turno : string, isla : string, efectivo: number, tarjeta: number, yape: number):Promise<{ hasError: boolean; message: string; }> => {
 
         const body = {
             "session": id,
@@ -140,7 +209,8 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             "turno": turno,
             "isla": isla,
             "efectivo": efectivo,
-            "tarjeta": tarjeta
+            "tarjeta": tarjeta,
+            "yape": yape
         }    
         try {
             const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/cerrarturno`, body);
@@ -360,6 +430,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             createCierre,
             createCierreDia,
             createOrder,
+            modifyOrder,
             emptyOrder,
             cleanOrder,
             listarHistorico,

@@ -66,7 +66,7 @@ export const FuelCard: FC<Props> = ({ fuel }) => {
                   //color:'#fff',
                   zIndex:2,
                   position:'relative'
-                }}>S/.{ fuel?.valorTotal }</Typography>
+                }}>S/ { (Math.round((fuel?.valorTotal||0) * 100) / 100).toFixed(2) }</Typography>
                 <Typography fontWeight={500}>PU : { fuel?.precioUnitario }</Typography>
                 <Typography fontWeight={500}>Galones : { fuel?.volTotal }</Typography>
               </Box>

@@ -78,7 +78,7 @@ const CierrePage: NextPage = () => {
                                     cierres.map( cierre => (
                                         <Card key={cierre.id}>
                                             <CardContent>
-                                                <Typography fontWeight={400}>Isla: { cierre.isla } - Turno: { cierre.turno } - Galones: { cierre.total.toFixed(2) } - Efectivo: { cierre.efectivo.toFixed(2) } - Tarjeta: { cierre.tarjeta.toFixed(2) } </Typography>
+                                            <Typography fontWeight={400}>Isla: { cierre.isla } - Turno: { cierre.turno } - Galones: { cierre.total.toFixed(2) } - Efectivo: { cierre.efectivo.toFixed(2) } - Tarjeta: { cierre.tarjeta.toFixed(2) } </Typography>
                                             </CardContent>
                                         </Card>
                                     ) )

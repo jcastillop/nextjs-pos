@@ -1,7 +1,6 @@
 import { IFuel, IReceptor } from '@/interfaces';
-import { FuelState } from '.';
+import { FuelState, RECEPTOR_INITIAL } from '.';
 import { IComprobante } from '@/interfaces/comprobante';
-import { initialReceptor } from '@/database/receptor';
 
 type FuelActionType = 
    | { type: '[Cart] - LoadCart fuel' } 
@@ -38,7 +37,7 @@ export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelSta
          case '[Cart] - Fuel clean':
             return {
                ...state,
-               receptor: initialReceptor        
+               receptor: RECEPTOR_INITIAL        
             }            
          case '[Cart] - Fuel processing':
             return {

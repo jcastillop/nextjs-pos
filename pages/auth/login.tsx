@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { signIn, getSession, getProviders } from 'next-auth/react';
 import { AuthLayout } from '@/components/layouts'
-import { Box, Button, Chip, Grid,Link,TextField,ToggleButton,ToggleButtonGroup,Typography } from '@mui/material'
+import { Box, Button, Chip, Grid,Link,MenuItem,TextField,ToggleButton,ToggleButtonGroup,Typography } from '@mui/material'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { ErrorOutline } from '@mui/icons-material'
 import { GetServerSideProps } from 'next';
 import router from 'next/router';
+import { UiContext } from '@/context';
+import { useValidaIp } from '@/hooks';
+
 
 type FormData = {
     user: string,
-    password: string
+    password: string,
+    turno: string
 };
 
 
@@ -18,7 +22,9 @@ const LoginPage = () => {
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
     const [ showError, setShowError ] = useState(false);
     const [providers, setProviders] = useState<any>({});
+    const { showAlert } = useContext( UiContext );
     //const callbackUrl = (router.query?.callbackUrl as string) ?? "/";    
+    const { isla, hasError, terminal, message } = useValidaIp();
 
     useEffect(() => {
         getProviders().then( prov => {
@@ -26,11 +32,11 @@ const LoginPage = () => {
         })
       }, [])    
 
-    const onSubmit  = async ({ user, password }: FormData) =>{
+    const onSubmit  = async ({ user, password, turno }: FormData) =>{
         setShowError(false);
-        const result = await signIn('credentials',{ user, password, redirect: false });
+        const result = await signIn('credentials',{ user, password, turno, isla, terminal, redirect: false });
         if (result?.error) {
-            console.log("error")
+            showAlert({mensaje: result?.error, severity: 'error', time: 7000})
           } else {
             router.push("/");
           }
@@ -43,6 +49,11 @@ const LoginPage = () => {
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
                         <Typography variant='h1' component='h1'>FUEL-HUB</Typography>
+                        <Chip 
+                            label= { hasError? message : `${terminal} - ${isla}`}
+                            color= { hasError? 'error' :'success' }
+                            className="fadeIn"
+                        />                         
                         <Chip 
                             label="No reconocemos ese usuario / contraseña"
                             color="error"
@@ -87,7 +98,21 @@ const LoginPage = () => {
                         alignItems="center"
                         justifyContent="center"                   
                     >
-                      
+                        <TextField
+                        select
+                        fullWidth
+                        label="Select"
+                        defaultValue='TURNO1'
+                        inputProps={register('turno', {
+                            required: 'Please enter currency',
+                        })}
+                        error={ !!errors.turno }
+                        helperText={errors.turno?.message}
+                        >
+                            <MenuItem value={"TURNO1"}>TURNO1</MenuItem>
+                            <MenuItem value={"TURNO2"}>TURNO2</MenuItem>
+                            <MenuItem value={"TURNO3"}>TURNO3</MenuItem>
+                        </TextField>                      
                     </Grid>
                     <Grid item xs={12}>
                             <Button
@@ -95,6 +120,7 @@ const LoginPage = () => {
                                 color="secondary"
                                 className='circular-btn'
                                 size='large'
+                                disabled = { hasError }
                                 fullWidth>
                                 Ingresar
                             </Button>
