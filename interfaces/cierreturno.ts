@@ -10,3 +10,25 @@ export interface ICierreTurno {
     estado: number;
     Usuario: IUser;
 }
+export interface ICierreTurnoHistorico {
+    id: number;    
+    fecha: Date;
+    turno: string;
+    isla: string;
+    efectivo: number;
+    tarjeta: number;
+    yape: number;
+    total: number;
+}
+export interface ICierreTurnoPrint {
+    producto: string;
+    total: number;
+    despacho?: number;
+    calibracion?: number;
+}
+
+export interface ICierreTurnoTotalesPrint {
+    efectivo: number;
+    tarjeta: number;
+    yape: number;
+}

@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
 
           const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/usuarios/login`, body);
           if(data){
-            return { id: data.usuario.login.UsuarioId, usuario: data.usuario.usuario.usuario, correo: data.usuario.usuario.correo, nombre: data.usuario.usuario.nombre, rol: data.usuario.usuario.rol, grifo: data.usuario.login.terminal, isla: data.usuario.login.isla, jornada: data.usuario.login.jornada };
+            return { id: data.usuario.login.UsuarioId, usuario: data.usuario.usuario.usuario, correo: data.usuario.usuario.correo, nombre: data.usuario.usuario.nombre, rol: data.usuario.usuario.rol, grifo: data.usuario.login.terminal, isla: data.usuario.login.isla, jornada: data.usuario.login.jornada, fecha_registro: data.usuario.login.fecha_registro };
           }else{
             //return null;
             log4js( "NexthAuthCredentials",data, 'error');
@@ -62,6 +62,7 @@ export const authOptions: NextAuthOptions = {
       session.user.grifo = String(token.grifo)
       session.user.isla = String(token.isla)
       session.user.jornada = String(token.jornada)
+      session.user.fecha_registro = String(token.fecha_registro)
       return session // The return type will match the one returned in `useSession()`
     },    
     
@@ -76,6 +77,7 @@ export const authOptions: NextAuthOptions = {
         token.grifo = user.grifo;
         token.isla = user.isla;
         token.jornada = user.jornada;
+        token.fecha_registro = user.fecha_registro;
       }
 
       return token;

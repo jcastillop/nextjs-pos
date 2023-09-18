@@ -19,5 +19,6 @@ declare module "next-auth" {
         isla?: string;
         jornada?: string;
         otro?: string;
+        fecha_registro?: string;
     }
   }

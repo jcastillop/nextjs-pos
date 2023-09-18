@@ -61,22 +61,34 @@ export const Print: React.FC<Props> = ({comprobantes}) => {
     const { fuels, isLoading, isError } = useFuels('/abastecimientos/count/total',null,null,{ refreshInterval: 3}, '0', '100')
 
     const handleAceptar = async () => {
-        if(fuels.length > 0){
-            showAlert({mensaje: `Tiene abastecimientos pendientes por liquidar: ${ fuels.length }, no puede cerrar turno`, severity: 'error'})
-        }else{
-            if(comprobantes.length > 0){
-                const session = await getSession();
-                const data = await createCierre(parseInt(session?.user.id?session?.user.id:"0"), new Date(formatDateSQL(value)), session?.user.jornada || '', session?.user.isla || '',totalEfectivo, totalTarjeta, totalYape);            
-                if(!data.hasError){
-                    handlePrint();                
-                    showAlert({mensaje: 'Turno cerrado satisfactoriamente', severity: 'success'})                
-                }else{
-                    showAlert({mensaje: data.message.toString(), severity: 'error'})
-                }
+        if(comprobantes.length > 0){
+            const session = await getSession();
+            const data = await createCierre(parseInt(session?.user.id?session?.user.id:"0"), new Date(formatDateSQL(value)), session?.user.jornada || '', session?.user.isla || '',totalEfectivo, totalTarjeta, totalYape);            
+            if(!data.hasError){
+                handlePrint();                
+                showAlert({mensaje: 'Turno cerrado satisfactoriamente', severity: 'success'})                
             }else{
-                showAlert({mensaje: 'No tiene cuenta por liquidar', severity: 'error'})
+                showAlert({mensaje: data.message.toString(), severity: 'error'})
             }
-        }
+        }else{
+            showAlert({mensaje: 'No tiene cuenta por liquidar', severity: 'error'})
+        }        
+        // if(fuels.length > 0){
+        //     showAlert({mensaje: `Tiene abastecimientos pendientes por liquidar: ${ fuels.length }, no puede cerrar turno`, severity: 'error'})
+        // }else{
+        //     if(comprobantes.length > 0){
+        //         const session = await getSession();
+        //         const data = await createCierre(parseInt(session?.user.id?session?.user.id:"0"), new Date(formatDateSQL(value)), session?.user.jornada || '', session?.user.isla || '',totalEfectivo, totalTarjeta, totalYape);            
+        //         if(!data.hasError){
+        //             handlePrint();                
+        //             showAlert({mensaje: 'Turno cerrado satisfactoriamente', severity: 'success'})                
+        //         }else{
+        //             showAlert({mensaje: data.message.toString(), severity: 'error'})
+        //         }
+        //     }else{
+        //         showAlert({mensaje: 'No tiene cuenta por liquidar', severity: 'error'})
+        //     }
+        // }
 
     }
 
