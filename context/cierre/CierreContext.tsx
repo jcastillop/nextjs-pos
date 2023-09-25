@@ -1,6 +1,7 @@
 
 import { createContext } from 'react';
 import { IComprobante } from '@/interfaces/comprobante';
+import { ICierreTurnoHistorico } from '@/interfaces';
 
 interface ContextProps {
     isLoaded: boolean;
@@ -9,7 +10,7 @@ interface ContextProps {
     total: number;
     idUsuario: number;
 
-    createCierre: (id: number, fecha : Date) => Promise<{ hasError: boolean; message: string; }>;
+    createCierre: (id: number, fecha : Date) => Promise<{ hasError: boolean, cierre?: ICierreTurnoHistorico, cantidad: number, message: string }>;
 }
 
 

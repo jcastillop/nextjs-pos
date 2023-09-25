@@ -3,6 +3,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { Box, Button, Card, CardContent, CardHeader, Grid, TextField } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { formatDateUS } from '@/helpers/util';
+import { ReporteProductoDias } from '@/hooks/useReportes';
+import { useExcelDownloder } from 'react-xls';
 
 type FormData = {
     fechaInicio: Date;
@@ -11,17 +14,29 @@ type FormData = {
 
 export const Diario = () => {
 
-    const [fechaInicio, setFechaInicio] = useState<Date | null>(new Date());
-    const [fechaFin, setFechaFin] = useState<Date | null>(new Date());
-    
+    const { ExcelDownloder, Type } = useExcelDownloder();
+
     const { control, register, reset, handleSubmit, trigger, setValue, getValues, formState: { errors } }  = useForm<FormData>({
         defaultValues: {
             fechaInicio: new Date(), fechaFin: new Date()
         }
     });
 
-    const onSubmitReporte = async (data: FormData) => {
-        console.log(fechaInicio);
+    const [showPrint, setShowPrint] = useState(false);
+    const [dataDownloader, setDataDownloader] = useState<any>();
+
+    const onSubmitReporte = async ({ fechaInicio, fechaFin}: FormData) => {
+        
+        const paramFechaInicio: string = formatDateUS(fechaInicio || new Date());
+        const paramFechaFin: string = formatDateUS(fechaFin || new Date());
+        const { hasError, message, data} = await ReporteProductoDias(paramFechaInicio, paramFechaFin);
+        if(!hasError && data.length > 0 ){
+            const reporte = { paramFechaInicio: data }
+            setDataDownloader(reporte)
+            setShowPrint(true)
+        }else{
+            setShowPrint(false)
+        }
     }
 
     return (
@@ -41,12 +56,11 @@ export const Diario = () => {
                                             name="fechaInicio"
                                             control={ control }
                                             render={
-                                                ({ field: { onChange, ...restField } }) =>
+                                                ({ field }) =>
                                                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                                                 <DatePicker
                                                     label="Fecha de inicio"
-                                                    value={ fechaInicio }
-                                                    onChange={(newValue) => setFechaInicio(newValue)}
+                                                    onChange={(date) => field.onChange(date)}
                                                 />
                                                 </LocalizationProvider>
                                                 }
@@ -57,12 +71,11 @@ export const Diario = () => {
                                             name="fechaFin"
                                             control={ control }
                                             render={
-                                                ({ field: { onChange, ...restField } }) =>
+                                                ({ field }) =>
                                                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                                                 <DatePicker
                                                     label="Fecha fin"
-                                                    value={ fechaFin }
-                                                    onChange={(newValue) => setFechaFin(newValue)}
+                                                    onChange={(date) => field.onChange(date)}
                                                 />
                                                 </LocalizationProvider>
                                                 }
@@ -86,16 +99,16 @@ export const Diario = () => {
                             </Button>                            
                         </Grid> 
                         <Grid item xs={6} sm={6}>
-                            <Button
-                            color='success'
-                            className='circular-btn'
-                            fullWidth
-                            type='submit'
-                            disabled
-                            >                           
-                                Descargar
-                            </Button>                            
-                        </Grid>                         
+                            {
+                                showPrint ? <ExcelDownloder
+                                filename={`REPORTE_DIARIO_${formatDateUS(getValues("fechaInicio") || new Date())}_${formatDateUS(getValues("fechaFin") || new Date())}`}
+                                data={ dataDownloader }
+                                type={ Type.Button }
+                                >                           
+                                    Descargar
+                                </ExcelDownloder> : <></>
+                            }
+                        </Grid>                           
                     </Grid>                  
                 </Box>                
             </form>

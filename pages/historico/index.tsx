@@ -201,7 +201,7 @@ const HistoricoPage = () => {
       disableColumnMenu: true,
       renderCell: (params: GridRenderCellParams<any>) => {
         if(params.row.tipo == constantes.TipoComprobante.Factura || params.row.tipo == constantes.TipoComprobante.Boleta){
-          if(params.row.motivo){
+          if(params.row.motivo || !params.row.hash){
             return(<Button variant="contained" color="secondary" disabled>Generar</Button>)
           }else{
             return (

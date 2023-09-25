@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { IComprobante, IReceptor, IUser } from '@/interfaces';
+import { ICierreTurnoHistorico, IComprobante, IReceptor, IUser } from '@/interfaces';
 interface ContextProps {
     isLoaded: boolean;
     receptor: IReceptor;
@@ -9,7 +9,7 @@ interface ContextProps {
     emptyOrder: any;
     cleanOrder: any;
     findRuc: (valor: string) => Promise<{ hasError: boolean; receptores?: IReceptor[]; error: any; }>;
-    createCierre: (id: number, fecha : Date, turno : string, isla : string, efectivo: number, tarjeta: number, yape: number) => Promise<{ hasError: boolean; message: string; }>;
+    createCierre: (id: number, fecha : Date, turno : string, isla : string, efectivo: number, tarjeta: number, yape: number) => Promise<{ hasError: boolean, cierre?: ICierreTurnoHistorico, cantidad: number, message: string }>;
     createCierreDia: (id: number) => Promise<{ hasError: boolean; message: string; }>;
     listarHistorico: (idUsuario: number) => Promise<{ hasError: boolean; comprobantes?: IComprobante[] }>;
     listarUsuarios: () => Promise<{ hasError: boolean; usuarios?: IUser[] }>;

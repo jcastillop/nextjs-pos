@@ -1,5 +1,5 @@
 import { FuelLayout } from '@/components/layouts'
-import { getDatetimeFormat, getTodayDatetime } from '@/helpers'
+import { getDatetimeFormat, getDatetimeFormatFromString, getTodayDatetime } from '@/helpers'
 import { useObtieneCierre } from '@/hooks/useCierres'
 import { CreditCard, PhoneAndroid } from '@mui/icons-material'
 import { Typography, Grid, Divider, Card, CardContent, List, ListItem, ListItemText, Chip } from '@mui/material'
@@ -64,7 +64,7 @@ export const CierreTurnoPage = () => {
                     
                     <Grid item xs={12} sm={6}>
                         <Typography variant="h5" component="div">Venta del día</Typography>
-                        <Typography sx={{ display: 'inline' }} component="span" variant="body2" color="text.primary">Galones / Soles / Tipo pago - { session?.user.fecha_registro  } - { fechaActual } </Typography>                                                
+                        <Typography sx={{ display: 'inline' }} component="span" variant="body2" color="text.primary">Galones / Soles / Tipo pago - { getDatetimeFormatFromString(session?.user.fecha_registro || "")  } - { fechaActual } </Typography>                                                
                         <Card className='summary-card' sx={{ maxWidth: 600 , margin:1 }}>
                             <CardContent>
 
@@ -76,49 +76,49 @@ export const CierreTurnoPage = () => {
                                     <Grid item xs={2} display='flex' justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>CERAFIN</Typography></Grid> 
                                     {
                                         galonaje? galonaje.map( galones => (
-                                                <>
-                                                <Grid item xs={6} >
-                                                    <Typography>{ galones.producto }</Typography>
-                                                </Grid>
-                                                <Grid item xs={2} display='flex' justifyContent='end'>
-                                                    <Typography>{ galones.total.toFixed(3) }</Typography>
-                                                </Grid>
-                                                <Grid item xs={2} display='flex' justifyContent='end'>
-                                                    <Typography>{ (galones.despacho?galones.despacho:0).toFixed(3) }</Typography>
-                                                </Grid>
-                                                <Grid item xs={2} display='flex' justifyContent='end'>
-                                                    <Typography>{ (galones.calibracion?galones.calibracion:0).toFixed(3) }</Typography>
-                                                </Grid>                                                                                                
-                                                </>                             
+                                                <Grid container key={ galones.producto }>
+                                                    <Grid item xs={6} >
+                                                        <Typography>{ galones.producto }</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={2} display='flex' justifyContent='end'>
+                                                        <Typography>{ galones.total.toFixed(3) }</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={2} display='flex' justifyContent='end'>
+                                                        <Typography>{ (galones.despacho?galones.despacho:0).toFixed(3) }</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={2} display='flex' justifyContent='end'>
+                                                        <Typography>{ (galones.calibracion?galones.calibracion:0).toFixed(3) }</Typography>
+                                                    </Grid>                                                                                                
+                                                </Grid>                             
                                         )):<></>
                                     }
                                 </Grid>     
-                                    <Divider sx={{ my:1 }} />                                           
-                                    <Typography component="div" sx={{ fontWeight: 'bold' }}>VENTA SOLES</Typography>
-                                    <Grid container>
+                                <Divider sx={{ my:1 }} />                                           
+                                <Typography component="div" sx={{ fontWeight: 'bold' }}>VENTA SOLES</Typography>
+                                <Grid container>
                                     <Grid item xs={6} sx={{ marginTop: 1, marginBottom: 0.5}}><Typography sx={{ fontWeight: 'bold' }}>PRODUCTO</Typography></Grid>
                                     <Grid item xs={2} display='flex' justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>TOTAL</Typography></Grid> 
                                     <Grid item xs={2} display='flex' justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>DESPACHO</Typography></Grid> 
                                     <Grid item xs={2} display='flex' justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>CERAFIN</Typography></Grid>                                         
                                     {
                                         totalproducto? totalproducto.map( producto => (
-                                                <>
-                                                <Grid item xs={6} >
-                                                    <Typography>{ producto.producto }</Typography>
-                                                </Grid>
-                                                <Grid item xs={2} display='flex' justifyContent='end'>
-                                                    <Typography>S/ { producto.total.toFixed(2) }</Typography>
-                                                </Grid>
-                                                <Grid item xs={2} display='flex' justifyContent='end'>
-                                                    <Typography>S/ { (producto.despacho?producto.despacho:0).toFixed(2) }</Typography>
-                                                </Grid>
-                                                <Grid item xs={2} display='flex' justifyContent='end'>
-                                                    <Typography>S/ { (producto.calibracion?producto.calibracion:0).toFixed(2) }</Typography>
-                                                </Grid>                                                   
-                                                </>                             
+                                                <Grid container key={ producto.producto }>
+                                                    <Grid item xs={6} >
+                                                        <Typography>{ producto.producto }</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={2} display='flex' justifyContent='end'>
+                                                        <Typography>S/ { producto.total.toFixed(2) }</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={2} display='flex' justifyContent='end'>
+                                                        <Typography>S/ { (producto.despacho?producto.despacho:0).toFixed(2) }</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={2} display='flex' justifyContent='end'>
+                                                        <Typography>S/ { (producto.calibracion?producto.calibracion:0).toFixed(2) }</Typography>
+                                                    </Grid>                                                   
+                                                </Grid>                             
                                         )):<></>
                                     }
-                                    </Grid>                  
+                                </Grid>                  
                                 <Divider sx={{ my:1 }} />                                           
                                 <Typography component="div" sx={{ fontWeight: 'bold' }}>VENTA POR TIPO DE PAGO</Typography>
                                 <Grid container>

@@ -2,7 +2,7 @@ import { FC, useReducer } from 'react';
 import axios from 'axios';
 import { FuelContext, fuelReducer } from './';
 import { posApi } from '../../api';
-import { IComprobante, IFuel, IReceptor, IUser } from '@/interfaces';
+import { ICierreTurnoHistorico, IComprobante, IFuel, IReceptor, IUser } from '@/interfaces';
 import { getSession } from 'next-auth/react';
 import { initialReceptor } from '@/database/receptor';
 import { initialComprobante } from '@/database/comprobante';
@@ -24,6 +24,11 @@ const CART_INITIAL_STATE: FuelState = {
 type Props = { 
     children?: React.ReactNode;
 };
+
+interface PropsCierreTurno {
+    cierre: ICierreTurnoHistorico;
+    cantidad: number;
+}
 
 export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
 
@@ -201,7 +206,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
 
     }
 
-    const createCierre = async(id: number, fecha : Date, turno : string, isla : string, efectivo: number, tarjeta: number, yape: number):Promise<{ hasError: boolean; message: string; }> => {
+    const createCierre = async(id: number, fecha : Date, turno : string, isla : string, efectivo: number, tarjeta: number, yape: number):Promise<{ hasError: boolean, cierre?: ICierreTurnoHistorico, cantidad: number, message: string }> => {
 
         const body = {
             "session": id,
@@ -217,21 +222,17 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
 
             return {
                 hasError: false,
-                message: data
+                cierre: data.cierre.cierre,
+                cantidad: data.cierre.cantidad,
+                message: "Turno cerrado satisfactoriamente"
             }
 
-
-        } catch (error) {
+        } catch (error: any) {
             
-            if ( axios.isAxiosError(error) ) {
-                return {
-                    hasError: true,
-                    message: error.response?.data.message
-                }
-            }
             return {
                 hasError: true,
-                message : 'Error no controlado, hable con el administrador'
+                cantidad: 0,
+                message: error.toString()
             }
         }
 

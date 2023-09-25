@@ -287,10 +287,10 @@ export const PrintPos = forwardRef((props: IPrintPosProps, ref) => {
     return (
       <div style={{ display: "none" }}>
         <div ref={ref as RefObject<HTMLDivElement>} style={{ fontSize:11, marginLeft: 14, marginTop:-1, marginRight: 15, paddingLeft: 0, paddingTop: 0 }}>
-          <div style={{border:'2px solid'}}>
-                    { renderSwitch(props.receptor, props.comprobante) }
-                  </div>
+          <div>
+            { renderSwitch(props.receptor, props.comprobante) }
           </div>
+        </div>
       </div>
     );
 });

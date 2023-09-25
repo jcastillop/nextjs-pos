@@ -45,12 +45,16 @@ export const CierreTurnoDialog: React.FC<Props> = ({totalGalones, totalProducto,
             const session = await getSession();
             // horaIngreso = session?.user.
             setHoraIngreso(session?.user.fecha_registro || "")
-            const data = await createCierre(parseInt(session?.user.id?session?.user.id:"0"), new Date(formatDateSQL(value)), session?.user.jornada || '', session?.user.isla || '',totales.efectivo, totales.tarjeta, totales.yape);            
-            if(!data.hasError){
-                handlePrint();                
-                showAlert({mensaje: 'Turno cerrado satisfactoriamente', severity: 'success'})                
+            const { hasError, cierre, message, cantidad } = await createCierre(parseInt(session?.user.id?session?.user.id:"0"), new Date(formatDateSQL(value)), session?.user.jornada || '', session?.user.isla || '',totales.efectivo, totales.tarjeta, totales.yape);            
+            if(hasError){
+                showAlert({mensaje: message, severity: 'error'})
+            }else if (cantidad == 0){
+                showAlert({mensaje: "Ocurrió un error actualizando los comprobantes", severity: 'error'})
+            }else if (!cierre){
+                showAlert({mensaje: "Ocurrió un error generando el cierre de comprobantes", severity: 'error'})
             }else{
-                showAlert({mensaje: data.message.toString(), severity: 'error'})
+                handlePrint();                
+                showAlert({mensaje: `Turno cerrado satisfactoriamente, ${cantidad} comprobantes`, severity: 'success'})                                
             }
         }else{
             showAlert({mensaje: 'No tiene cuenta por liquidar', severity: 'error'})
