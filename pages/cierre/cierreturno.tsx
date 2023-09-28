@@ -4,11 +4,12 @@ import { useObtieneCierre } from '@/hooks/useCierres'
 import { CreditCard, PhoneAndroid } from '@mui/icons-material'
 import { Typography, Grid, Divider, Card, CardContent, List, ListItem, ListItemText, Chip } from '@mui/material'
 
-import { useSession } from 'next-auth/react'
+import { getSession, useSession } from 'next-auth/react'
 import React, { useEffect, useState } from 'react'
 import PaymentsIcon from '@mui/icons-material/Payments';
 import { CierreTurnoDialog } from '@/components/cierre'
 import { FullScreenLoading } from '@/components/ui'
+import { GetServerSideProps } from 'next'
 
 export const CierreTurnoPage = () => {
 
@@ -153,5 +154,24 @@ export const CierreTurnoPage = () => {
     
         )
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
+
+    const session = await getSession({ req });
+    const { p = '/auth/login'} = query
+  
+    if(!session){
+        return {
+            redirect: {
+                destination: p.toString(),
+                permanent: false
+            }
+        }
+    }
+    return{
+        props: {}
+    }
+  }
+  
 
 export default CierreTurnoPage

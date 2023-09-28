@@ -68,7 +68,6 @@ const InvoicePage : NextPage = () => {
 
     useEffect(() => {
         setValue("efectivo", fuel?.valorTotal||0, { shouldValidate: true });
-        console.log("cambio")
     }, [fuel?.valorTotal, setValue])    
 
     const [tipoComprobante, setTipoComprobante] = useState<string>('03');
@@ -112,7 +111,7 @@ const InvoicePage : NextPage = () => {
         }     
 
         const { hasError, respuesta } = await createOrder(tipoComprobante, receptorForm, data.comentario, fuel?.descripcionCombustible || "", data.tarjeta, data.efectivo, data.yape,"","","","", fuel?.idAbastecimiento); 
-        console.log(respuesta);
+
         if(!hasError){
             showAlert({mensaje: respuesta, time: 1500})         
             await setTimeout(function(){      

@@ -36,8 +36,6 @@ export const ReporteProductoDias = async (  fecha_inicio: string, fecha_fin: str
 
     const { data } = await posApi.post<IData>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/reporteproducto`, body);
 
-    console.log(data)
-
     return {
         hasError : data.hasError,
         message: data.message,

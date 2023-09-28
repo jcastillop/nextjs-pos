@@ -66,7 +66,7 @@ const NotaCreditoPage: NextPage = () => {
         const producto: string = fuel?.descripcionCombustible || "";
         const prefijo: string = tipo_afectado == Constantes.TipoComprobante.Boleta?"B":"F";
 
-        const { hasError, respuesta } = await createOrder(constantes.TipoComprobante.NotaCredito, receptorForm, "", producto, 0, 0, tipo_afectado, numeracion_afectado, fecha_afectado, prefijo, idAbastecimiento); 
+        const { hasError, respuesta } = await createOrder(constantes.TipoComprobante.NotaCredito, receptorForm, "", producto, 0, 0, 0, tipo_afectado, numeracion_afectado, fecha_afectado, prefijo, idAbastecimiento); 
         
         if(hasError){
             console.log("tiene errrores");

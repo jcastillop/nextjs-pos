@@ -15,16 +15,16 @@ export interface IFuel {
 }
 
 export interface IProduct {
-    description: string;
-    images: string[];
-    inStock: number;
-    price: number;
-    sizes: ISize[];
-    slug: string;
-    tags: string[];
-    title: string;
-    type: IType;
-    gender: 'men'|'women'|'kid'|'unisex'
+    id: number;
+    nombre: string;
+    descripcion: string;
+    imagenes?: string[];
+    stock: number;
+    codigo: string;
+    medida: string;
+    precio: number;
+    valor: number;
+    estado: number;
 }
 
 export interface IKeyValue {

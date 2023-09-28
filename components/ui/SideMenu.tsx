@@ -1,7 +1,7 @@
 import React from "react";
 import { useContext } from "react";
 import { Box, Divider, Drawer, Link, List, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from "@mui/material"
-import { CloseOutlined, InsertInvitationOutlined, LoginOutlined, PersonOutlineOutlined, ManageAccountsOutlined, SavingsOutlined } from "@mui/icons-material"
+import { CloseOutlined, InsertInvitationOutlined, LoginOutlined, PersonOutlineOutlined, ManageAccountsOutlined, SavingsOutlined, ArticleOutlined, ShoppingCartOutlined, InventoryOutlined } from "@mui/icons-material"
 
 import { signOut, useSession } from 'next-auth/react';
 import { UiContext } from "@/context";
@@ -62,12 +62,33 @@ export const SideMenu = () => {
                 </ListItemButton>                            
                 {
                     session?.user.rol == "ADMIN_ROLE" && (
-                        <ListItemButton LinkComponent={Link} href="/users">
-                            <ListItemIcon>
-                                <ManageAccountsOutlined/>
-                            </ListItemIcon>
-                            <ListItemText primary={'Usuarios'} />
-                        </ListItemButton>
+                        <>
+                            <ListItemButton LinkComponent={Link} href="/products">
+                                <ListItemIcon>
+                                    <InventoryOutlined/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Productos'} />
+                            </ListItemButton>                         
+                            <ListItemButton LinkComponent={Link} href="/reports">
+                                <ListItemIcon>
+                                    <ArticleOutlined/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Reportes'} />
+                            </ListItemButton>   
+                            <ListItemButton LinkComponent={Link} href="/users">
+                                <ListItemIcon>
+                                    <ManageAccountsOutlined/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Usuarios'} />
+                            </ListItemButton>                                
+                            <ListItemButton LinkComponent={Link} href="/vender">
+                                <ListItemIcon>
+                                    <ShoppingCartOutlined/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Vender'} />
+                            </ListItemButton>                                                    
+                        </>
+                        
                     )
                 }                                        
             </List>

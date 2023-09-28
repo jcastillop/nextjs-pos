@@ -43,10 +43,6 @@ const InvoicePage : NextPage = () => {
     const componentRef = useRef();
     const { showAlert } = useContext( UiContext );
 
-    console.log("get data");
-    console.log(router.query.id);
-    console.log(router.query.tipo);
-
     const { fuel, isLoading, isError } = useFuel(`/${ router.query.slug }`,{ refreshInterval: 0});
 
     const { modifyOrder, findRuc, comprobante, receptor, emptyOrder, cleanOrder, isLoaded } = useContext(FuelContext)

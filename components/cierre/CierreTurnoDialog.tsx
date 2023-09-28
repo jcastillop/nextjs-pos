@@ -43,7 +43,6 @@ export const CierreTurnoDialog: React.FC<Props> = ({totalGalones, totalProducto,
     const handleAceptar = async () => {
         if(totalProducto.length > 0){
             const session = await getSession();
-            // horaIngreso = session?.user.
             setHoraIngreso(session?.user.fecha_registro || "")
             const { hasError, cierre, message, cantidad } = await createCierre(parseInt(session?.user.id?session?.user.id:"0"), new Date(formatDateSQL(value)), session?.user.jornada || '', session?.user.isla || '',totales.efectivo, totales.tarjeta, totales.yape);            
             if(hasError){

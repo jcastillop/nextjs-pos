@@ -117,8 +117,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
     const session = await getSession({ req });
     const { p = '/auth/login'} = query
     const { q = '/'} = query
-
-    console.log(session?.user.rol);
   
     if(!session){
         return {
