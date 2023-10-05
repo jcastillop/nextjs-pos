@@ -1,0 +1,22 @@
+import { IFuel, IProduct } from "@/interfaces"
+import { Grid } from "@mui/material"
+import { FC } from "react"
+import { ProductCard } from "./ProductCard";
+
+
+
+interface Props {
+    products: IProduct[];
+}
+
+export const ProductList: FC<Props> = ({ products }) => {
+  return (
+    <Grid container spacing={3}>
+        {
+            products.map( product => (
+                <ProductCard product={product} key={product.id}/>
+            ) )
+        }
+    </Grid>
+  )
+}

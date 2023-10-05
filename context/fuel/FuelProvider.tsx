@@ -1,8 +1,9 @@
-import { FC, useReducer } from 'react';
+import { FC, useEffect, useReducer } from 'react';
 import axios from 'axios';
+import Cookie from 'js-cookie';
 import { FuelContext, fuelReducer } from './';
 import { posApi } from '../../api';
-import { ICierreTurnoHistorico, IComprobante, IFuel, IReceptor, IUser } from '@/interfaces';
+import { ICierreTurnoHistorico, IComprobante, IComprobanteAdmin, IComprobanteAdminItem, IFuel, IReceptor, IUser } from '@/interfaces';
 import { getSession } from 'next-auth/react';
 import { initialReceptor } from '@/database/receptor';
 import { initialComprobante } from '@/database/comprobante';
@@ -11,12 +12,14 @@ import { initialComprobante } from '@/database/comprobante';
 export interface FuelState {
     children?: React.ReactNode;
     isLoaded: boolean;
+    cart: IComprobanteAdminItem[];
     receptor: IReceptor;
     comprobante: IComprobante;
 }
 
 const CART_INITIAL_STATE: FuelState = {
     isLoaded: false,
+    cart: [],
     receptor: initialReceptor,
     comprobante: initialComprobante
 }
@@ -42,6 +45,15 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
     //     }
     //     dispatch({ type: '[Cart] - Update order summary', payload: orderSummary });
     // }, [state.numeroComprobante]);
+
+    useEffect(() => {
+        try {
+            const cookieProducts = Cookie.get('cart') ? JSON.parse( Cookie.get('cart')! ): []
+            dispatch({ type: '[Cart] - LoadCart from cookies | storage', payload: cookieProducts });
+        } catch (error) {
+            dispatch({ type: '[Cart] - LoadCart from cookies | storage', payload: [] });
+        }
+    }, []);    
 
     const emptyOrder = async() => {
         dispatch({ type: '[Cart] - Fuel complete' });
@@ -117,6 +129,54 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             }
         }
 
+    }
+
+    const createOrderAdministrador = async(comprobanteAdmin: IComprobanteAdmin, receptor: IReceptor, tipo: string, sesionid: number): Promise<{ hasError: boolean; respuesta: any; storage?: any; }> => {
+        dispatch({ type: '[Cart] - Fuel processing' });
+            comprobanteAdmin.usuarioId = sesionid
+            comprobanteAdmin.tipo_comprobante = tipo
+            comprobanteAdmin.Receptor = receptor
+        try {
+
+
+            //OBTENIENDO INFO DEL COMPROBANTE
+            const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/comprobanteadmin`, comprobanteAdmin);
+            //hasError, receptor, comprobante, respuesta
+            const orderSummary = {
+                receptor: data.receptor,
+                comprobante: data.comprobante
+            }
+
+            await dispatch({ type: '[Cart] - Update order summary', payload: orderSummary })
+            
+            const comprobante: IComprobante = data.comprobante;
+
+            if(comprobante && comprobante.errors){
+                return {
+                    hasError: true,
+                    respuesta: comprobante.errors,
+                    storage: data.comprobante
+                }                
+            }else{
+                return {
+                    hasError: data.hasError,
+                    respuesta: data.respuesta,
+                    storage: data.comprobante
+                }
+            }            
+            
+        } catch (error) {
+            if ( axios.isAxiosError(error) ) {
+                return {
+                    hasError: true,
+                    respuesta: error.response?.data.message
+                }
+            }
+            return {
+                hasError: true,
+                respuesta : 'Error no controlado, hable con el administrador ' + error
+            }
+        }
     }
 
     const modifyOrder = async(correlativo: string, id_comprobante: string, tipo: string, receptor : IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, prefijo: string, id?: number): Promise<{ hasError: boolean; respuesta: any; }> => {
@@ -422,7 +482,49 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
                 message: error.toString()
             }
         }        
-    }    
+    }  
+    
+    // useEffect(() => {
+    //     Cookie.set('cart', JSON.stringify( state.cart ));
+    //     console.log("guardando en el carro")
+    //     const cookieProducts = Cookie.get('cart') ? JSON.parse( Cookie.get('cart')! ): []
+    //     console.log(cookieProducts)
+    // }, [state.cart]);
+
+    const addProductToCart = ( product: IComprobanteAdminItem ) => {
+        //! Nivel 1
+        // dispatch({ type: '[Cart] - Add Product', payload: product });
+
+        //! Nivel 2
+        // const productsInCart = state.cart.filter( p => p._id !== product._id && p.size !== product.size );
+        // dispatch({ type: '[Cart] - Add Product', payload: [...productsInCart, product] })
+
+        //! Nivel Final
+        const productInCart = state.cart.some( p => p.codigo_producto === product.codigo_producto );
+        if ( !productInCart ){
+            const prod = [...state.cart, product ]
+            
+            Cookie.set('cart', JSON.stringify( [...state.cart, product ] ));
+            return dispatch({ type: '[Cart] - Update products in cart', payload: prod })
+        } 
+
+        // Acumular
+        const updatedProducts = state.cart.map( p => {
+            // Actualizar la cantidad
+            p.cantidad += product.cantidad;
+            return p;
+        });
+
+        Cookie.set('cart', JSON.stringify( updatedProducts ));
+        dispatch({ type: '[Cart] - Update products in cart', payload: updatedProducts });
+    }
+
+    const removeCartProduct = ( product: IComprobanteAdminItem ) => {
+        console.log("entro")
+        const updatedProducts = state.cart.filter( producto => producto.codigo_producto != product.codigo_producto)
+        Cookie.set('cart', JSON.stringify( updatedProducts ));
+        return dispatch({ type: '[Cart] - Update products in cart', payload: updatedProducts })
+    }
 
     return (
         <FuelContext.Provider value={{
@@ -431,6 +533,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             createCierre,
             createCierreDia,
             createOrder,
+            createOrderAdministrador,
             modifyOrder,
             emptyOrder,
             cleanOrder,
@@ -441,7 +544,9 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             cambiarPassword,
             validarAdministrador,
             obtenerCierres,
-            findRuc
+            findRuc,
+            addProductToCart,
+            removeCartProduct
         }}>
             { children }
         </FuelContext.Provider>

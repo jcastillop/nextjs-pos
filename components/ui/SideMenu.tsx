@@ -81,7 +81,7 @@ export const SideMenu = () => {
                                 </ListItemIcon>
                                 <ListItemText primary={'Usuarios'} />
                             </ListItemButton>                                
-                            <ListItemButton LinkComponent={Link} href="/vender">
+                            <ListItemButton LinkComponent={Link} href="/cart">
                                 <ListItemIcon>
                                     <ShoppingCartOutlined/>
                                 </ListItemIcon>

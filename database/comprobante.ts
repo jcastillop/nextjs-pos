@@ -1,4 +1,4 @@
-import { IComprobante } from "@/interfaces/comprobante";
+import { IComprobante, IComprobanteAdmin } from "@/interfaces/comprobante";
 
 export const initialComprobante: IComprobante = {
     id: 0,
@@ -36,5 +36,58 @@ export const initialComprobante: IComprobante = {
     placa: "",
     billete: 0,
     producto_precio: "",
-    codigo_combustible: ""
+    codigo_combustible: "",
+    pago_yape: 0,
+    id_abastecimiento: 0,
+    fecha_abastecimiento: ""
+}
+
+export const initialComprobanteAdmin: IComprobanteAdmin = {
+    Receptor: {
+        id_receptor: 0,
+        tipo_documento: 0,
+        numero_documento: '',
+        razon_social: '',
+        direccion: '',
+        correo: '',
+        placa: ''
+    },
+    numeracion: '',
+    tipo_comprobante: '',
+    numeracion_comprobante: '',
+    fecha_emision: '',
+    moneda: '',
+    tipo_operacion: '',
+    tipo_nota: '',
+    tipo_documento_afectado: '',
+    numeracion_documento_afectado: '',
+    fecha_documento_afectado: '',
+    motivo_documento_afectado: '',
+    gravadas: 0,
+    igv: 0,
+    total: 0,
+    monto_letras: '',
+    cadena_para_codigo_qr: '',
+    codigo_hash: '',
+    pdf: '',
+    url: '',
+    errors: '',
+    id_abastecimiento: 0,
+    pistola: 0,
+    codigo_combustible: '',
+    dec_combustible: '',
+    volumen: 0,
+    fecha_abastecimiento: '',
+    tiempo_abastecimiento: 0,
+    volumen_tanque: 0,
+    comentario: '',
+    tarjeta: 0,
+    efectivo: 0,
+    placa: '',
+    billete: 0,
+    producto_precio: 0,
+    usuarioId: 0,
+    ruc: '',
+    yape: 0,
+    items: []
 }

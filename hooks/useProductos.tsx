@@ -12,10 +12,25 @@ export const useProductos = ( config: SWRConfiguration = {} ) => {
 
     const { data, error, isLoading } = useSWR<Props>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/productos/`, config);
 
+    const productos = data?.productos || [];
+
+    return {
+        hasErrorProduct: error,
+        isLoadingProduct: isLoading,
+        productos: productos
+    }
+}
+
+export const useProducto = ( url: string, config: SWRConfiguration = {} ) => {    
+
+    const { data, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/productos${ url }`, config);
+
+    const producto: IProduct = data?.producto || null;
+
     return {
         hasError: error,
-        isLoading,
-        productos: data?.productos
+        isLoading: isLoading,
+        producto: producto
     }
 }
 

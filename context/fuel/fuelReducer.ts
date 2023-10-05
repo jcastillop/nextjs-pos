@@ -1,10 +1,12 @@
 import { IFuel, IReceptor } from '@/interfaces';
-import { FuelState, RECEPTOR_INITIAL } from '.';
-import { IComprobante } from '@/interfaces/comprobante';
+import { FuelState } from '.';
+import { IComprobante, IComprobanteAdminItem } from '@/interfaces/comprobante';
 
 type FuelActionType = 
    | { type: '[Cart] - LoadCart fuel' } 
    | { type: '[Cart] - Update fuel', payload: IFuel }
+   | { type: '[Cart] - Update products in cart', payload: IComprobanteAdminItem[] }
+   | { type: '[Cart] - LoadCart from cookies | storage', payload: IComprobanteAdminItem[] } 
    | { 
       type: '[Cart] - Update order summary', 
       payload: {
@@ -16,9 +18,25 @@ type FuelActionType =
    | { type: '[Cart] - Fuel processing' }
    | { type: '[Cart] - Fuel clean' }
 
+const RECEPTOR_INITIAL:IReceptor = {
+   id_receptor: 0,
+   tipo_documento: 0,
+   numero_documento: '',
+   razon_social: '',
+   direccion: '',
+   correo: '',
+   placa: ''
+}
+
 export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelState => {
 
    switch (action.type) {
+      case '[Cart] - LoadCart from cookies | storage':
+         return {
+            ...state,
+            isLoaded: true,
+            cart: [...action.payload]
+          }      
       case '[Cart] - Update order summary':
          return {
             ...state,
@@ -43,7 +61,12 @@ export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelSta
             return {
                ...state,
                isLoaded: true
-            }            
+            }  
+         case '[Cart] - Update products in cart':
+            return {
+               ...state,
+               cart: [ ...action.payload ]
+            }                      
       
        default:
           return state;

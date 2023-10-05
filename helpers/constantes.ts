@@ -14,7 +14,8 @@ const constantes = Object.freeze({
         GPREMIUM2:      "4",
         GREGULAR:       "2",
         GLP:            "7"
-    }
+    },
+    IGV:0.18,
 });
 
 export default constantes;

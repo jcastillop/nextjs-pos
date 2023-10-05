@@ -7,6 +7,7 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { ProductDialog } from '@/components/products/ProductDialog';
 import { IProduct } from '@/interfaces';
 import { GetServerSideProps, NextPage } from 'next';
+import { FuelContext } from '@/context';
 
 const ProductPage: NextPage = () => {
 
@@ -24,7 +25,7 @@ const ProductPage: NextPage = () => {
 
   const { data: session, status } = useSession()
 
-  const { productos, isLoading, hasError } = useProductos({ refreshInterval: 0});
+  const { productos, isLoadingProduct, hasErrorProduct } = useProductos({ refreshInterval: 0});
 
   if ( !productos ) return (<></>);
 
