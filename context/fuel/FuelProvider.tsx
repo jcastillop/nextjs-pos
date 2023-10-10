@@ -62,7 +62,10 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
         dispatch({ type: '[Cart] - Fuel complete' });
         dispatch({ type: '[Cart] - Fuel clean' });
     }
-        
+    const emptyCart = async() => {
+        dispatch({ type: '[Cart] - Cart complete' });
+    }
+
     const createOrder = async(tipo: string, receptor : IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, yape: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, prefijo: string, id?: number): Promise<{ hasError: boolean; respuesta: any; }> => {
 
         dispatch({ type: '[Cart] - Fuel processing' });
@@ -141,7 +144,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
 
             //OBTENIENDO INFO DEL COMPROBANTE
             const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/comprobanteadmin`, comprobanteAdmin);
-            //hasError, receptor, comprobante, respuesta
+
             const orderSummary = {
                 receptor: data.receptor,
                 comprobante: data.comprobante
@@ -492,13 +495,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
     // }, [state.cart]);
 
     const addProductToCart = ( product: IComprobanteAdminItem ) => {
-        //! Nivel 1
-        // dispatch({ type: '[Cart] - Add Product', payload: product });
-
-        //! Nivel 2
-        // const productsInCart = state.cart.filter( p => p._id !== product._id && p.size !== product.size );
-        // dispatch({ type: '[Cart] - Add Product', payload: [...productsInCart, product] })
-
+        console.log("addProductToCart")
         //! Nivel Final
         const productInCart = state.cart.some( p => p.codigo_producto === product.codigo_producto );
         if ( !productInCart ){
@@ -520,10 +517,14 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
     }
 
     const removeCartProduct = ( product: IComprobanteAdminItem ) => {
-        console.log("entro")
+        console.log("removeCartProduct")
         const updatedProducts = state.cart.filter( producto => producto.codigo_producto != product.codigo_producto)
         Cookie.set('cart', JSON.stringify( updatedProducts ));
         return dispatch({ type: '[Cart] - Update products in cart', payload: updatedProducts })
+    }
+    const updateCartQuantity = (product: IComprobanteAdminItem) => {
+        console.log("updateCartQuantity")
+        dispatch({ type: '[Cart] - Change cart quantity', payload: product });
     }
 
     return (
@@ -537,6 +538,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             modifyOrder,
             emptyOrder,
             cleanOrder,
+            emptyCart,
             listarHistorico,
             listarUsuarios,
             guardarUsuario,
@@ -546,7 +548,8 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             obtenerCierres,
             findRuc,
             addProductToCart,
-            removeCartProduct
+            removeCartProduct,
+            updateCartQuantity
         }}>
             { children }
         </FuelContext.Provider>

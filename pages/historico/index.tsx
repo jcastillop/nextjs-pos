@@ -10,7 +10,7 @@ import { useRouter } from 'next/router'
 import { IPrintPosProps, PrintPos } from '@/components/print/PrintPos'
 
 import { initialReceptor } from '@/database/receptor';
-import { IComprobante } from '@/interfaces/comprobante'
+import { IComprobante, IComprobanteAdmin, IComprobanteAdminItem } from '@/interfaces/comprobante'
 import { initialComprobante } from '@/database/comprobante'
 import { useState } from 'react';
 
@@ -19,6 +19,9 @@ import { Print } from '@/components/print/Pint'
 import Link from 'next/link'
 import { Constantes } from '@/helpers'
 import { useHistorico } from '@/hooks'
+// import { NotaCreditoDialog } from '../../components/notacredito/NotaCreditoDialog';
+import { IReceptor } from '@/interfaces'
+import { NotaCreditoDialog } from '@/components'
 
 interface TotalizadoresState {
   totalEfectivo: number;
@@ -204,12 +207,13 @@ const HistoricoPage = () => {
           if(params.row.motivo || !params.row.hash){
             return(<Button variant="contained" color="secondary" disabled>Generar</Button>)
           }else{
+
             return (
               <Link
                 href={{
                   pathname: '/historico/notacredito',
                   query: {
-                    id: params.row.abastecimiento,
+                    id: params.row.id,
                     numero_documento: params.row.documento,
                     razon_social: params.row.cliente,
                     descripcion: params.row.combustible,
@@ -221,7 +225,7 @@ const HistoricoPage = () => {
               >
                 <Button variant="contained" color="secondary">Generar</Button>
               </Link>
-            )
+            )            
           }
         }else{
           return(<></>)
@@ -269,7 +273,8 @@ const HistoricoPage = () => {
       abastecimiento: comprobante.id_abastecimiento,
       error       : comprobante.errors,
       fecha_emision       : comprobante.fecha_emision,
-      fecha_abastecimiento       : comprobante.fecha_abastecimiento
+      fecha_abastecimiento       : comprobante.fecha_abastecimiento,
+      motivo       : comprobante.motivo_documento_afectado
   }));
 
   
@@ -325,7 +330,7 @@ const HistoricoPage = () => {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
-
+  
   const session = await getSession({ req });  
   const { p = '/auth/login'} = query
 

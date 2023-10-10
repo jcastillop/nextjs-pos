@@ -1,6 +1,6 @@
-import { FC, useContext, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import {Button, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid}  from '@mui/material/';
+import {Button, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, MenuItem}  from '@mui/material/';
 import { useForm } from 'react-hook-form';
 import CreateIcon from '@mui/icons-material/Create';
 
@@ -16,10 +16,21 @@ interface Props{
 
 export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
 
+    const currencies = [
+        {
+          value: 'NIU',
+          label: 'NIU',
+        },
+        {
+          value: 'GAL',
+          label: 'GAL',
+        }
+      ];
+
     const { showAlert } = useContext( UiContext );
     const router = useRouter();
 
-    const { register, reset, handleSubmit, trigger, setValue, getValues, formState: { errors } }  = useForm<IProduct>({
+    const { register, handleSubmit, setValue, getValues, formState: { errors } }  = useForm<IProduct>({
         defaultValues: {
             id: product?.id,
             nombre: product?.nombre,
@@ -47,6 +58,22 @@ export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const handleEfectivoValueChange = (event: { target: { value: any; }; }) => {
+        const newEfectivoValue = +event.target.value
+        setValue("valor", +((newEfectivoValue/1.18).toFixed(getValues("medida")=="GAL"?10:2)), { shouldValidate: true });
+    };      
+
+    const isDecimalValid = () => {
+        const arr = getValues("valor").toString().split(".")
+        if(arr.length != 2) return true;
+        const decimales = arr[1].length
+        if(getValues("medida") == "GAL"){
+            return decimales == 10? true: `El cantidad de decimales es incorrecta para ${getValues("medida")}, la cantidad requerida es 10`
+        }else{
+            return decimales == 2? true: `El cantidad de decimales es incorrecta para ${getValues("medida")}, la cantidad requerida es 2`
+        }
     };
 
     return (
@@ -124,17 +151,27 @@ export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <TextField 
+                            select
                             label={'Medida'}
                             variant='standard' 
                             fullWidth
+                            defaultValue={ "NIU" }
                             { ...register('medida', {
                                 required: 'Este campo es requerido'
                                 
                             })}
                             InputLabelProps={{ shrink: true }}
                             error={ !!errors.medida }
-                            helperText={ errors.medida?.message }
-                        />
+                            helperText={ errors.medida?.message }                    
+                        >
+                            {
+                                currencies.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                    </MenuItem>
+                                ))
+                            }   
+                        </TextField>
                     </Grid> 
                     <Grid item xs={12} sm={6}>
                         <TextField 
@@ -148,6 +185,7 @@ export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
                             InputLabelProps={{ shrink: true }}
                             error={ !!errors.precio }
                             helperText={ errors.precio?.message }
+                            onChange={handleEfectivoValueChange}
                         />
                     </Grid>  
                     <Grid item xs={12} sm={6}>
@@ -156,12 +194,14 @@ export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
                             variant='standard' 
                             fullWidth
                             { ...register('valor', {
-                                required: 'Este campo es requerido'
+                                required: 'Este campo es requerido',
+                                validate: isDecimalValid
                                 
                             })}
                             InputLabelProps={{ shrink: true }}
                             error={ !!errors.valor }
                             helperText={ errors.valor?.message }
+                            disabled
                         />
                     </Grid>                                                                                                                        
                 </Grid>
@@ -173,7 +213,7 @@ export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
                 className='circular-btn'
                 type='submit'
             >                           
-                Guardar usuario
+                Guardar producto
             </Button>
             <Button 
             onClick={handleClose}

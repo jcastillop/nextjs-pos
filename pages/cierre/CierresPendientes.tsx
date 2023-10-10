@@ -1,11 +1,10 @@
 import { NextPage } from "next";
-import { ICierre } from ".";
 
 type PrintCierreProps = {
-    cierres: ICierre[];
+   
 };
 
-const CierresPendientes: React.FC<PrintCierreProps> = ({ cierres }) => {
+const CierresPendientes: React.FC<PrintCierreProps> = ({  }) => {
     
     return(
         <></>

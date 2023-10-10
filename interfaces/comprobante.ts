@@ -35,6 +35,7 @@ export interface IComprobante {
     fecha_abastecimiento: string;
 }
 export interface IComprobanteAdmin {
+    id?: number;
     Receptor: IReceptor;
     numeracion: string;
     tipo_comprobante: string;
@@ -73,6 +74,7 @@ export interface IComprobanteAdmin {
     usuarioId: number;
     ruc: string;
     yape: number;
+    prefijo?: string;
     items: IComprobanteAdminItem[];
 }
 export interface IComprobanteAdminItem {

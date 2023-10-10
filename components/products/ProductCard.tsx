@@ -1,22 +1,32 @@
-import { IFuel, IProduct } from '@/interfaces';
+import { IComprobanteAdminItem, IFuel, IProduct } from '@/interfaces';
 import NextLink from 'next/link';
+import { useRouter } from "next/router";
 import { Box, Button, Card, CardActionArea, CardMedia, Chip, Grid, Link, Typography } from '@mui/material'
-import React, { FC, useMemo, useState } from 'react'
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
-import { useSession } from 'next-auth/react';
-import { ItemCounter } from '../ui';
+import React, { FC, useContext, useMemo, useState } from 'react'
+import { FuelContext } from '@/context';
 
 interface Props{
     product? : IProduct;
 }
 
 export const ProductCard: FC<Props> = ({ product }) => {
-
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
-  const { data: session, status } = useSession();
+  const { addProductToCart } = useContext( FuelContext )
+  const itemcomprobante: IComprobanteAdminItem = {
+    cantidad: 0,
+    precio: product?.precio || 0,
+    valor: product?.valor || 0,
+    igv: 0,
+    valor_venta: 0,
+    precio_venta: 0,
+    descripcion: product?.nombre || "",
+    codigo_producto: product?.codigo || "",
+    medida: product?.medida || ""
+  }  
   const onAddProduct = () => {
-    // addProductToCart(tempCartProduct);
-    // router.push('/cart');
+    addProductToCart(itemcomprobante);
+    router.push('/cart');
 }  
 
   return (
@@ -38,8 +48,10 @@ export const ProductCard: FC<Props> = ({ product }) => {
       //border-top: 3px solid var(--red);
     }}>
       {
-            <NextLink href={`/products/${product?.id}`} passHref prefetch={false} legacyBehavior>
-            <Link>
+            // <NextLink href={`/products/${product?.id}`} passHref prefetch={false} legacyBehavior>
+            <Link 
+              style={{ cursor: 'pointer' }}
+              onClick={ onAddProduct }>
               <div style={{
                 position:'relative',
               }}>
@@ -75,7 +87,6 @@ export const ProductCard: FC<Props> = ({ product }) => {
               </Box>
               </div>
             </Link>
-            </NextLink>          
       }
     </Card>
 

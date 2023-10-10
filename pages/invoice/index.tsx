@@ -1,25 +1,20 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form';
+
+import {  OrderSumaryAdministrator } from '@/components/cart'
+import { FuelLayout, ShopLayout } from '@/components/layouts'
+
+import { Constantes } from '@/helpers'
+import { PhoneAndroid, CreditCard, Payments, AddCircle } from '@mui/icons-material'
+
+import { Box, Button, Card, CardContent, Divider, Grid, IconButton, InputAdornment, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { GetServerSideProps, NextPage } from 'next'
-import { useRouter } from 'next/router';
-import { useReactToPrint } from 'react-to-print';
-import { Box, Button, Card, CardContent, Divider, Grid, TextField, Typography, ToggleButtonGroup, ToggleButton, InputAdornment, IconButton, Dialog, DialogActions, DialogTitle, DialogContentText, DialogContent } from '@mui/material'
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import PaymentsIcon from '@mui/icons-material/Payments';
-
+import { getSession } from 'next-auth/react'
 import { FuelContext, UiContext } from '@/context'
-import { FuelLayout } from '@/components/layouts'
-import { PrintPos } from '@/components/print/PrintPos'
-
-import { useFuel } from '@/hooks/useFuel';
-import { getSession } from 'next-auth/react';
-
-import { IReceptor } from '@/interfaces';
-import constantes from '@/helpers/constantes';
-import { AutorizacionDialog } from '@/components/admin/AutorizacionDialog';
-import { Constantes } from '@/helpers';
-import { PhoneAndroid } from '@mui/icons-material';
-import { FuelSummary } from '@/components';
+import { useRouter } from 'next/router'
+import { IComprobanteAdmin, IComprobanteAdminItem, IReceptor } from '@/interfaces'
+import { useForm } from 'react-hook-form'
+import { useReactToPrint } from 'react-to-print'
+import { PrintComprobanteAdmin } from '@/components/print/PrintComprobanteAdmin'
 
 type FormData = {
     numeroDocumento: string;
@@ -28,79 +23,129 @@ type FormData = {
     correo: string;
     placa: string;
     comentario: string;
-    tarjeta: number;
+        
+    numeracion?: string;
+    ruc_emisor: string;
+    tipoComprobante: string;
+    fecha_emision: string;    
+    moneda: string;
+    gravadas: number;
+    igv: number;
+    total: number;
     efectivo: number;
+    tarjeta: number;
     yape: number;
+    billete: number;
+    usuarioId: number;
+    ruc: string;    
 }
 
-type CalibracionData = {
-    open: boolean;
-    state: boolean;
+const initialComprobante: IComprobanteAdmin = {
+    Receptor: {
+        id_receptor: 0,
+        tipo_documento: 0,
+        numero_documento: '',
+        razon_social: '',
+        direccion: '',
+        correo: '',
+        placa: ''
+    },
+    numeracion: '',
+    tipo_comprobante: '',
+    numeracion_comprobante: '',
+    fecha_emision: '',
+    moneda: '',
+    tipo_operacion: '',
+    tipo_nota: '',
+    tipo_documento_afectado: '',
+    numeracion_documento_afectado: '',
+    fecha_documento_afectado: '',
+    motivo_documento_afectado: '',
+    gravadas: 0,
+    igv: 0,
+    total: 0,
+    monto_letras: '',
+    cadena_para_codigo_qr: '',
+    codigo_hash: '',
+    pdf: '',
+    url: '',
+    errors: '',
+    id_abastecimiento: 0,
+    pistola: 0,
+    codigo_combustible: '',
+    dec_combustible: '',
+    volumen: 0,
+    fecha_abastecimiento: '',
+    tiempo_abastecimiento: 0,
+    volumen_tanque: 0,
+    comentario: '',
+    tarjeta: 0,
+    efectivo: 0,
+    placa: '',
+    billete: 0,
+    producto_precio: 0,
+    usuarioId: 0,
+    ruc: '',
+    yape: 0,
+    items: []
 }
 
-const InvoicePage : NextPage = () => {
+
+const CartPage: NextPage = () => {
 
     const router = useRouter();
     const componentRef = useRef();
+    
     const { showAlert } = useContext( UiContext );
+    const { findRuc, cart, createOrderAdministrador, emptyOrder, isLoaded, emptyCart } = useContext(FuelContext)
 
-    const { fuel, isLoading, isError } = useFuel(`/${ router.query.slug }`,{ refreshInterval: 0});
-
-    const { createOrder, findRuc, comprobante, receptor, emptyOrder, cleanOrder, isLoaded } = useContext(FuelContext)
-
-    const { register, reset, watch, handleSubmit, trigger, setValue, getValues, formState: { errors } }  = useForm<FormData>({
-        defaultValues: {
-            numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: '', tarjeta: 0, efectivo: 0, yape: 0
-        }
-    });
-
-    const isTotalValid = () => {
-        const validateTarjeta = +getValues("tarjeta")
-        const validateEfectivo = +getValues("efectivo")
-        const validateYape = +getValues("yape")
-        const total = fuel?.valorTotal||0
-
-        if (total != ( validateTarjeta + validateEfectivo + validateYape )){
-            return `El monto no coincide con el total: ${total}`
-        }else{
-            return true
-        }
-    };
-
-    useEffect(() => {
-        setValue("efectivo", fuel?.valorTotal||0, { shouldValidate: true });
-    }, [fuel?.valorTotal, setValue])    
-
+    const [comprobante, setComprobante] = useState(initialComprobante)
+    
     const [tipoComprobante, setTipoComprobante] = useState<string>('03');
 
-    const [openAlertaCalibracion, setOpenAlertaCalibracion] = useState<CalibracionData>({open: false, state: false});
-
-    useEffect(() => {
-        if(openAlertaCalibracion.state){
-            setTipoComprobante(constantes.TipoComprobante.Calibracion);
-            reset({ numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: '', tarjeta: 0, efectivo: 0, yape: 0});
+    const { register, reset, watch, handleSubmit, trigger, setValue, getValues, formState: { errors } }  = useForm<FormData>({
+        defaultValues: { 
+            numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '',
+            numeracion: '',
+            ruc_emisor: '',
+            tipoComprobante: tipoComprobante,
+            fecha_emision: '',
+            moneda: '',
+            gravadas: 0,
+            igv: 0,
+            total: 0,
+            efectivo: 0,
+            tarjeta: 0,
+            yape: 0,
+            billete: 0,
+            usuarioId: 0,
+            ruc: ''
         }
-    }, [openAlertaCalibracion, reset])
-    
-
-    const handlePrint = useReactToPrint({
-        pageStyle: "@page { size: auto;  margin: 0mm; } @media print { body { -webkit-print-color-adjust: exact; } }",        
-        content: () => componentRef.current || null,
-        onAfterPrint: () => {
-            // Reset the Promise resolve so we can print again
-            emptyOrder();
-            router.push('/');
-          }        
     });
 
-    const handleClickMedioPago = (formValue : 'tarjeta'|'efectivo'|'yape') => {
-        setValue('tarjeta', 0, { shouldValidate: true });
-        setValue('efectivo', 0, { shouldValidate: true });
-        setValue('yape', 0, { shouldValidate: true });
-        setValue(formValue, fuel?.valorTotal||0, { shouldValidate: true });
-    }
+    useEffect(() => {
+        const totalize = cart?.map(item => ({ igv: item.igv, total: item.precio_venta, gravadas: item.valor_venta })).reduce((a, b) => {
+            return ({
+                igv: (a.igv || 0) + (b.igv || 0),
+                total: (a.total || 0) + (b.total || 0),
+                gravadas: (a.gravadas || 0) + (b.gravadas || 0)
+            })
+        }, { igv: 0, total: 0, gravadas: 0 })
+        setComprobante( current => ({
+            ...current,
+            items: cart,
+            gravadas: +(totalize.gravadas.toFixed(2)),
+            total: +(totalize.total),
+            igv:+(totalize.igv)
+        }))
+        setValue("efectivo", +(totalize.total), { shouldValidate: true });
+    }, [cart, setValue])
 
-    const onSubmitFuel = async (data: FormData) => {
+
+    const onSubmitForm = async (data: FormData) => {
+
+        const session = await getSession();
+
         const receptorForm: IReceptor = {
             id_receptor: 0,
             numero_documento: data.numeroDocumento,
@@ -109,11 +154,36 @@ const InvoicePage : NextPage = () => {
             direccion: data.direccion,
             correo: data.correo,
             placa: data.placa,
-        }     
+        }
+        setComprobante( current => ({
+            ...current,
+            Receptor: receptorForm,
+            numeracion: data.numeracion||"",
+            tipo_comprobante: tipoComprobante,
+            fecha_emision: data.fecha_emision,
+            moneda: data.moneda,
+            gravadas: data.gravadas,
+            igv: data.igv,
+            total: data.total,
+            efectivo: data.efectivo,
+            tarjeta: data.tarjeta,
+            yape: data.yape,
+            billete: data.billete,
+            usuarioId: +(session?.user.id || 0),
+            ruc: ''
+        }))
 
-        const { hasError, respuesta } = await createOrder(tipoComprobante, receptorForm, data.comentario, fuel?.descripcionCombustible || "", data.tarjeta, data.efectivo, data.yape,"","","","", fuel?.idAbastecimiento); 
+        const { hasError, respuesta, storage } = await createOrderAdministrador(comprobante, receptorForm, tipoComprobante, +(session?.user.id || 0)); 
 
         if(!hasError){
+            setComprobante( current => ({
+                ...current,
+                numeracion: storage.numeracion_comprobante,
+                cadena_para_codigo_qr: storage.cadena_para_codigo_qr,
+                codigo_hash: storage.codigo_hash,
+                fecha_abastecimiento: storage.fecha_abastecimiento
+            }))
+
             showAlert({mensaje: respuesta, time: 1500})         
             await setTimeout(function(){      
                 handlePrint();
@@ -121,13 +191,12 @@ const InvoicePage : NextPage = () => {
             
         }else{
             emptyOrder();
+            emptyCart();
             showAlert({mensaje: respuesta, severity: 'error', time: 7000})
             router.push('/');
         }
+    }
 
-
-    }    
-    
     const checkKeyDown = async (e: React.KeyboardEvent<HTMLFormElement>) => {
         if (e.key === 'Enter'){
             e.preventDefault();
@@ -146,41 +215,42 @@ const InvoicePage : NextPage = () => {
             }
             }
 
-    };    
-
-    const handleTipoDocumento = (
-      event: React.MouseEvent<HTMLElement>,
-      nuevoTipoDocumento: string,
-    ) => {
-        
-        if(nuevoTipoDocumento == constantes.TipoComprobante.Calibracion){
-            setOpenAlertaCalibracion({open: true, state: false});
-        }else{
-            setTipoComprobante(nuevoTipoDocumento);
-            reset({ numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: ''});
-        }        
     };
 
-    // const handleTarjetaValueChange = (event: { target: { value: any; }; }) => {
-    //     const newTarjetaValue = +event.target.value
-    //     setValue("efectivo", +(((fuel?.valorTotal||0) - newTarjetaValue).toFixed(2)), { shouldValidate: true });
-    // };
+    const handlePrint = useReactToPrint({
+        pageStyle: "@page { size: auto;  margin: 0mm; } @media print { body { -webkit-print-color-adjust: exact; } }",        
+        content: () => componentRef.current || null,
+        onAfterPrint: () => {
+            // Reset the Promise resolve so we can print again
+            emptyOrder();
+            emptyCart();
+            router.push('/');
+          }        
+    });
 
-    // const handleEfectivoValueChange = (event: { target: { value: any; }; }) => {
-    //     const newEfectivoValue = +event.target.value
-    //     setValue("tarjeta", +(((fuel?.valorTotal||0) - newEfectivoValue).toFixed(2)), { shouldValidate: true });
-    // };    
+    const handleTipoDocumento = (
+        event: React.MouseEvent<HTMLElement>,
+        nuevoTipoDocumento: string,
+      ) => {
+          
+        setTipoComprobante(nuevoTipoDocumento);
+        //reset({ numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: ''});
+    };
 
-
-
+    const handleClickMedioPago = (formValue : 'tarjeta'|'efectivo'|'yape') => {
+        setValue('tarjeta', 0, { shouldValidate: true });
+        setValue('efectivo', 0, { shouldValidate: true });
+        setValue('yape', 0, { shouldValidate: true });
+        setValue(formValue, comprobante.total, { shouldValidate: true });
+    }
+    
     return (
-        <FuelLayout title='Resumen de compra' pageDescription={'Resumen de la compra'}>
-            <Typography variant='h1' component='h1'>Detalle de la orden</Typography>
-            <AutorizacionDialog open={openAlertaCalibracion} setOpen={setOpenAlertaCalibracion}/>
+        <FuelLayout title='Venta de productos' pageDescription={'Venta de productos'}>
+            <Typography variant='h1' component='h1'>Venta de productos</Typography>
             <>
-                <PrintPos ref={componentRef} receptor={receptor} comprobante={comprobante}/>
-                <form onSubmit={ handleSubmit( onSubmitFuel ) } onKeyDown={(e) => checkKeyDown(e)}>
-                    <Grid container  spacing={2}>
+            <PrintComprobanteAdmin ref={componentRef} comprobante={comprobante}/>
+                <form onSubmit={ handleSubmit( onSubmitForm ) } onKeyDown={(e) => checkKeyDown(e)}>
+                    <Grid container spacing={2}>
                         <Grid item xs={12} sm={7}>
                             <Card className='sumary-card'>
                                 <CardContent>
@@ -201,10 +271,10 @@ const InvoicePage : NextPage = () => {
                                             aria-label="Tipo de documento"        
                                             sx={{ mt: 1}}                                       
                                         >
-                                            <ToggleButton value="03">BOLETA</ToggleButton>
-                                            <ToggleButton value="01">FACTURA</ToggleButton>
-                                            <ToggleButton value="50">NOTA DESPACHO</ToggleButton>
-                                            <ToggleButton value="51">CALIBRACION</ToggleButton>
+                                            <ToggleButton value="03" sx={{fontSize: 20}}>BOLETA</ToggleButton>
+                                            <ToggleButton value="01" sx={{fontSize: 20}}>FACTURA</ToggleButton>
+                                            <ToggleButton value="50" sx={{fontSize: 20}}>NOTA DESPACHO</ToggleButton>
+                                            <ToggleButton value="51" sx={{fontSize: 20}}>CALIBRACION</ToggleButton>
                                         </ToggleButtonGroup>    
                                     </Grid>
                                     <Grid container spacing={2} sx={{ mt: 1}}>
@@ -213,6 +283,7 @@ const InvoicePage : NextPage = () => {
                                             <TextField 
                                                 label={(tipoComprobante=='03'||tipoComprobante=='51')?'DNI':'RUC'}
                                                 variant='standard' 
+                                                inputProps={{style: { fontSize: 25, textTransform: "uppercase" }}}
                                                 fullWidth
                                                 { ...register('numeroDocumento', {
                                                     validate:{
@@ -226,7 +297,7 @@ const InvoicePage : NextPage = () => {
                                                         message: `El ${ (tipoComprobante=='03'||tipoComprobante=='51')?'DNI':'RUC' } ingresado es incorrecto`
                                                       }
                                                 })}
-                                                InputLabelProps={{ shrink: true }} 
+                                                InputLabelProps={{ shrink: true }}
                                                 error={ !!errors.numeroDocumento }
                                                 helperText={ errors.numeroDocumento?.message }
                                             />
@@ -235,6 +306,7 @@ const InvoicePage : NextPage = () => {
                                             <TextField 
                                                 label={(tipoComprobante=='03'||tipoComprobante=='51')?'Nombres':'Razón social'}
                                                 variant='standard' 
+                                                inputProps={{style: { fontSize: 25, textTransform: "uppercase" }}}
                                                 fullWidth
                                                 { ...register('razonSocial', {
                                                     required: 'Este campo es requerido'
@@ -249,6 +321,7 @@ const InvoicePage : NextPage = () => {
                                             <TextField 
                                                 label='Direccion' 
                                                 variant='standard' 
+                                                inputProps={{style: { fontSize: 25, textTransform: "uppercase" }}}
                                                 InputLabelProps={{ shrink: true }} 
                                                 fullWidth
                                                 { ...register('direccion')}
@@ -265,7 +338,7 @@ const InvoicePage : NextPage = () => {
                                                 }}                                            
                                                 label='Placa' 
                                                 variant='standard' 
-                                                inputProps={{style: { fontSize: 20, textTransform: "uppercase" }}}
+                                                inputProps={{style: { fontSize: 25, textTransform: "uppercase" }}}
                                                 InputLabelProps={{ shrink: true,  }} 
                                                 fullWidth
                                                 { ...register('placa')}
@@ -290,9 +363,7 @@ const InvoicePage : NextPage = () => {
                                                 variant="standard"
                                                 type='number'
                                                 fullWidth
-                                                { ...register('tarjeta', {
-                                                    validate: isTotalValid
-                                                })}
+                                                { ...register('tarjeta')}
                                                 error={ !!errors.tarjeta }
                                                 helperText={ errors.tarjeta?.message }
                                                 // onChange={handleTarjetaValueChange}
@@ -304,7 +375,7 @@ const InvoicePage : NextPage = () => {
                                                     startAdornment: (
                                                         <InputAdornment position="start">
                                                             <IconButton aria-label="toggle password visibility" onClick={() => handleClickMedioPago('tarjeta')}>
-                                                                <CreditCardIcon color="secondary"/>
+                                                                <CreditCard color="secondary"/>
                                                             </IconButton>
                                                         </InputAdornment>
                                                     ),
@@ -317,9 +388,7 @@ const InvoicePage : NextPage = () => {
                                                 variant='standard' 
                                                 type='number'
                                                 fullWidth
-                                                { ...register('efectivo', {
-                                                    validate: isTotalValid
-                                                })}
+                                                { ...register('efectivo',)}
                                                 error={ !!errors.efectivo }
                                                 helperText={ errors.efectivo?.message }  
                                                 // onChange={handleEfectivoValueChange}
@@ -334,7 +403,7 @@ const InvoicePage : NextPage = () => {
                                                                 aria-label="toggle password visibility"
                                                                 onClick={() => handleClickMedioPago('efectivo')}
                                                             >
-                                                                <PaymentsIcon color="success"/>
+                                                                <Payments color="success"/>
                                                             </IconButton>                                                            
                                                             
                                                         </InputAdornment>
@@ -348,9 +417,7 @@ const InvoicePage : NextPage = () => {
                                                 variant='standard' 
                                                 type='number'
                                                 fullWidth
-                                                { ...register('yape', {
-                                                    validate: isTotalValid
-                                                })}
+                                                { ...register('yape')}
                                                 error={ !!errors.yape }
                                                 helperText={ errors.yape?.message }  
                                                 // onChange={handleEfectivoValueChange}
@@ -372,7 +439,7 @@ const InvoicePage : NextPage = () => {
                                                     ),
                                                 }}
                                             />  
-                                        </Grid>                                        
+                                        </Grid>
                                     </Grid>
                             </CardContent>
                             </Card>
@@ -382,7 +449,7 @@ const InvoicePage : NextPage = () => {
                                 <CardContent>
                                     <Typography variant='h2'>Resumen</Typography>
                                     <Divider sx={{mt: 2, mb: 2}}/>
-                                    <FuelSummary fuel={fuel}/>
+                                    <OrderSumaryAdministrator comprobante={comprobante}/>
                                 </CardContent>
                             </Card>
                         </Grid>
@@ -422,4 +489,4 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
     }
 }
 
-export default InvoicePage
+export default CartPage

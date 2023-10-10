@@ -6,7 +6,7 @@ interface Props{
     fuel?: IFuel
 }
 
-export const OrderSumary: FC<Props> = ({ fuel }) => {
+export const FuelSummary: FC<Props> = ({ fuel }) => {
   return (
     <Grid container>
         <Grid item xs={6}>

@@ -1,65 +1,103 @@
+"use client"
+import { FC, useContext } from 'react';
 import NextLink from 'next/link';
-import { Box, Button, CardActionArea, CardMedia, Grid, Link, Typography } from "@mui/material";
-import { initialData } from "../../database/products";
-import { ItemCounter } from '../ui';
-import { FC } from 'react';
+import { Box, Button, CardActionArea, CardMedia, Grid, Link, TextField, Typography } from '@mui/material';
+import { FuelContext } from '@/context';
+import { ItemCounter } from '@/components/ui';
+import { IComprobanteAdminItem } from '@/interfaces';
+import { Constantes } from '@/helpers';
 
-const productsInCart = [
-    initialData.products[0],
-    initialData.products[1],
-    initialData.products[2]
-]
 
-interface Props{
-    editable: boolean;
+
+interface Props {
+    editable?: boolean;
 }
 
-export const CartList: FC<Props> = ({ editable }) => {
-  return (
-    <>
-        {
-            productsInCart.map( product =>(
-                <Grid container spacing={2} key={ product.slug } sx={{ mb: 1}}>
-                    <Grid item xs={3}>
-                        {/* LLevar a la pagina del producto */}
-                        <NextLink href='/product/slug' legacyBehavior>
-                            <Link>
-                                <CardActionArea>
-                                    <CardMedia 
-                                        image={`/products/${product.images[0]}`}
-                                        component='img'
-                                        sx={{ borderRadius: '5px'}}
-                                    />
-                                </CardActionArea>
-                            </Link>
-                        </NextLink>
-                    </Grid>
-                    <Grid item xs={7}>
-                        <Box display='flex' flexDirection='column'>
-                            <Typography variant='body1'>{ product.title}</Typography>
-                            <Typography variant='body1'>Talla: M</Typography>
+export const CartList: FC<Props> = ({ editable = false }) => {
+
+    const { cart, removeCartProduct, updateCartQuantity } = useContext( FuelContext )
+
+    const onNewCartQuantityValue = (product: IComprobanteAdminItem, newQuantityValue: number) => {
+        const vufix:number = product.medida == "GAL"?10:2
+        product.cantidad = newQuantityValue;
+        product.igv = +(newQuantityValue * product.valor * Constantes.IGV).toFixed(2);
+        product.precio_venta = +(newQuantityValue * product.precio).toFixed(2);
+        product.valor_venta = +(newQuantityValue * product.valor).toFixed(vufix);  
+        updateCartQuantity( product );
+    }
+
+    const onUpdateTotal = ( product: IComprobanteAdminItem, total: number ) => {
+        const vufix:number = product.medida == "GAL"?10:2
+        product.precio_venta = total
+        product.cantidad = +( total/product.precio ).toFixed(3)
+        product.valor_venta = +( total/(1 + Constantes.IGV) ).toFixed(vufix)
+        product.igv = +( product.valor_venta * Constantes.IGV ).toFixed(2)
+        product.valor = +( product.valor_venta / product.cantidad ).toFixed(vufix)
+        updateCartQuantity( product );
+    }       
+
+    return (
+        <>
+            {
+                cart && cart.map( product => (
+                    <Grid container spacing={2} key={ product.codigo_producto } sx={{ mb:1 }}>
+
+                        <Grid item xs={8}>
+                            <Box display='flex' flexDirection='column'>
+                                <Typography variant='body1'>{ product.descripcion } {product.medida == "NIU"? `(Unidades)`: `(Total soles)`}</Typography>
+                                {
+                                    editable 
+                                    ? (
+                                        product.medida == "NIU"
+                                        ? (
+                                        <ItemCounter 
+                                            currentValue={ product.cantidad }
+                                            maxValue={ 99 } 
+                                            updatedQuantity={ ( value ) => onNewCartQuantityValue(product, value )}
+                                        />
+                                        ): (
+
+                                            <TextField 
+                                                variant='standard' 
+                                                type='number'
+                                                value={ product.precio_venta }
+                                                inputProps={{
+                                                    maxLength: 5,
+                                                    step: 0.01
+                                                }}
+                                                fullWidth 
+                                                onChange={(e)=>{
+                                                    onUpdateTotal(product, +e.target.value);
+                                                }}
+                                                sx={{mb:2}}
+                                            />                                              
+                                        )
+                                    )
+                                    : (
+                                        <Typography variant='h5'>{ product.cantidad } { product.cantidad > 1 ? 'productos':'producto' }</Typography>
+                                    )
+                                }
+                                
+                            </Box>
+                        </Grid>
+                        <Grid item xs={4} display='flex' alignItems='center' flexDirection='column'>
+                            <Typography variant='subtitle1'>{ `S/ ${ product.precio }` }</Typography>
                             
                             {
-                                editable
-                                ? <ItemCounter/>
-                                : <Typography variant='h5'>3 items</Typography>
-                            }
-                        </Box>
-                    </Grid>
-                    <Grid item xs={2} display='flex' alignItems='center' flexDirection='column'>
-                        <Typography variant='subtitle1'>${ product.price }</Typography>
-                        {
-                            editable && (
-                                <Button variant='text' color='secondary'>
-                                    Remover
-                                </Button>
+                                editable && (
+                                    <Button 
+                                        variant='text' 
+                                        color='secondary' 
+                                        onClick={ () => removeCartProduct( product ) }
+                                    >
+                                        Remover
+                                    </Button>
                                 )
-                        }
+                            }
+                        </Grid>
                     </Grid>
-                    
-                </Grid>
-            ))
-        }
-    </>
-  )
+                ))
+            }
+        </>
+    )
 }

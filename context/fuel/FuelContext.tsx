@@ -10,6 +10,7 @@ interface ContextProps {
     createOrderAdministrador: (comprobanteAdmin: IComprobanteAdmin, receptor: IReceptor, tipo: string, sesionid: number) => Promise<{ hasError: boolean; respuesta: any;  storage?: any; }>;
     emptyOrder: any;
     cleanOrder: any;
+    emptyCart: () => void;
     findRuc: (valor: string) => Promise<{ hasError: boolean; receptores?: IReceptor[]; error: any; }>;
     createCierre: (id: number, fecha : Date, turno : string, isla : string, efectivo: number, tarjeta: number, yape: number) => Promise<{ hasError: boolean, cierre?: ICierreTurnoHistorico, cantidad: number, message: string }>;
     createCierreDia: (id: number) => Promise<{ hasError: boolean; message: string; }>;
@@ -21,7 +22,8 @@ interface ContextProps {
     validarAdministrador: (password: string) => Promise<{ hasSuccess: boolean; message: string; }>;
     obtenerCierres: (fecha : Date) => Promise<{ total: number; cierres: any;}>;
     addProductToCart: (product: IComprobanteAdminItem) => void;
-    removeCartProduct: (product: IComprobanteAdminItem, texto: string) => void;
+    updateCartQuantity: (product: IComprobanteAdminItem) => void;
+    removeCartProduct: (product: IComprobanteAdminItem) => void;
 }
 
 

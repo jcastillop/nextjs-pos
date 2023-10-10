@@ -17,6 +17,8 @@ type FuelActionType =
    | { type: '[Cart] - Fuel complete' }
    | { type: '[Cart] - Fuel processing' }
    | { type: '[Cart] - Fuel clean' }
+   | { type: '[Cart] - Change cart quantity', payload: IComprobanteAdminItem }
+   | { type: '[Cart] - Cart complete' }
 
 const RECEPTOR_INITIAL:IReceptor = {
    id_receptor: 0,
@@ -34,7 +36,6 @@ export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelSta
       case '[Cart] - LoadCart from cookies | storage':
          return {
             ...state,
-            isLoaded: true,
             cart: [...action.payload]
           }      
       case '[Cart] - Update order summary':
@@ -67,7 +68,19 @@ export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelSta
                ...state,
                cart: [ ...action.payload ]
             }                      
-      
+         case '[Cart] - Change cart quantity':
+            return {
+               ...state,
+               cart: state.cart.map( product => {
+                  if ( product.codigo_producto !== action.payload.codigo_producto ) return product;
+                  return action.payload;
+               })
+            }
+         case '[Cart] - Cart complete':
+            return {
+               ...state,
+               cart: []   
+            }                  
        default:
           return state;
     }

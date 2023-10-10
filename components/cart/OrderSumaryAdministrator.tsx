@@ -1,6 +1,6 @@
 import { FuelContext } from "@/context"
 import { IComprobanteAdmin, IComprobanteAdminItem } from "@/interfaces"
-import cart from "@/pages/cart"
+import cart from "@/pages/invoice"
 import { CloseOutlined, ClosedCaptionOutlined } from "@mui/icons-material"
 import { Button, Divider, Grid, IconButton, Typography } from "@mui/material"
 import { FC, useContext, useEffect } from "react"
@@ -13,6 +13,8 @@ export const OrderSumaryAdministrator: FC<Props> = ({ comprobante }) => {
 
     const { removeCartProduct } = useContext(FuelContext)
 
+    console.log(comprobante);
+
     // const totalize = comprobante?.items.map(item => ({ igv: item.igv, total: item.precio_venta, gravadas: item.valor_venta })).reduce((a, b) => {
     //     return ({
     //         igv: (a.igv || 0) + (b.igv || 0),
@@ -23,10 +25,10 @@ export const OrderSumaryAdministrator: FC<Props> = ({ comprobante }) => {
 
     return (
         <Grid container>
-            <Grid item xs={1}>
+            {/* <Grid item xs={1}>
                 <Typography></Typography>
-            </Grid>              
-            <Grid item xs={4}>
+            </Grid>               */}
+            <Grid item xs={5}>
                 <Typography variant='subtitle1'>Descripción</Typography>
             </Grid>            
             <Grid item xs={2} display='flex' justifyContent='end'>
@@ -44,12 +46,12 @@ export const OrderSumaryAdministrator: FC<Props> = ({ comprobante }) => {
             {
                 comprobante?.items.map( item => (
                     <Grid container key={ item.codigo_producto } alignItems="center" justifyItems="flex-end">
-                        <Grid item xs={1} display='flex' alignItems='center' flexDirection='column' sx={{ mt:-2}}>
+                        {/* <Grid item xs={1} display='flex' alignItems='center' flexDirection='column' sx={{ mt:-2}}>
                             <IconButton aria-label="toggle password visibility" onClick={() => removeCartProduct(item)}>
                                 <CloseOutlined color="error"/>
                             </IconButton>
-                        </Grid>                           
-                        <Grid item xs={4} sx={{ mb: 2}}>
+                        </Grid>                            */}
+                        <Grid item xs={5} sx={{ mb: 2}}>
                             <Typography variant='subtitle2'>{ item.descripcion }</Typography>
                         </Grid> 
                         <Grid item xs={2} display='flex' justifyContent='end' sx={{ mb: 2}}>

@@ -18,7 +18,6 @@ export const PrintComprobanteAdmin = forwardRef((props: IPrintComprobanteAdminPr
   
 
   const renderSwitch = (comprobante: IComprobanteAdmin) => {
-    console.log(comprobante);
     const totalize = comprobante?.items.map(item => ({ igv: item.igv, total: item.precio_venta, gravadas: item.valor_venta })).reduce((a, b) => {
       return ({
           igv: (a.igv || 0) + (b.igv || 0),
@@ -84,9 +83,9 @@ export const PrintComprobanteAdmin = forwardRef((props: IPrintComprobanteAdminPr
                     comprobante.items.map( item => (
                         <Grid container key={ item.codigo_producto } sx={{ml:1}}>
                           <Grid item xs={3} style={{paddingTop: 0}}>{ item.descripcion }</Grid>  
-                          <Grid item xs={3} style={{paddingTop: 0}}>{ item.cantidad }</Grid>  
-                          <Grid item xs={3} style={{paddingTop: 0}}>{ item.valor.toFixed(5) }</Grid>  
-                          <Grid item xs={3} style={{paddingTop: 0}}>{ item.valor_venta.toFixed(5) }</Grid>  
+                          <Grid item xs={3} style={{paddingTop: 0}} sx={{ justifyContent:"flex-end"}}>{ item.cantidad }</Grid>  
+                          <Grid item xs={3} style={{paddingTop: 0}} sx={{ justifyContent:"flex-end"}}>{ item.valor.toFixed(item.medida == "GAL"?5:2) }</Grid>  
+                          <Grid item xs={3} style={{paddingTop: 0}} sx={{ justifyContent:"flex-end"}}>{ item.valor_venta.toFixed(item.medida == "GAL"?5:2) }</Grid>  
 
                         </Grid>
                     ))
