@@ -2,11 +2,13 @@ import { IUser } from "./user";
 
 export interface ICierreTurno {
     id: number;
+    fecha: Date;
     total: number;
     turno: string;
     isla: string;
     efectivo: number;
     tarjeta: number;
+    yape: number;
     estado: number;
     Usuario: IUser;
 }

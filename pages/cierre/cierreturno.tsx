@@ -56,7 +56,7 @@ export const CierreTurnoPage = () => {
                                             <Grid item xs={4} sx={{ display: 'flex',alignItems: 'center',flexWrap: 'wrap' }}>
                                                 <PhoneAndroid color='warning'/><span> S/ { (cierre.yape?cierre.yape:0).toFixed(2) }</span>
                                             </Grid>
-                                            </Grid>                             
+                                        </Grid>                             
                                     </CardContent>
                                 </Card>                                                                                                                                        
                                 )):<></>

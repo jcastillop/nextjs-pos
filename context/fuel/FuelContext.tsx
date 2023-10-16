@@ -20,7 +20,7 @@ interface ContextProps {
     reiniciarPassword: (usuario: IUser) => Promise<{ hasError: boolean; message: string; }>;
     cambiarPassword: (id: number, password: string) => Promise<{ hasError: boolean; message: string; }>;
     validarAdministrador: (password: string) => Promise<{ hasSuccess: boolean; message: string; }>;
-    obtenerCierres: (fecha : Date) => Promise<{ total: number; cierres: any;}>;
+    obtenerCierres: () => Promise<{ total: number; cierres: any;}>;
     addProductToCart: (product: IComprobanteAdminItem) => void;
     updateCartQuantity: (product: IComprobanteAdminItem) => void;
     removeCartProduct: (product: IComprobanteAdminItem) => void;

@@ -10,7 +10,6 @@ import PaymentsIcon from '@mui/icons-material/Payments';
 import { FuelContext, UiContext } from '@/context'
 import { FuelLayout } from '@/components/layouts'
 import { PrintPos } from '@/components/print/PrintPos'
-import { OrderSumary } from '@/components/cart';
 import { useFuel } from '@/hooks/useFuel';
 import { getSession } from 'next-auth/react';
 
@@ -18,6 +17,7 @@ import { IReceptor } from '@/interfaces';
 import constantes from '@/helpers/constantes';
 import { AutorizacionDialog } from '@/components/admin/AutorizacionDialog';
 import { Constantes } from '@/helpers';
+import { FuelSummary } from '@/components';
 
 type FormData = {
     numeroDocumento: string;
@@ -332,7 +332,7 @@ const InvoicePage : NextPage = () => {
                                 <CardContent>
                                     <Typography variant='h2'>Resumen</Typography>
                                     <Divider sx={{mt: 2, mb: 2}}/>
-                                    <OrderSumary fuel={fuel}/>
+                                    <FuelSummary fuel={fuel}/>
                                 </CardContent>
                             </Card>
                         </Grid>

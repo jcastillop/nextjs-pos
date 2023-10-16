@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
 
           const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/usuarios/login`, body);
           if(data){
-            return { id: data.usuario.login.UsuarioId, usuario: data.usuario.usuario.usuario, correo: data.usuario.usuario.correo, nombre: data.usuario.usuario.nombre, rol: data.usuario.usuario.rol, grifo: data.usuario.login.terminal, isla: data.usuario.login.isla, jornada: data.usuario.login.jornada, fecha_registro: data.usuario.login.fecha_registro };
+            return { id: data.usuario.login.UsuarioId, usuario: data.usuario.usuario.usuario, correo: data.usuario.usuario.correo, nombre: data.usuario.usuario.nombre, rol: data.usuario.usuario.rol, grifo: data.usuario.login.terminal, isla: data.usuario.login.isla, jornada: data.usuario.login.jornada, fecha_registro: data.usuario.login.fecha_inicio };
           }else{
             //return null;
             log4js( "NexthAuthCredentials",data, 'error');

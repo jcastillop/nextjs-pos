@@ -331,13 +331,10 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
 
     }     
 
-    const obtenerCierres = async(fecha : Date):Promise<{ total: number; cierres: any; }> => {
+    const obtenerCierres = async():Promise<{ total: number; cierres: any; }> => {
 
-        const body = {
-            "fecha": fecha
-        }    
         try {
-            const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/listarturnos`, body);
+            const { data } = await posApi.post(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/listarturnos`);
 
             return {
                 total: 0,
