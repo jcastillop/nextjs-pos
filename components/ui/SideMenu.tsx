@@ -1,7 +1,7 @@
 import React from "react";
 import { useContext } from "react";
 import { Box, Divider, Drawer, Link, List, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from "@mui/material"
-import { CloseOutlined, InsertInvitationOutlined, LoginOutlined, PersonOutlineOutlined, ManageAccountsOutlined, SavingsOutlined, ArticleOutlined, ShoppingCartOutlined, InventoryOutlined } from "@mui/icons-material"
+import { CloseOutlined, InsertInvitationOutlined, LoginOutlined, PersonOutlineOutlined, ManageAccountsOutlined, SavingsOutlined, ArticleOutlined, ShoppingCartOutlined, InventoryOutlined, Face2Outlined } from "@mui/icons-material"
 
 import { signOut, useSession } from 'next-auth/react';
 import { UiContext } from "@/context";
@@ -86,7 +86,13 @@ export const SideMenu = () => {
                                     <ShoppingCartOutlined/>
                                 </ListItemIcon>
                                 <ListItemText primary={'Vender'} />
-                            </ListItemButton>                                                    
+                            </ListItemButton> 
+                            <ListItemButton LinkComponent={Link} href="/customers">
+                                <ListItemIcon>
+                                    <Face2Outlined/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Clientes'} />
+                            </ListItemButton>                                                                                 
                         </>
                         
                     )

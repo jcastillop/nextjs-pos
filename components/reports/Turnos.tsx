@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form';
 import { Box, Button, Card, CardContent, CardHeader, Checkbox, FormControlLabel, FormGroup, Grid, TextField } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -6,6 +6,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { formatDateUS } from '@/helpers/util';
 import { ReporteProductoTurnos } from '@/hooks/useReportes';
 import { useExcelDownloder } from 'react-xls';
+import { UiContext } from '@/context';
 
 
 type FormData = {
@@ -22,6 +23,7 @@ const turnosList = [
 export const Turnos = () => {
 
     const { ExcelDownloder, Type } = useExcelDownloder();
+    const { showAlert } = useContext( UiContext );
 
     const { control, register, reset, handleSubmit, trigger, setValue, getValues, formState: { errors } }  = useForm<FormData>({
         defaultValues: {
@@ -33,18 +35,19 @@ export const Turnos = () => {
     const [dataDownloader, setDataDownloader] = useState<any>();
 
     const onSubmitReporte = async ( { fechaInicio, turno } : FormData) => {
-
-        const paramFechaInicio: string = formatDateUS(fechaInicio || new Date());
-        const { hasError, message, data} = await ReporteProductoTurnos(paramFechaInicio, turno.toString());
-        if(!hasError && data.length > 0 ){
-            const reporte = { paramFechaInicio: data }
-            setDataDownloader(reporte)
-            setShowPrint(true)
+        if(fechaInicio && turno.length > 0){
+            const paramFechaInicio: string = formatDateUS(fechaInicio || new Date());
+            const { hasError, message, data} = await ReporteProductoTurnos(paramFechaInicio, turno.toString());
+            if(!hasError && data.length > 0 ){
+                const reporte = { paramFechaInicio: data }
+                setDataDownloader(reporte)
+                setShowPrint(true)
+            }else{
+                setShowPrint(false)
+            }
         }else{
-            setShowPrint(false)
+            showAlert({mensaje: "Seleccione la fecha y/o elija algún turno", severity: 'error', time: 7000})
         }
-
-        
     }
 
     return (

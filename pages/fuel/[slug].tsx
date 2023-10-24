@@ -18,7 +18,7 @@ import { IReceptor } from '@/interfaces';
 import constantes from '@/helpers/constantes';
 import { AutorizacionDialog } from '@/components/admin/AutorizacionDialog';
 import { Constantes } from '@/helpers';
-import { PhoneAndroid } from '@mui/icons-material';
+import { PersonSearchOutlined, PhoneAndroid } from '@mui/icons-material';
 import { FuelSummary } from '@/components';
 
 type FormData = {
@@ -144,7 +144,7 @@ const InvoicePage : NextPage = () => {
                     showAlert({mensaje: 'Cliente NO encontrado, se registrará un nuevo cliente', severity: 'warning', time: 3000})
                 }
             }
-            }
+        }
 
     };    
 
@@ -160,6 +160,21 @@ const InvoicePage : NextPage = () => {
             reset({ numeroDocumento: '', razonSocial: '', direccion: '', correo: '', placa: '', comentario: ''});
         }        
     };
+
+    const HandleConsultaRuc = async () => {
+
+        const data = await findRuc(getValues("numeroDocumento"));
+        if(data.receptores && !data.hasError && data.receptores.length > 0){
+            reset({ razonSocial: '', direccion: '', correo: '', placa: ''});
+            showAlert({mensaje: 'Cliente encontrado'})
+            setValue("numeroDocumento", data.receptores[0].numero_documento, { shouldValidate: true });
+            setValue("razonSocial", data.receptores[0].razon_social, { shouldValidate: true });
+            setValue("direccion", data.receptores[0].direccion, { shouldValidate: true });
+        }else{
+            showAlert({mensaje: 'Cliente NO encontrado, se registrará un nuevo cliente', severity: 'warning', time: 3000})
+        }
+
+    }
 
     // const handleTarjetaValueChange = (event: { target: { value: any; }; }) => {
     //     const newTarjetaValue = +event.target.value
@@ -229,6 +244,19 @@ const InvoicePage : NextPage = () => {
                                                 InputLabelProps={{ shrink: true }} 
                                                 error={ !!errors.numeroDocumento }
                                                 helperText={ errors.numeroDocumento?.message }
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <IconButton
+                                                                aria-label="toggle password visibility"
+                                                                onClick={() => HandleConsultaRuc()}
+                                                            >
+                                                                <PersonSearchOutlined/>
+                                                            </IconButton>                                                            
+                                                            
+                                                        </InputAdornment>
+                                                    ),
+                                                }}                                                
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
