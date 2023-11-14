@@ -34,7 +34,12 @@ export const FuelNavbar = () => {
                 <Link>
                   <Button color={ asPath === '/historico'?'primary':'info' }>Histórico</Button>
                 </Link>
-              </NextLink>       
+              </NextLink>
+              <NextLink href={'/gastos'} passHref legacyBehavior>
+                <Link>
+                  <Button color={ asPath === '/gastos'?'primary':'info' }>Gastos</Button>
+                </Link>
+              </NextLink>              
             </Box>
             
             <Box flex={1}/>

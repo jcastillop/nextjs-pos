@@ -7,6 +7,7 @@ import { formatDateUS } from '@/helpers/util';
 import { ReporteProductoTurnos } from '@/hooks/useReportes';
 import { useExcelDownloder } from 'react-xls';
 import { UiContext } from '@/context';
+import { BorderAll, Padding } from '@mui/icons-material';
 
 
 type FormData = {
@@ -22,7 +23,7 @@ const turnosList = [
 
 export const Turnos = () => {
 
-    const { ExcelDownloder, Type } = useExcelDownloder();
+    const { ExcelDownloder, Type, setData, setFilename } = useExcelDownloder();
     const { showAlert } = useContext( UiContext );
 
     const { control, register, reset, handleSubmit, trigger, setValue, getValues, formState: { errors } }  = useForm<FormData>({
@@ -35,11 +36,16 @@ export const Turnos = () => {
     const [dataDownloader, setDataDownloader] = useState<any>();
 
     const onSubmitReporte = async ( { fechaInicio, turno } : FormData) => {
+
         if(fechaInicio && turno.length > 0){
             const paramFechaInicio: string = formatDateUS(fechaInicio || new Date());
             const { hasError, message, data} = await ReporteProductoTurnos(paramFechaInicio, turno.toString());
             if(!hasError && data.length > 0 ){
                 const reporte = { paramFechaInicio: data }
+                // @ts-ignore 
+                setData(reporte)
+                // @ts-ignore 
+                setFilename(`REPORTE_VENTAS_TURNOS_${paramFechaInicio}`)
                 setDataDownloader(reporte)
                 setShowPrint(true)
             }else{

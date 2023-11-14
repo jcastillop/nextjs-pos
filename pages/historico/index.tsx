@@ -215,6 +215,7 @@ const HistoricoPage = () => {
                   query: {
                     id: params.row.id,
                     numero_documento: params.row.documento,
+                    tipo_documento: params.row.cliente_tipo_doc,
                     razon_social: params.row.cliente,
                     descripcion: params.row.combustible,
                     tipo_afectado: params.row.tipo,
@@ -253,6 +254,7 @@ const HistoricoPage = () => {
       id          : comprobante.id,
       fecha       : new Date(comprobante.fecha_abastecimiento).toLocaleString('es-PE', { timeZone: 'UTC' }),
       cliente     : comprobante["Receptore.razon_social"],
+      cliente_tipo_doc     : comprobante["Receptore.tipo_documento"],
       comprobante : comprobante.numeracion_comprobante,
       gravadas    : comprobante.total_gravadas,
       igv         : comprobante.total_igv,
@@ -284,7 +286,7 @@ const HistoricoPage = () => {
       <FuelLayout title={'Pos - Shop'} pageDescription={'Productos de POS'} imageFullUrl={''}>
         <Typography variant='h1' component = 'h1'>Histórico de ventas</Typography>
         
-        {
+        {/* {
           session?.user.rol == 'USER_ROLE' &&  (
             <>
               <Typography  variant="subtitle1" style={{ color: 'blue' }}>Tarjeta S/ {totalTarjeta.toFixed(2)} - Efectivo S/ {totalEfectivo.toFixed(2)} - Yape/Plin S/ {totalYape.toFixed(2)}</Typography>
@@ -292,7 +294,7 @@ const HistoricoPage = () => {
             </>
           )
         }
-        
+         */}
         <div style={{ display: "none" }}>
             <PrintPos ref={componentRef} receptor={printObject.receptor} comprobante={printObject.comprobante}/>
         </div>

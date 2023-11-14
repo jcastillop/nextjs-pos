@@ -106,7 +106,7 @@ const NotaCreditoPage: NextPage = () => {
         const receptorForm: IReceptor = {
             id_receptor: 0,
             numero_documento: router.query.numero_documento?.toString() || "",
-            tipo_documento: 0,
+            tipo_documento: router.query.tipo_documento? +router.query.tipo_documento:0,
             razon_social: router.query.razon_social?.toString() || "",
             direccion: "",
             correo: "",
