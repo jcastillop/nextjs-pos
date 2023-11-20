@@ -15,7 +15,7 @@ export const CierreTurnoPage = () => {
 
     const { data: session, status } = useSession()
 
-    const { cierres, galonaje, totalproducto, totalsoles, isLoading, error } = useObtieneCierre(session?.user.id || "",{ refreshInterval: 0});
+    const { cierres, galonaje, totalproducto, totalsoles, gastos, isLoading, error } = useObtieneCierre(session?.user.id || "",{ refreshInterval: 0});
 
     const [fechaActual, setFechaActual] = useState("")
 
@@ -136,10 +136,26 @@ export const CierreTurnoPage = () => {
                                         </>:<></>
                                     }
                                 </Grid>
+                                <Divider sx={{ my:1 }} />                                           
+                                <Typography component="div" sx={{ fontWeight: 'bold' }}>GASTOS</Typography>  
+                                <Grid container>
+                                {
+                                        gastos? gastos.gastos.map( gasto => (
+                                                <Grid container key={ gasto.id }>
+                                                    <Grid item xs={6} >
+                                                        <Typography>{ gasto.concepto }</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6} display='flex' justifyContent='end'>
+                                                        <Typography>S/ { gasto.monto.toFixed(2) }</Typography>
+                                                    </Grid>                                          
+                                                </Grid>                             
+                                        )):<></>
+                                    }                                    
+                                </Grid>                              
                                 <Divider sx={{ my:1 }} />  
                                 {
                                     galonaje && totalproducto && totalsoles
-                                    ? <CierreTurnoDialog totalGalones={ galonaje! } totalProducto={totalproducto!} totales={totalsoles!}/>:<></>
+                                    ? <CierreTurnoDialog totalGalones={ galonaje! } totalProducto={totalproducto!} totales={totalsoles!} gastos={gastos?.gastos!}/>:<></>
                                 }
                                 
                                 

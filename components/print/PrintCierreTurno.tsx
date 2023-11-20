@@ -1,6 +1,6 @@
 import { getDatetimeFormatFromString, getTodayDatetime } from '@/helpers';
 import constantes from '@/helpers/constantes';
-import { ICierreTurnoPrint, ICierreTurnoTotalesPrint, IComprobante } from '@/interfaces';
+import { ICierreTurnoPrint, ICierreTurnoTotalesPrint, IComprobante, IGasto } from '@/interfaces';
 import { Grid, Typography } from '@mui/material';
 import { useSession } from 'next-auth/react';
 import React, { RefObject, forwardRef } from 'react'
@@ -9,10 +9,11 @@ type IPrintCierreProps = {
     totalGalones: ICierreTurnoPrint[];
     totalProducto: ICierreTurnoPrint[];
     totales: ICierreTurnoTotalesPrint;
+    gastos: IGasto[];
     horaIngreso: string;
 };
   
-export const PrintCierreTurno = forwardRef(({horaIngreso, totalGalones, totalProducto, totales}: IPrintCierreProps, ref) => {
+export const PrintCierreTurno = forwardRef(({horaIngreso, totalGalones, totalProducto, totales, gastos}: IPrintCierreProps, ref) => {
 
     const { data: session, status } = useSession()
 
@@ -38,9 +39,9 @@ export const PrintCierreTurno = forwardRef(({horaIngreso, totalGalones, totalPro
             <Grid container spacing={1} sx={{ mt: 0}}>
                 <Grid item xs={12} style={{paddingTop: 0, fontWeight: 'bold', marginTop: 3, fontSize:15}}>VENTA GALONES</Grid>
                 <Grid item xs={6} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>PRODUCTO</Typography></Grid> 
-                <Grid item xs={2} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>TOT.</Typography></Grid> 
+                <Grid item xs={2} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>TOTAL</Typography></Grid> 
                 <Grid item xs={2} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>DES.</Typography></Grid> 
-                <Grid item xs={2} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>CERA.</Typography></Grid>                 
+                <Grid item xs={2} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>SERA.</Typography></Grid>                 
                 {
                     totalGalones.map((galones:ICierreTurnoPrint)=>(
                         <Grid container key={ galones.producto } style={{ marginLeft: 10 }}>
@@ -53,9 +54,9 @@ export const PrintCierreTurno = forwardRef(({horaIngreso, totalGalones, totalPro
                 }
                 <Grid item xs={12} style={{paddingTop: 0, fontWeight: 'bold', marginTop: 3, fontSize:15}}>VENTA SOLES</Grid>
                 <Grid item xs={6} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>PRODUCTO</Typography></Grid> 
-                <Grid item xs={2} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>TOT.</Typography></Grid> 
+                <Grid item xs={2} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>TOTAL</Typography></Grid> 
                 <Grid item xs={2} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>DES.</Typography></Grid> 
-                <Grid item xs={2} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>CERA.</Typography></Grid>                   
+                <Grid item xs={2} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>SERA.</Typography></Grid>                   
                 {
                     totalProducto.map((producto:ICierreTurnoPrint)=>(
                         <Grid container key={ producto.producto } style={{ marginLeft: 10 }}>
@@ -77,7 +78,23 @@ export const PrintCierreTurno = forwardRef(({horaIngreso, totalGalones, totalPro
                     <Grid item xs={6} style={{paddingTop: 0, fontWeight: 'bold', marginTop: 2, fontSize:15}}>TOTAL</Grid>
                     <Grid item xs={6} style={{paddingTop: 0, fontWeight: 'bold', marginTop: 2, fontSize:15}}>S/ { (efectivo + tarjeta + yape).toFixed(2) }</Grid>                                       
                 </Grid>
-
+                {
+                    gastos && (
+                        <>
+                        <Grid item xs={12} style={{paddingTop: 0, fontWeight: 'bold', marginTop: 3, fontSize:15}}>GASTOS</Grid>
+                        <Grid item xs={6} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>CONCEPTO</Typography></Grid> 
+                        <Grid item xs={6} justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>MONTO</Typography></Grid>    
+                        </>
+                    )
+                }
+                {
+                    gastos && gastos.map((gasto:IGasto)=>(
+                        <Grid container key={ gasto.id } style={{ marginLeft: 10 }}>
+                            <Grid item xs={6} style={{paddingTop: 0}}>S/ { gasto.concepto }</Grid>
+                            <Grid item xs={6} style={{paddingTop: 0}}>S/ { gasto.monto.toFixed(2) }</Grid>
+                        </Grid>
+                    ))
+                }                
             </Grid>            
         </>
             </div>

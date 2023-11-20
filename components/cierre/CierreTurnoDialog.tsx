@@ -1,7 +1,7 @@
 import React, { useContext, useRef, useState } from 'react';
 import { useReactToPrint } from 'react-to-print';
 
-import { ICierreTurnoPrint, ICierreTurnoTotalesPrint, IComprobante } from '@/interfaces';
+import { ICierreTurnoPrint, ICierreTurnoTotalesPrint, IComprobante, IGasto } from '@/interfaces';
 import constantes from '@/helpers/constantes';
 import router from 'next/router';
 import { FuelContext, UiContext } from '@/context';
@@ -17,10 +17,11 @@ type Props = {
     totalGalones: ICierreTurnoPrint[];
     totalProducto: ICierreTurnoPrint[];
     totales: ICierreTurnoTotalesPrint;
+    gastos: IGasto[];
 }
 
 
-export const CierreTurnoDialog: React.FC<Props> = ({totalGalones, totalProducto, totales}) => {
+export const CierreTurnoDialog: React.FC<Props> = ({totalGalones, totalProducto, totales, gastos}) => {
 
     
 
@@ -94,7 +95,7 @@ export const CierreTurnoDialog: React.FC<Props> = ({totalGalones, totalProducto,
 
     return (
         <div>
-            <PrintCierreTurno {...{horaIngreso, totalGalones, totalProducto, totales}} ref={componentRef} />
+            <PrintCierreTurno {...{horaIngreso, totalGalones, totalProducto, totales, gastos}} ref={componentRef} />
             <Button color="secondary" onClick={handleClickOpen} >
                 CERRAR TURNO
             </Button>    

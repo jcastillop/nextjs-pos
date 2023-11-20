@@ -1,4 +1,5 @@
 export * from './alerta';
+export * from './gasto';
 export * from './products';
 export * from './comprobante';
 export * from './customers';

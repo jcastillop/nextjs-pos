@@ -4,7 +4,7 @@ import { Box, Button, Card, CardContent, CardHeader, Checkbox, FormControlLabel,
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { formatDateUS } from '@/helpers/util';
-import { ReporteProductoTurnos } from '@/hooks/useReportes';
+import { ReporteCierresDiarios, ReporteProductoTurnos } from '@/hooks/useReportes';
 import { useExcelDownloder } from 'react-xls';
 import { UiContext } from '@/context';
 import { BorderAll, Padding } from '@mui/icons-material';
@@ -12,47 +12,40 @@ import { BorderAll, Padding } from '@mui/icons-material';
 
 type FormData = {
     fechaInicio: Date | null;
-    turno: string[];
 }
 
-const turnosList = [
-    "TURNO1",
-    "TURNO2",
-    "TURNO3"
-]
-
-export const Turnos = () => {
+export const Cierres = () => {
 
     const { ExcelDownloder, Type, setData, setFilename } = useExcelDownloder();
     const { showAlert } = useContext( UiContext );
 
     const { control, register, reset, handleSubmit, trigger, setValue, getValues, formState: { errors } }  = useForm<FormData>({
         defaultValues: {
-            fechaInicio: new Date(), turno: []
+            fechaInicio: new Date()
         }
     });
 
     const [showPrint, setShowPrint] = useState(false);
     const [dataDownloader, setDataDownloader] = useState<any>();
 
-    const onSubmitReporte = async ( { fechaInicio, turno } : FormData) => {
+    const onSubmitReporte = async ( { fechaInicio } : FormData) => {
 
-        if(fechaInicio && turno.length > 0){
+        if(fechaInicio){
             const paramFechaInicio: string = formatDateUS(fechaInicio || new Date());
-            const { hasError, message, data} = await ReporteProductoTurnos(paramFechaInicio, turno.toString());
+            const { hasError, message, data} = await ReporteCierresDiarios(paramFechaInicio);
             if(!hasError && data.length > 0 ){
                 const reporte = { paramFechaInicio: data }
                 // @ts-ignore 
                 setData(reporte)
                 // @ts-ignore 
-                setFilename(`REPORTE_VENTAS_TURNOS_${paramFechaInicio}`)
+                setFilename(`REPORTE_CIERRE_DIA_${paramFechaInicio}`)
                 setDataDownloader(reporte)
                 setShowPrint(true)
             }else{
                 setShowPrint(false)
             }
         }else{
-            showAlert({mensaje: "Seleccione la fecha y/o elija algún turno", severity: 'error', time: 7000})
+            showAlert({mensaje: "Seleccione la fecha", severity: 'error', time: 7000})
         }
     }
 
@@ -63,27 +56,11 @@ export const Turnos = () => {
                     <Grid item xs={12} sm={12}>
                         <Card className='card-diario'>
                             <CardHeader
-                                title="Reporte totalizado de turnos"
-                                subheader="Seleccione los turnos y la fecha para obtener el reporte"
+                                title="Reporte cierres diarios"
+                                subheader="Seleccione la fecha para obtener el reporte"
                             />                            
                             <CardContent> 
                                 <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                    <FormGroup>
-                                        {
-                                            turnosList.map( turno =>(
-                                                <Grid item xs={4} key={ turno }>
-                                                <FormControlLabel
-                                                  value={turno}
-                                                  control={<Checkbox />}
-                                                  label={turno}
-                                                  { ...register('turno')}
-                                                />
-                                              </Grid>                                                
-                                            ))
-                                        }
-                                    </FormGroup>
-                                    </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <Controller
                                             name="fechaInicio"
@@ -120,7 +97,7 @@ export const Turnos = () => {
                         <Grid item xs={6} sm={6}>
                             {
                                 showPrint ? <ExcelDownloder
-                                filename={`REPORTE_VENTAS_TURNOS_${formatDateUS(getValues("fechaInicio") || new Date())}`}
+                                filename={`REPORTE_CIERRE_DIA_${formatDateUS(getValues("fechaInicio") || new Date())}`}
                                 data={ dataDownloader }
                                 type={ Type.Button }
                                 >                           

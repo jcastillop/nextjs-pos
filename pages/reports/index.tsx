@@ -3,24 +3,30 @@ import { getSession, useSession } from "next-auth/react";
 import { Button, Collapse, Grid, List, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Typography } from "@mui/material";
 
 import { FuelLayout } from "@/components/layouts";
-import { Storefront, ExpandLess, ExpandMore, PunchClock, PeopleAlt } from "@mui/icons-material";
+import { Storefront, ExpandLess, ExpandMore, PunchClock, PeopleAlt, Summarize, Book } from "@mui/icons-material";
 import { CalendarIcon } from "@mui/x-date-pickers";
 import { useState } from "react";
-import { Diario, Turnos } from "@/components/reports";
+import { Cierres, DeclaracionMensual, Diario, Turnos } from "@/components/reports";
 
 interface IReporte {
-    tipo: 'diario'|'turnos'
+    tipo: 'diario'|'turnos'|'declaracion_mensual'|'cierres'
 }
 
 const PerfilPage: NextPage = () => {
 
     const [tipoReporte, setTipoReporte] = useState<IReporte>({tipo: 'diario'});
 
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
+
+    const [openContable, setOpenContable] = useState(false);
     
     const handleClick = () => {
         setOpen(!open);
     };
+
+    const handleClickContable = () => {
+        setOpenContable(!openContable);
+    };    
 
     const renderSwitch = ({ tipo }: IReporte) => {
         switch(tipo) {
@@ -32,6 +38,14 @@ const PerfilPage: NextPage = () => {
                 return <>
                     <Turnos/>
                 </>
+            case 'declaracion_mensual':
+                return <>
+                    <DeclaracionMensual/>
+                </>
+            case 'cierres':
+                return <>
+                    <Cierres/>
+                </>                
         }
     }
 
@@ -74,18 +88,36 @@ const PerfilPage: NextPage = () => {
                                 <ListItemIcon>
                                 <PunchClock />
                                 </ListItemIcon>
-                                <ListItemText primary="Turno" />
+                                <ListItemText primary="Totalizado de turnos" />
                             </ListItemButton>  
 
-                            <ListItemButton sx={{ pl: 4 }}>
+                            <ListItemButton sx={{ pl: 4 }} onClick={ ()=> {setTipoReporte({ tipo: 'cierres'})} }>
                                 <ListItemIcon>
                                 <PeopleAlt />
                                 </ListItemIcon>
-                                <ListItemText primary="Usuario" />
+                                <ListItemText primary="Cierres diarios" />
                             </ListItemButton>  
                                                     
                             </List>
                         </Collapse>
+
+                        <ListItemButton onClick={handleClickContable}>
+                            <ListItemIcon>
+                            <Book />
+                            </ListItemIcon>
+                            <ListItemText primary="Contables" />
+                            {openContable ? <ExpandLess /> : <ExpandMore />}
+                        </ListItemButton>
+
+                        <Collapse in={openContable} timeout="auto" unmountOnExit>
+                            <ListItemButton sx={{ pl: 4 }} onClick={ ()=> {setTipoReporte({ tipo: 'declaracion_mensual'})} }>
+                                <ListItemIcon>
+                                <Summarize />
+                                </ListItemIcon>
+                                <ListItemText primary="Declaracion mensual" />
+                            </ListItemButton>  
+                        </Collapse>
+
                         </List>
                     </Grid>
                     <Grid item xs={12} sm={9}>

@@ -1,3 +1,4 @@
+import { IGasto } from "./gasto";
 import { IUser } from "./user";
 
 export interface ICierreTurno {
@@ -33,4 +34,8 @@ export interface ICierreTurnoTotalesPrint {
     efectivo: number;
     tarjeta: number;
     yape: number;
+}
+export interface ICierreTurnoGastos {
+    gastos: IGasto[];
+    total: number;
 }
