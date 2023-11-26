@@ -13,6 +13,10 @@ export interface FuelState {
     children?: React.ReactNode;
     isLoaded: boolean;
     cart: IComprobanteAdminItem[];
+    numberOfItems: number;
+    subTotal: number;
+    tax: number;
+    total: number;    
     receptor: IReceptor;
     comprobante: IComprobante;
 }
@@ -20,8 +24,12 @@ export interface FuelState {
 const CART_INITIAL_STATE: FuelState = {
     isLoaded: false,
     cart: [],
+    numberOfItems: 0,
     receptor: initialReceptor,
-    comprobante: initialComprobante
+    comprobante: initialComprobante,
+    subTotal: 0,
+    tax: 0,
+    total: 0
 }
 
 type Props = { 
@@ -483,6 +491,23 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             }
         }        
     }  
+
+    useEffect(() => {
+        
+        const numberOfItems = state.cart.reduce( ( prev, current ) => current.cantidad + prev , 0 );
+        const subTotal = +(state.cart.reduce( ( prev, current ) => (current.valor_venta * current.cantidad) + prev, 0 )).toFixed(2);
+        const taxRate =  Number(process.env.NEXT_PUBLIC_TAX_RATE || 0);
+    
+        const orderSummary = {
+            numberOfItems,
+            subTotal,
+            tax: +(subTotal * taxRate).toFixed(2),
+            total: +(subTotal * ( taxRate + 1 )).toFixed(2)
+        }
+
+        dispatch({ type: '[Cart] - Update order cart', payload: orderSummary });
+    }, [state.cart]);
+    
     
     // useEffect(() => {
     //     Cookie.set('cart', JSON.stringify( state.cart ));

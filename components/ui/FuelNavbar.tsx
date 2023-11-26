@@ -2,14 +2,16 @@ import NextLink from "next/link";
 import { AppBar, Badge, Box, Button, IconButton, Link, Toolbar, Typography } from "@mui/material";
 import { SearchOutlined, ShoppingCartOutlined } from "@mui/icons-material";
 import { useRouter } from "next/router";
-import { UseDate } from "./UseDate";
 import { useContext } from "react";
-import { UiContext } from "@/context";
+import { FuelContext, UiContext } from "@/context";
+import { useSession  } from 'next-auth/react';
 
 export const FuelNavbar = () => {
 
   const { asPath } = useRouter();
   const { toggleSideMenu } = useContext( UiContext );
+  const { numberOfItems } = useContext( FuelContext );
+  const { data: session, status } = useSession()
 
   return (
     <AppBar>
@@ -25,11 +27,13 @@ export const FuelNavbar = () => {
             <Box flex={1}/>
 
             <Box sx={{ display: { xs:'none', sm:'block' } }}>
-              <NextLink href={'/'} passHref legacyBehavior>
+              {
+                session?.user.rol == 'USER_ROLE' && <NextLink href={'/'} passHref legacyBehavior>
                 <Link >
                   <Button color={ asPath === '/'?'primary':'info' }>Despacho</Button>
                 </Link>
               </NextLink>
+              }
               <NextLink href={'/historico'} passHref legacyBehavior>
                 <Link>
                   <Button color={ asPath === '/historico'?'primary':'info' }>Histórico</Button>
@@ -48,6 +52,18 @@ export const FuelNavbar = () => {
               <NextLink href='/' passHref legacyBehavior>
                 <Link display={"flex"} alignItems='center'>
                   {/* <UseDate /> */}
+                </Link>
+              </NextLink>
+            </Box>
+
+            <Box>
+              <NextLink href="/cart" passHref legacyBehavior>
+                <Link>
+                    <IconButton>
+                        <Badge badgeContent={ numberOfItems > 9 ? '+9': numberOfItems  } color="secondary">
+                            <ShoppingCartOutlined />
+                        </Badge>
+                    </IconButton>
                 </Link>
               </NextLink>
             </Box>

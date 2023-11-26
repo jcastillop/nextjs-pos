@@ -6,14 +6,13 @@ import { FuelLayout } from '@/components/layouts';
 import { FuelList } from '@/components/fuel/FuelList';
 
 import { getSession, useSession  } from 'next-auth/react';
-import { useFuels, useProductos } from '@/hooks';
-import { ProductList } from '@/components/products';
+import { useFuels } from '@/hooks';
 
 const HomePage: NextPage = () => {
 
   //const { fuels, isLoading, isError } = useFuels('/abastecimientos?pistola=1&offset=0&limit=10&desde=2022-05-21&hasta=2022-05-22',{ refreshInterval: 5})
   const { fuels, isLoading, isError } = useFuels('/abastecimientos',null,null,{ refreshInterval: 3}, '0', '100')
-  const { productos, isLoadingProduct, hasErrorProduct } = useProductos({ refreshInterval: 0});
+  // const { productos, isLoadingProduct, hasErrorProduct } = useProductos({ refreshInterval: 0});
 
   const { data: session, status } = useSession()
 
@@ -22,14 +21,17 @@ const HomePage: NextPage = () => {
         <FuelLayout title={'Pos - Shop'} pageDescription={'Productos de POS'} imageFullUrl={''}>
              <Typography variant='h6' sx={{ mb:1 }}>{session?.user.grifo} - {session?.user.isla} - {session?.user.usuario} - {session?.user.jornada}</Typography>
             {
-              session?.user.rol == 'USER_ROLE'?
-              (isLoading
-               ? <FullScreenLoading/>
-               : <FuelList fuels={fuels}/>
-              ):(isLoadingProduct
-               ? <FullScreenLoading/>
-               : <ProductList products={productos}/>
-              )
+              // session?.user.rol == 'USER_ROLE'?
+              // (isLoading
+              //  ? <FullScreenLoading/>
+              //  : <FuelList fuels={fuels}/>
+              // ):(isLoadingProduct
+              //  ? <FullScreenLoading/>
+              //  : <ProductList products={productos}/>
+              // )
+              isLoading
+              ? <FullScreenLoading/>
+              : <FuelList fuels={fuels}/>             
              }
         </FuelLayout>        
        {/* }     */}
@@ -41,6 +43,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
 
   const session = await getSession({ req });
   const { p = '/auth/login'} = query
+  const { q = '/market'} = query
 
   if(!session){
       return {
@@ -49,10 +52,21 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query})=>{
               permanent: false
           }
       }
+  }else{
+    if(session.user.rol == 'ADMIN_ROLE'){
+      return {
+        redirect: {
+            destination: q.toString(),
+            permanent: false
+        }
+      } 
+    }else{
+      return{
+        props: {}
+      }
+    }
   }
-  return{
-      props: {}
-  }
+
 }
 
 export default HomePage;

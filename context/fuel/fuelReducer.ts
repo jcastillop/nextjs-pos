@@ -19,6 +19,15 @@ type FuelActionType =
    | { type: '[Cart] - Fuel clean' }
    | { type: '[Cart] - Change cart quantity', payload: IComprobanteAdminItem }
    | { type: '[Cart] - Cart complete' }
+   | { 
+      type: '[Cart] - Update order cart', 
+      payload: {
+         numberOfItems: number;
+         subTotal: number;
+         tax: number;
+         total: number;
+      }
+   }   
 
 const RECEPTOR_INITIAL:IReceptor = {
    id_receptor: 0,
@@ -38,6 +47,11 @@ export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelSta
             ...state,
             cart: [...action.payload]
           }      
+      case '[Cart] - Update order cart':
+         return {
+            ...state,
+            ...action.payload
+         }
       case '[Cart] - Update order summary':
          return {
             ...state,

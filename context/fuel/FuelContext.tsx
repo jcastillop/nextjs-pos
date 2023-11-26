@@ -5,6 +5,10 @@ interface ContextProps {
     receptor: IReceptor;
     comprobante: IComprobante;
     cart: IComprobanteAdminItem[];
+    numberOfItems: number;
+    subTotal: number;
+    tax: number;
+    total: number;    
     createOrder: (tipo: string, receptor: IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, yape: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, prefijo: string, id?:number) => Promise<{ hasError: boolean; respuesta: any; }>;
     modifyOrder: (correlativo: string, id_comprobante: string, tipo: string, receptor: IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, prefijo: string, id?:number) => Promise<{ hasError: boolean; respuesta: any; }>;
     createOrderAdministrador: (comprobanteAdmin: IComprobanteAdmin, receptor: IReceptor, tipo: string, sesionid: number) => Promise<{ hasError: boolean; respuesta: any;  storage?: any; }>;

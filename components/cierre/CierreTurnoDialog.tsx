@@ -15,13 +15,12 @@ import { PrintCierreTurno } from '../print/PrintCierreTurno';
 
 type Props = {
     totalGalones: ICierreTurnoPrint[];
-    totalProducto: ICierreTurnoPrint[];
     totales: ICierreTurnoTotalesPrint;
     gastos: IGasto[];
 }
 
 
-export const CierreTurnoDialog: React.FC<Props> = ({totalGalones, totalProducto, totales, gastos}) => {
+export const CierreTurnoDialog: React.FC<Props> = ({totalGalones, totales, gastos}) => {
 
     
 
@@ -42,7 +41,7 @@ export const CierreTurnoDialog: React.FC<Props> = ({totalGalones, totalProducto,
     const { fuels, isLoading, isError } = useFuels('/abastecimientos/count/total',null,null,{ refreshInterval: 3}, '0', '100')
 
     const handleAceptar = async () => {
-        if(totalProducto.length > 0){
+        if(totalGalones.length > 0){
             const session = await getSession();
             setHoraIngreso(session?.user.fecha_registro || "")
             const { hasError, cierre, message, cantidad } = await createCierre(parseInt(session?.user.id?session?.user.id:"0"), new Date(formatDateSQL(value)), session?.user.jornada || '', session?.user.isla || '',totales.efectivo, totales.tarjeta, totales.yape);            
@@ -95,7 +94,7 @@ export const CierreTurnoDialog: React.FC<Props> = ({totalGalones, totalProducto,
 
     return (
         <div>
-            <PrintCierreTurno {...{horaIngreso, totalGalones, totalProducto, totales, gastos}} ref={componentRef} />
+            <PrintCierreTurno {...{horaIngreso, totalGalones, totales, gastos}} ref={componentRef} />
             <Button color="secondary" onClick={handleClickOpen} >
                 CERRAR TURNO
             </Button>    

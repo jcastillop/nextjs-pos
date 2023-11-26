@@ -25,9 +25,12 @@ export interface ICierreTurnoHistorico {
 }
 export interface ICierreTurnoPrint {
     producto: string;
-    total: number;
-    despacho?: number;
-    calibracion?: number;
+    total_galones: number;
+    despacho_galones: number;
+    calibracion_galones: number;
+    total_soles: number;
+    despacho_soles: number;
+    calibracion_soles: number;    
 }
 
 export interface ICierreTurnoTotalesPrint {

@@ -21,6 +21,19 @@ export const useProductos = ( config: SWRConfiguration = {} ) => {
     }
 }
 
+export const useProductosTipo = ( tipo: string, config: SWRConfiguration = {} ) => {    
+
+    const { data, error, isLoading } = useSWR<Props>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/productos/tipo/${ tipo }`, config);
+
+    const productos = data?.productos || [];
+
+    return {
+        hasErrorProduct: error,
+        isLoadingProduct: isLoading,
+        productos: productos
+    }
+}
+
 export const useProducto = ( url: string, config: SWRConfiguration = {} ) => {    
 
     const { data, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/productos${ url }`, config);

@@ -15,7 +15,7 @@ export const CierreTurnoPage = () => {
 
     const { data: session, status } = useSession()
 
-    const { cierres, galonaje, totalproducto, totalsoles, gastos, isLoading, error } = useObtieneCierre(session?.user.id || "",{ refreshInterval: 0});
+    const { cierres, galonaje, totalsoles, gastos, isLoading, error } = useObtieneCierre(session?.user.id || "",{ refreshInterval: 0});
 
     const [fechaActual, setFechaActual] = useState("")
 
@@ -82,13 +82,13 @@ export const CierreTurnoPage = () => {
                                                         <Typography>{ galones.producto }</Typography>
                                                     </Grid>
                                                     <Grid item xs={2} display='flex' justifyContent='end'>
-                                                        <Typography>{ galones.total.toFixed(3) }</Typography>
+                                                        <Typography>{ galones.total_galones.toFixed(3) }</Typography>
                                                     </Grid>
                                                     <Grid item xs={2} display='flex' justifyContent='end'>
-                                                        <Typography>{ (galones.despacho?galones.despacho:0).toFixed(3) }</Typography>
+                                                        <Typography>{ (galones.despacho_galones?galones.despacho_galones:0).toFixed(3) }</Typography>
                                                     </Grid>
                                                     <Grid item xs={2} display='flex' justifyContent='end'>
-                                                        <Typography>{ (galones.calibracion?galones.calibracion:0).toFixed(3) }</Typography>
+                                                        <Typography>{ (galones.calibracion_galones?galones.calibracion_galones:0).toFixed(3) }</Typography>
                                                     </Grid>                                                                                                
                                                 </Grid>                             
                                         )):<></>
@@ -102,19 +102,19 @@ export const CierreTurnoPage = () => {
                                     <Grid item xs={2} display='flex' justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>DESPACHO</Typography></Grid> 
                                     <Grid item xs={2} display='flex' justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>CERAFIN</Typography></Grid>                                         
                                     {
-                                        totalproducto? totalproducto.map( producto => (
+                                        galonaje? galonaje.map( producto => (
                                                 <Grid container key={ producto.producto }>
                                                     <Grid item xs={6} >
                                                         <Typography>{ producto.producto }</Typography>
                                                     </Grid>
                                                     <Grid item xs={2} display='flex' justifyContent='end'>
-                                                        <Typography>S/ { producto.total.toFixed(2) }</Typography>
+                                                        <Typography>S/ { (producto.total_soles?producto.total_soles:0).toFixed(2) }</Typography>
                                                     </Grid>
                                                     <Grid item xs={2} display='flex' justifyContent='end'>
-                                                        <Typography>S/ { (producto.despacho?producto.despacho:0).toFixed(2) }</Typography>
+                                                        <Typography>S/ { (producto.despacho_soles?producto.despacho_soles:0).toFixed(2) }</Typography>
                                                     </Grid>
                                                     <Grid item xs={2} display='flex' justifyContent='end'>
-                                                        <Typography>S/ { (producto.calibracion?producto.calibracion:0).toFixed(2) }</Typography>
+                                                        <Typography>S/ { (producto.calibracion_soles?producto.calibracion_soles:0).toFixed(2) }</Typography>
                                                     </Grid>                                                   
                                                 </Grid>                             
                                         )):<></>
@@ -154,8 +154,8 @@ export const CierreTurnoPage = () => {
                                 </Grid>                              
                                 <Divider sx={{ my:1 }} />  
                                 {
-                                    galonaje && totalproducto && totalsoles
-                                    ? <CierreTurnoDialog totalGalones={ galonaje! } totalProducto={totalproducto!} totales={totalsoles!} gastos={gastos?.gastos!}/>:<></>
+                                    galonaje && totalsoles
+                                    ? <CierreTurnoDialog totalGalones={ galonaje! } totales={totalsoles!} gastos={gastos?.gastos!}/>:<></>
                                 }
                                 
                                 
