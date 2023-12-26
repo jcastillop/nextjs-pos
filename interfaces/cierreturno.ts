@@ -1,3 +1,4 @@
+import { IDeposito } from "./deposito";
 import { IGasto } from "./gasto";
 import { IUser } from "./user";
 
@@ -40,5 +41,9 @@ export interface ICierreTurnoTotalesPrint {
 }
 export interface ICierreTurnoGastos {
     gastos: IGasto[];
+    total: number;
+}
+export interface ICierreTurnoDepositos {
+    depositos: IDeposito[];
     total: number;
 }

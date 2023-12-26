@@ -1,5 +1,5 @@
 import NextLink from 'next/link'
-import { CartList, OrderSumary } from '@/components/cart'
+import { CartList } from '@/components/cart'
 import { ShopLayout } from '@/components/layouts'
 import { Box, Card, CardContent, Chip, Divider, Grid, Link, Typography } from '@mui/material'
 import React from 'react'
@@ -59,7 +59,6 @@ const OrderPage = () => {
                             </NextLink>
                         </Box>
 
-                        <OrderSumary/>
                         <Box sx={{ mt: 3}}>
                           {/*  */}
                           <h1>Pagar</h1>

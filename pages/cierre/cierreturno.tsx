@@ -1,5 +1,5 @@
 import { FuelLayout } from '@/components/layouts'
-import { getDatetimeFormat, getDatetimeFormatFromString, getTodayDatetime } from '@/helpers'
+import { getDatetimeFormat, getDatetimeFormatFromString, getDatetimeFormatFromStringLocal, getTodayDatetime } from '@/helpers'
 import { useObtieneCierre } from '@/hooks/useCierres'
 import { CreditCard, PhoneAndroid } from '@mui/icons-material'
 import { Typography, Grid, Divider, Card, CardContent, List, ListItem, ListItemText, Chip } from '@mui/material'
@@ -12,10 +12,10 @@ import { FullScreenLoading } from '@/components/ui'
 import { GetServerSideProps } from 'next'
 
 export const CierreTurnoPage = () => {
-
+    //cambios
     const { data: session, status } = useSession()
 
-    const { cierres, galonaje, totalsoles, gastos, isLoading, error } = useObtieneCierre(session?.user.id || "",{ refreshInterval: 0});
+    const { cierres, galonaje, totalsoles, gastos, depositos, isLoading, error } = useObtieneCierre(session?.user.id || "",{ refreshInterval: 0});
 
     const [fechaActual, setFechaActual] = useState("")
 
@@ -136,26 +136,54 @@ export const CierreTurnoPage = () => {
                                         </>:<></>
                                     }
                                 </Grid>
-                                <Divider sx={{ my:1 }} />                                           
-                                <Typography component="div" sx={{ fontWeight: 'bold' }}>GASTOS</Typography>  
-                                <Grid container>
                                 {
-                                        gastos? gastos.gastos.map( gasto => (
-                                                <Grid container key={ gasto.id }>
-                                                    <Grid item xs={6} >
-                                                        <Typography>{ gasto.concepto }</Typography>
-                                                    </Grid>
-                                                    <Grid item xs={6} display='flex' justifyContent='end'>
-                                                        <Typography>S/ { gasto.monto.toFixed(2) }</Typography>
-                                                    </Grid>                                          
-                                                </Grid>                             
-                                        )):<></>
-                                    }                                    
-                                </Grid>                              
+                                    gastos && gastos.gastos.length > 0 && (
+                                        <>
+                                        <Divider sx={{ my:1 }} />                                           
+                                        <Typography component="div" sx={{ fontWeight: 'bold' }}>GASTOS</Typography>  
+                                        <Grid container>
+                                        {
+                                                gastos.gastos.map( gasto => (
+                                                        <Grid container key={ gasto.id }>
+                                                            <Grid item xs={6} >
+                                                                <Typography>{ gasto.concepto }</Typography>
+                                                            </Grid>
+                                                            <Grid item xs={6} display='flex' justifyContent='end'>
+                                                                <Typography>S/ { gasto.monto.toFixed(2) }</Typography>
+                                                            </Grid>                                          
+                                                        </Grid>                             
+                                                ))
+                                            }                                    
+                                        </Grid>                              
+                                        </>
+                                    )
+                                }
+                                {
+                                    depositos && depositos.depositos.length > 0 && (
+                                        <>
+                                        <Divider sx={{ my:1 }} />                                           
+                                        <Typography component="div" sx={{ fontWeight: 'bold' }}>DEPOSITOS PARCIALES</Typography>  
+                                        <Grid container>
+                                        {
+                                                depositos.depositos.map( deposito => (
+                                                        <Grid container key={ deposito.id }>
+                                                            <Grid item xs={6} >
+                                                                <Typography>{ getDatetimeFormatFromStringLocal(deposito.fecha) }</Typography>
+                                                            </Grid>
+                                                            <Grid item xs={6} display='flex' justifyContent='end'>
+                                                                <Typography>S/ { deposito.monto.toFixed(2) }</Typography>
+                                                            </Grid>                                          
+                                                        </Grid>                             
+                                                ))
+                                            }                                    
+                                        </Grid>                              
+                                        </>
+                                    )
+                                }                                
                                 <Divider sx={{ my:1 }} />  
                                 {
                                     galonaje && totalsoles
-                                    ? <CierreTurnoDialog totalGalones={ galonaje! } totales={totalsoles!} gastos={gastos?.gastos!}/>:<></>
+                                    ? <CierreTurnoDialog totalGalones={ galonaje! } totales={totalsoles!} gastos={gastos?.gastos!} depositos={depositos?.depositos!}/>:<></>
                                 }
                                 
                                 

@@ -1,5 +1,5 @@
 import useSWR, { SWRConfiguration } from "swr"
-import { ICierreTurnoGastos, ICierreTurnoHistorico, ICierreTurnoPrint, ICierreTurnoTotalesPrint } from '@/interfaces';
+import { ICierreTurnoDepositos, ICierreTurnoGastos, ICierreTurnoHistorico, ICierreTurnoPrint, ICierreTurnoTotalesPrint } from '@/interfaces';
 
 export const useObtieneCierre = ( idUsuario: string, config: SWRConfiguration = {} ) => {    
     
@@ -7,6 +7,7 @@ export const useObtieneCierre = ( idUsuario: string, config: SWRConfiguration = 
     const { data: galonaje, error: galonajeError, isLoading: isLoadingGalonaje } = useSWR<ICierreTurnoPrint[]>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/cierreturnogalonaje?idUsuario=${idUsuario}`, config);
     const { data: totalsoles, error: totalsolesError, isLoading: isLoadingTotalsoles } = useSWR<ICierreTurnoTotalesPrint>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/cierreturnototalsoles?idUsuario=${idUsuario}`, config);
     const { data: gastos, error: gastosError, isLoading: isLoadingGastos } = useSWR<ICierreTurnoGastos>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/gastos/${ idUsuario }`, config);
+    const { data: depositos, error: depositosError, isLoading: isLoadingDepositos } = useSWR<ICierreTurnoDepositos>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/depositos/${ idUsuario }`, config);
 
     return {
         error: { cierreError, galonajeError, totalsolesError },
@@ -15,5 +16,6 @@ export const useObtieneCierre = ( idUsuario: string, config: SWRConfiguration = 
         galonaje: galonaje,
         totalsoles: totalsoles,
         gastos: gastos,
+        depositos: depositos,
     }
 }

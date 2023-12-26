@@ -214,7 +214,8 @@ const InvoicePage : NextPage = () => {
                                             exclusive
                                             onChange={handleTipoDocumento}
                                             aria-label="Tipo de documento"        
-                                            sx={{ mt: 1}}                                       
+                                            sx={{ mt: 1}}   
+                                            size='large'                              
                                         >
                                             <ToggleButton value="03">BOLETA</ToggleButton>
                                             <ToggleButton value="01">FACTURA</ToggleButton>
@@ -276,7 +277,8 @@ const InvoicePage : NextPage = () => {
                                         <Grid item xs={12} sm={6} display={{ xs: (tipoComprobante=='03'||tipoComprobante=='51')?"none":"block" }}>
                                             <TextField 
                                                 label='Direccion' 
-                                                variant='standard' 
+                                                variant='standard'
+                                                inputProps={{style: { fontSize: 20, textTransform: "uppercase" }}}
                                                 InputLabelProps={{ shrink: true }} 
                                                 fullWidth
                                                 { ...register('direccion')}
@@ -293,8 +295,8 @@ const InvoicePage : NextPage = () => {
                                                 }}                                            
                                                 label='Placa' 
                                                 variant='standard' 
+                                                InputLabelProps={{ shrink: true }} 
                                                 inputProps={{style: { fontSize: 20, textTransform: "uppercase" }}}
-                                                InputLabelProps={{ shrink: true,  }} 
                                                 fullWidth
                                                 { ...register('placa')}
                                                 error={ !!errors.placa }
@@ -306,6 +308,7 @@ const InvoicePage : NextPage = () => {
                                                 label='Comentarios' 
                                                 variant='standard' 
                                                 InputLabelProps={{ shrink: true }} 
+                                                inputProps={{style: { fontSize: 20, textTransform: "uppercase" }}}
                                                 fullWidth
                                                 { ...register('comentario')}
                                                 error={ !!errors.comentario }
@@ -326,7 +329,8 @@ const InvoicePage : NextPage = () => {
                                                 // onChange={handleTarjetaValueChange}
                                                 inputProps={{
                                                     maxLength: 5,
-                                                    step: 0.01
+                                                    step: 0.01,
+                                                    style: { fontSize: 15, textTransform: "uppercase" }
                                                 }}
                                                 InputProps={{
                                                     startAdornment: (
@@ -353,7 +357,8 @@ const InvoicePage : NextPage = () => {
                                                 // onChange={handleEfectivoValueChange}
                                                 inputProps={{
                                                     maxLength: 5,
-                                                    step: 0.01
+                                                    step: 0.01,
+                                                    style: { fontSize: 15, textTransform: "uppercase" }
                                                 }}                                                                                           
                                                 InputProps={{
                                                     startAdornment: (
@@ -384,7 +389,8 @@ const InvoicePage : NextPage = () => {
                                                 // onChange={handleEfectivoValueChange}
                                                 inputProps={{
                                                     maxLength: 5,
-                                                    step: 0.01
+                                                    step: 0.01,
+                                                    style: { fontSize: 15, textTransform: "uppercase" }
                                                 }}                                                                                           
                                                 InputProps={{
                                                     startAdornment: (

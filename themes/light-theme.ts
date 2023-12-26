@@ -1,5 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 import { red,  } from '@mui/material/colors';
+import { Grid } from '@mui/material';
 
 
 export const lightTheme = createTheme({
@@ -34,6 +35,14 @@ export const lightTheme = createTheme({
       }
     },
 
+    // MuiCardContent:{
+    //   styleOverrides: {
+    //     :{
+
+    //     }
+    //   }
+    // },
+
     MuiTypography: {
       styleOverrides: {
         h1: {
@@ -55,7 +64,7 @@ export const lightTheme = createTheme({
     MuiButton: {
       defaultProps: {
         variant: 'contained',
-        size: 'small',
+        size: 'medium',
         disableElevation: true,
         color:'info'
       },
@@ -71,7 +80,12 @@ export const lightTheme = createTheme({
         }
       }
     },
-
+    MuiToggleButton:{
+      defaultProps: {
+        size: 'large',
+        fullWidth: true
+      },
+    },
 
     MuiCard: {
       defaultProps: {
@@ -85,5 +99,10 @@ export const lightTheme = createTheme({
       }
     }
     
-  }
+  },
+  // typography:{
+  //   body1:{
+  //     fontSize: 16
+  //   }
+  // }
 });

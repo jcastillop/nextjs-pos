@@ -6,6 +6,8 @@ import { SWRConfig } from 'swr'
 import { AuthProvider, FuelProvider, UiProvider } from '../context'
 import { SessionProvider } from 'next-auth/react'
 import { Alerta } from '@/components/ui'
+import { initialReceptor } from '@/database/receptor'
+import { initialComprobante } from '@/database/comprobante'
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -17,7 +19,7 @@ export default function App({ Component, pageProps }: AppProps) {
       
       <SessionProvider>
         {/* <AuthProvider> */}
-          <FuelProvider isLoaded={false}>
+          <FuelProvider isLoaded={false} cart={[]} numberOfItems={0} subTotal={0} tax={0} total={0} receptor={initialReceptor} comprobante={initialComprobante}>
             <UiProvider>
               <ThemeProvider theme={ lightTheme }>
                 <CssBaseline/>

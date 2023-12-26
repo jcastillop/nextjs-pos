@@ -46,10 +46,14 @@ export const AuthProvider:FC<PropsWithChildren> =  ({ children }: Props)=> {
 
         try {
             const user: IUser = {
-                name: 'Jorge',
-                email: 'jorge.castillo',
-                phone: '947210811',
-                role: 'admin'
+                id: 0,
+                nombre: '',
+                usuario: '',
+                correo: '',
+                img: '',
+                rol: 'USER_ROLE',
+                estado: 0,
+                EmisorId: 0
             }
             dispatch({ type: '[Auth] - Login', payload: user });
             return true;

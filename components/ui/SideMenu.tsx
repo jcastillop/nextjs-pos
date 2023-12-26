@@ -1,7 +1,7 @@
 import React from "react";
 import { useContext } from "react";
 import { Box, Divider, Drawer, Link, List, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from "@mui/material"
-import { CloseOutlined, InsertInvitationOutlined, LoginOutlined, PersonOutlineOutlined, ManageAccountsOutlined, SavingsOutlined, ArticleOutlined, ShoppingCartOutlined, InventoryOutlined, Face2Outlined, CurrencyExchangeOutlined } from "@mui/icons-material"
+import { CloseOutlined, InsertInvitationOutlined, LoginOutlined, PersonOutlineOutlined, ManageAccountsOutlined, SavingsOutlined, ArticleOutlined, ShoppingCartOutlined, InventoryOutlined, Face2Outlined, CurrencyExchangeOutlined, LocalAtm } from "@mui/icons-material"
 
 import { signOut, useSession } from 'next-auth/react';
 import { UiContext } from "@/context";
@@ -46,12 +46,20 @@ export const SideMenu = () => {
                 </ListItemButton>
                 {
                     session?.user.rol == "USER_ROLE" && (
+                        <>
                         <ListItemButton LinkComponent={Link} href="/gastos">
                             <ListItemIcon>
                                 <CurrencyExchangeOutlined/>
                             </ListItemIcon>
                             <ListItemText primary={'Registro de gastos'} />
                         </ListItemButton>  
+                        <ListItemButton LinkComponent={Link} href="/depositos">
+                            <ListItemIcon>
+                                <LocalAtm/>
+                            </ListItemIcon>
+                            <ListItemText primary={'Depositos parciales'} />
+                        </ListItemButton>                          
+                        </>
                     )
                 }
                 <ListItemButton onClick={ logout }>

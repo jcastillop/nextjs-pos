@@ -6,3 +6,4 @@ export * from './customers';
 export * from './receptor';
 export * from './user';
 export * from './cierreturno';
+export * from './deposito';

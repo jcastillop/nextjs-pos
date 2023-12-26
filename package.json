@@ -5,8 +5,15 @@
   "scripts": {
     "dev": "next dev -p 80",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 80",
     "lint": "next lint"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false,
+    "net": false,
+    "child_process": false
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
@@ -15,6 +22,7 @@
     "@mui/material": "^5.11.14",
     "@mui/x-data-grid": "^6.0.3",
     "@mui/x-date-pickers": "^6.10.0",
+    "@thiagoelg/node-printer": "^0.6.2",
     "@types/node": "18.15.5",
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
@@ -22,12 +30,17 @@
     "browser-cookies": "^1.2.0",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.9",
+    "esc-pos-encoder": "^2.0.1",
+    "escpos": "^3.0.0-alpha.6",
+    "escpos-usb": "^3.0.0-alpha.4",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
     "js-cookie": "^3.0.5",
     "log4js": "^6.9.1",
-    "next": "13.2.4",
+    "next": "^13.5.6",
     "next-auth": "^4.22.1",
+    "node-thermal-printer": "^4.4.1",
+    "printer": "^0.4.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.9",
@@ -35,10 +48,11 @@
     "react-slideshow-image": "^4.2.1",
     "react-thermal-printer": "^0.11.0",
     "react-to-print": "^2.14.12",
-    "react-xls": "^0.1.1",
+    "react-xls": "^0.0.1",
     "request-ip": "^3.3.0",
     "swr": "^2.1.1",
-    "typescript": "5.0.2"
+    "typescript": "5.0.2",
+    "usb": "^2.11.0"
   },
   "main": "index.js",
   "author": "Jorge Castilo <jorge.castillo.pe@gmail.com>",

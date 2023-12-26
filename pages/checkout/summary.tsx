@@ -1,5 +1,5 @@
 import NextLink from 'next/link'
-import { CartList, OrderSumary } from '@/components/cart'
+import { CartList } from '@/components/cart'
 import { ShopLayout } from '@/components/layouts'
 import { Box, Button, Card, CardContent, Divider, Grid, Link, Typography } from '@mui/material'
 import React from 'react'
@@ -44,7 +44,6 @@ const SumaryPage = () => {
                             </NextLink>
                         </Box>
 
-                        <OrderSumary/>
                         <Box sx={{ mt: 3}}>
                             <Button color='secondary' className='circular-btn' fullWidth>
                                 Confirmar orden
