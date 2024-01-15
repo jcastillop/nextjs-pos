@@ -105,6 +105,14 @@ const HistoricoPage = () => {
     { field: 'isla', headerName: 'Isla', width: 100, sortable: false },
     { field: 'turno', headerName: 'Turno', width: 100, sortable: false },
     { field: 'usuario', headerName: 'Usuario', width: 100, sortable: false },    
+    { field: 'pdf', headerName: 'PDF', 
+      renderCell: (params: GridRenderCellParams<any>) => { 
+        return <a target="_blank" href={params.row.pdf} rel="noopener noreferrer">
+        PDF
+        </a>
+          
+      },width: 100,
+    },    
     {
         field: 'sunat',
         headerName: 'SUNAT',
@@ -272,6 +280,7 @@ const HistoricoPage = () => {
       isla        : comprobante["Cierreturno.isla"],
       turno       : comprobante["Cierreturno.turno"],
       usuario     : comprobante["Usuario.nombre"],
+      pdf         : comprobante.url,
       abastecimiento: comprobante.id_abastecimiento,
       error       : comprobante.errors,
       fecha_emision       : comprobante.fecha_emision,
@@ -285,16 +294,16 @@ const HistoricoPage = () => {
     <>
       <FuelLayout title={'Pos - Shop'} pageDescription={'Productos de POS'} imageFullUrl={''}>
         <Typography variant='h1' component = 'h1'>Histórico de ventas</Typography>
-        
-        {/* {
+{/*         
+        {
           session?.user.rol == 'USER_ROLE' &&  (
             <>
               <Typography  variant="subtitle1" style={{ color: 'blue' }}>Tarjeta S/ {totalTarjeta.toFixed(2)} - Efectivo S/ {totalEfectivo.toFixed(2)} - Yape/Plin S/ {totalYape.toFixed(2)}</Typography>
               <Print comprobantes={comprobantes}/> 
             </>
           )
-        }
-         */}
+        } */}
+        
         <div style={{ display: "none" }}>
             <PrintPos ref={componentRef} receptor={printObject.receptor} comprobante={printObject.comprobante}/>
         </div>

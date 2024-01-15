@@ -62,8 +62,8 @@ const initialComprobante: IComprobanteAdmin = {
     fecha_documento_afectado: '',
     motivo_documento_afectado: '',
     gravadas: 0,
-    igv: 0,
-    total: 0,
+    total_igv: 0,
+    total_venta: 0,
     monto_letras: '',
     cadena_para_codigo_qr: '',
     codigo_hash: '',
@@ -135,8 +135,8 @@ const CartPage: NextPage = () => {
             ...current,
             items: cart,
             gravadas: +(totalize.gravadas.toFixed(2)),
-            total: +(totalize.total),
-            igv:+(totalize.igv)
+            total_venta: +(totalize.total),
+            total_igv:+(totalize.igv)
         }))
         setValue("efectivo", +(totalize.total), { shouldValidate: true });
     }, [cart, setValue])
@@ -163,8 +163,8 @@ const CartPage: NextPage = () => {
             fecha_emision: data.fecha_emision,
             moneda: data.moneda,
             gravadas: data.gravadas,
-            igv: data.igv,
-            total: data.total,
+            total_igv: data.igv,
+            total_venta: data.total,
             efectivo: data.efectivo,
             tarjeta: data.tarjeta,
             yape: data.yape,
@@ -241,7 +241,7 @@ const CartPage: NextPage = () => {
         setValue('tarjeta', 0, { shouldValidate: true });
         setValue('efectivo', 0, { shouldValidate: true });
         setValue('yape', 0, { shouldValidate: true });
-        setValue(formValue, comprobante.total, { shouldValidate: true });
+        setValue(formValue, comprobante.total_venta, { shouldValidate: true });
     }
     
     return (

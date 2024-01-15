@@ -147,6 +147,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
             comprobanteAdmin.usuarioId = sesionid
             comprobanteAdmin.tipo_comprobante = tipo
             comprobanteAdmin.Receptor = receptor
+            comprobanteAdmin.placa = receptor.placa
         try {
 
 

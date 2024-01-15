@@ -29,8 +29,8 @@ const initialComprobante: IComprobanteAdmin = {
   fecha_documento_afectado: '',
   motivo_documento_afectado: '',
   gravadas: 0,
-  igv: 0,
-  total: 0,
+  total_igv: 0,
+  total_venta: 0,
   monto_letras: '',
   cadena_para_codigo_qr: '',
   codigo_hash: '',
@@ -75,8 +75,8 @@ export const CartPage = () => {
           ...current,
           items: cart,
           gravadas: +(totalize.gravadas.toFixed(2)),
-          total: +(totalize.total),
-          igv:+(totalize.igv)
+          total_venta: +(totalize.total),
+          total_igv:+(totalize.igv)
       }))
   }, [cart])
 

@@ -179,12 +179,12 @@ export const PrintComprobanteAdmin = forwardRef((props: IPrintComprobanteAdminPr
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}>IGV(18%)</Grid>
-                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.igv }</Grid>  
+                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.total_igv }</Grid>  
 
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}>Total: </Grid>
-                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.total }</Grid>  
+                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.total_venta }</Grid>  
               </Grid>
 
               <div style={{ height: "auto", margin: "0 auto", maxWidth: 80, width: "100%", marginTop:8 }}>
@@ -260,12 +260,12 @@ export const PrintComprobanteAdmin = forwardRef((props: IPrintComprobanteAdminPr
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}>IGV(18%)</Grid>
-                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.igv }</Grid>  
+                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.total_igv }</Grid>  
 
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}>Total: </Grid>
-                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.total }</Grid>  
+                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.total_venta }</Grid>  
               </Grid>            
           </>;
         case constantes.TipoComprobante.Calibracion:
@@ -330,12 +330,12 @@ export const PrintComprobanteAdmin = forwardRef((props: IPrintComprobanteAdminPr
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}>IGV(18%)</Grid>
-                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.igv }</Grid>  
+                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.total_igv }</Grid>  
 
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}></Grid>
                 <Grid item xs={3} style={{paddingTop: 0}}>Total: </Grid>
-                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.total }</Grid>  
+                <Grid item xs={3} style={{paddingTop: 0}}>S/{ comprobante.total_venta }</Grid>  
               </Grid>  
           </>;        
       }

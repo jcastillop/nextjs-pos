@@ -12,9 +12,6 @@ interface Props{
 export const OrderSumaryAdministrator: FC<Props> = ({ comprobante }) => {
 
     const { removeCartProduct } = useContext(FuelContext)
-
-    console.log(comprobante);
-
     // const totalize = comprobante?.items.map(item => ({ igv: item.igv, total: item.precio_venta, gravadas: item.valor_venta })).reduce((a, b) => {
     //     return ({
     //         igv: (a.igv || 0) + (b.igv || 0),
@@ -79,7 +76,7 @@ export const OrderSumaryAdministrator: FC<Props> = ({ comprobante }) => {
                 <Typography>IGV (18%)</Typography>
             </Grid>
             <Grid item xs={6} display='flex' justifyContent='end'>
-                <Typography>S/ { (comprobante.igv || 0).toFixed(2) }</Typography>
+                <Typography>S/ { (comprobante.total_igv || 0).toFixed(2) }</Typography>
             </Grid>
             <Grid item xs={12}>
                 <Divider sx={{mt: 2, mb: 2}}/>
@@ -88,7 +85,7 @@ export const OrderSumaryAdministrator: FC<Props> = ({ comprobante }) => {
                 <Typography variant="subtitle1">Total:</Typography>
             </Grid>
             <Grid item xs={6} display='flex' justifyContent='end'>
-                <Typography variant="subtitle1">S/ { (comprobante.total || 0).toFixed(2) }</Typography>
+                <Typography variant="subtitle1">S/ { (comprobante.total_venta || 0).toFixed(2) }</Typography>
             </Grid>
         </Grid>
     )
