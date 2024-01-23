@@ -53,11 +53,6 @@ export const NotaCreditoDialog: FC<Props> = ({ comprobante, idUsuario, receptor 
         //     items: (comprobante.Items as IComprobanteAdminItem[])
         // }))
 
-
-        console.log(comprobante);
-        console.log(idUsuario);
-        console.log(receptor);
-
         // const { hasError, respuesta, storage } = await createOrderAdministrador(comprobanteAdministrador, receptor, Constantes.TipoComprobante.NotaCredito, idUsuario);
 
         // if(!hasError){
@@ -128,7 +123,6 @@ export const NotaCreditoDialog: FC<Props> = ({ comprobante, idUsuario, receptor 
 
 
 export const getStaticProps = (async (context) => {
-    console.log("esto servira?")
     return { props: { repo:"hola" } }
   }) satisfies GetStaticProps<{repo: string}>
 

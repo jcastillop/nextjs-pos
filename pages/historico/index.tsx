@@ -122,8 +122,8 @@ const HistoricoPage = () => {
           if(params.row.tipo == constantes.TipoComprobante.Factura || params.row.tipo == constantes.TipoComprobante.Boleta || params.row.tipo == constantes.TipoComprobante.NotaCredito){
             if(params.row.error){
               return <Chip key={ params.row.id } variant='filled' label="Error SUNAT" color="error" component={ Link } href={`/fueledit/${params.row.abastecimiento}?id=${params.row.id}&tipo=${params.row.tipo}&correlativo=${params.row.comprobante}`} clickable/>
-            }else if(!params.row.hash){
-              return <Chip key={ params.row.id } variant='filled' label="Regularizar" color="warning" component={ Link } href={`/fueledit/${params.row.abastecimiento}?id=${params.row.id}&tipo=${params.row.tipo}&correlativo=${params.row.comprobante}`} clickable/>
+            // }else if(!params.row.hash){
+            //   return <Chip key={ params.row.id } variant='filled' label="Regularizar" color="warning" component={ Link } href={`/fueledit/${params.row.abastecimiento}?id=${params.row.id}&tipo=${params.row.tipo}&correlativo=${params.row.comprobante}`} clickable/>
             }else{
               return <Chip variant='filled' label="Correcto" color="success" />
               //return <Chip key={ params.row.id } variant='filled' label="Correcto" color="success" component={ Link } href={`/fueledit/${params.row.abastecimiento}?id=${params.row.id}&tipo=${params.row.tipo}&correlativo=${params.row.comprobante}`} clickable/>
@@ -249,7 +249,6 @@ const HistoricoPage = () => {
     pageStyle: "@page { size: auto;  margin: 0mm; } @media print { body { -webkit-print-color-adjust: exact; } }",        
     content: () => componentRef.current,
     onAfterPrint: () => {
-        console.log("test")
         // Reset the Promise resolve so we can print again
         //emptyOrder();
         //router.push('/');

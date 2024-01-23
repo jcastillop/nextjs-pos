@@ -22,7 +22,6 @@ export const useHistorico = ( idUsuario: string, config: SWRConfiguration = {} )
 export const useComprobante = ( id: string, config: SWRConfiguration = {} ) => {
 
     const { data, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/comprobante?id=${id}`, config);
-    console.log(data);
     return {
         hasErrorComprobante: false,
         comprobante: data?.comprobante,

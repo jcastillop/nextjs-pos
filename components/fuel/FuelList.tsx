@@ -16,14 +16,12 @@ export const FuelList: FC<Props> = ({ fuels }) => {
 
 
   const print = async (msg: any) => {
-     
-    //console.log(devices);
 
   };
 
   return (
     <Grid container spacing={3}>
-        <Button
+        {/* <Button
             color='secondary'
             className='circular-btn'
             fullWidth
@@ -31,7 +29,7 @@ export const FuelList: FC<Props> = ({ fuels }) => {
             type='button'
         >                           
             Confirmar orden
-        </Button>      
+        </Button>       */}
         {
             fuels.map( fuel => (
                 <FuelCard fuel={fuel} key={fuel.idAbastecimiento}/>

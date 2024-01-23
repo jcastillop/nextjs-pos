@@ -138,7 +138,6 @@ const NotasDespachoPage: NextPage = () => {
 
     useEffect(() => {
         const rows = apiRef.current.getSelectedRows()
-        console.log(rows);
         var itemComprobanteAdmin: IComprobanteAdminItem[] = []
         rows.forEach( row => {
             const vv:number = +row.total - (+row.igv) 
@@ -545,8 +544,6 @@ const NotasDespachoPage: NextPage = () => {
                             onClick={async (event) => {  
                                     // setFiltervalue("0")  
                                     // const rows = apiRef.current.getSelectedRows()
-                                    // console.log(rows)
-                                    console.log(rowSelectionModel)
                                 }}>
                                 Generar comprobante
                             </Button>

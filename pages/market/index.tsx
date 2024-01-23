@@ -16,8 +16,6 @@ const MarketPage: NextPage = () => {
 
   const { productos, isLoadingProduct, hasErrorProduct } = useProductosTipo(tipo, { refreshInterval: 0});
 
-  
-
   return (
     <>
         <FuelLayout title={'Pos - Shop'} pageDescription={'Productos de POS'} imageFullUrl={''}>

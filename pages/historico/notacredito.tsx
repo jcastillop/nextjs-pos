@@ -149,10 +149,6 @@ const NotaCreditoPage: NextPage = () => {
 
     const onSubmitFuel = async () => {
 
-        console.log(comprobanteAdministrador);
-
-  
-
         // const idAbastecimiento: number = router.query.id? +router.query.id : 0;
         // const tipo_afectado: string = router.query.tipo_afectado?.toString() || "";
         // const numeracion_afectado: string = router.query.numeracion_afectado?.toString() || "";

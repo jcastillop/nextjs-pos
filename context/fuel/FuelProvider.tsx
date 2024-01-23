@@ -512,13 +512,10 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
     
     // useEffect(() => {
     //     Cookie.set('cart', JSON.stringify( state.cart ));
-    //     console.log("guardando en el carro")
     //     const cookieProducts = Cookie.get('cart') ? JSON.parse( Cookie.get('cart')! ): []
-    //     console.log(cookieProducts)
     // }, [state.cart]);
 
     const addProductToCart = ( product: IComprobanteAdminItem ) => {
-        console.log("addProductToCart")
         //! Nivel Final
         const productInCart = state.cart.some( p => p.codigo_producto === product.codigo_producto );
         if ( !productInCart ){
@@ -540,13 +537,11 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
     }
 
     const removeCartProduct = ( product: IComprobanteAdminItem ) => {
-        console.log("removeCartProduct")
         const updatedProducts = state.cart.filter( producto => producto.codigo_producto != product.codigo_producto)
         Cookie.set('cart', JSON.stringify( updatedProducts ));
         return dispatch({ type: '[Cart] - Update products in cart', payload: updatedProducts })
     }
     const updateCartQuantity = (product: IComprobanteAdminItem) => {
-        console.log("updateCartQuantity")
         dispatch({ type: '[Cart] - Change cart quantity', payload: product });
     }
 

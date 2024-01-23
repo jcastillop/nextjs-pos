@@ -63,7 +63,6 @@ export const GastoDialog: FC<Props> = ({ gasto, newGasto }) => {
     
 
     const onSubmitUser = async (storageGasto: IGasto) => {
-        console.log(storageGasto)
         const { hasError, message, gasto } = newGasto? await guardarGasto(storageGasto): await actualizarGasto(storageGasto);
         showAlert({mensaje: message, severity: hasError? 'error':'success', time: 1500})  
         handleClose();
