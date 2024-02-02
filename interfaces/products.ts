@@ -12,6 +12,7 @@ export interface IFuel {
     fechaHora: number;
     totInicio: number;
     totFinal: number;
+    alertAutomatic?: number;
 }
 
 export interface IProduct {

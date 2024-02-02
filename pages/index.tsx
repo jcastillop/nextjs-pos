@@ -10,11 +10,11 @@ import { useFuels } from '@/hooks';
 
 const HomePage: NextPage = () => {
 
-  //const { fuels, isLoading, isError } = useFuels('/abastecimientos?pistola=1&offset=0&limit=10&desde=2022-05-21&hasta=2022-05-22',{ refreshInterval: 5})
-  const { fuels, isLoading, isError } = useFuels('/abastecimientos',null,null,{ refreshInterval: 3}, '0', '100')
-  // const { productos, isLoadingProduct, hasErrorProduct } = useProductos({ refreshInterval: 0});
-
   const { data: session, status } = useSession()
+  const idUsuario = session?.user.id?session?.user.id:'0'
+  //const { fuels, isLoading, isError } = useFuels('/abastecimientos?pistola=1&offset=0&limit=10&desde=2022-05-21&hasta=2022-05-22',{ refreshInterval: 5})
+  const { fuels, isLoading, isError } = useFuels('/abastecimientos', idUsuario,null,null,{ refreshInterval: 3}, '0', '100')
+  // const { productos, isLoadingProduct, hasErrorProduct } = useProductos({ refreshInterval: 0});
 
   return (
     <>

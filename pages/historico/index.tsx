@@ -39,7 +39,7 @@ const HistoricoPage = () => {
 
   const { data: session, status } = useSession()
 
-  const { comprobantes, isLoading, hasError } = useHistorico(session?.user.id || "",{ refreshInterval: 0});
+  const { comprobantes, isLoading, hasError } = useHistorico(session?.user.id || "",{ refreshInterval: 3}, '0', '100');
 
   const { totalEfectivo, totalTarjeta, totalYape } : TotalizadoresState = 
     comprobantes?.filter(

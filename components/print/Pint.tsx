@@ -44,12 +44,14 @@ type Props = {
 export const Print: React.FC<Props> = ({comprobantes}) => {
 
     var totalizadores = TOT_GALONES_INITIAL_STATE;
+    
     const componentRef = useRef(null);
     const { createCierre } = useContext(FuelContext)
     const { showAlert } = useContext( UiContext );
     const [value, setValue] = React.useState<Date>(new Date());
     const [isOpenDialog, setOpenDialog] = useState(false);
     const { data: session, status } = useSession()
+    const idUsuario = session?.user.id?session?.user.id:'0'    
     const handlePrint = useReactToPrint({
         pageStyle: "@page { size: auto;  margin: 0mm; } @media print { body { -webkit-print-color-adjust: exact; } }",        
         content: () => componentRef.current,
@@ -58,7 +60,7 @@ export const Print: React.FC<Props> = ({comprobantes}) => {
             router.push("/");
         }
     });
-    const { fuels, isLoading, isError } = useFuels('/abastecimientos/count/total',null,null,{ refreshInterval: 3}, '0', '100')
+    const { fuels, isLoading, isError } = useFuels('/abastecimientos/count/total',idUsuario,null,null,{ refreshInterval: 3}, '0', '100')
 
     const handleAceptar = async () => {
         if(comprobantes.length > 0){

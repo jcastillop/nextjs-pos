@@ -12,10 +12,10 @@ interface Props {
 // eslint-disable-next-line react-hooks/rules-of-hooks
 
 
-export const useFuels = ( url: string, desde: string | null, hasta: string | null, config: SWRConfiguration = {}, offset: string = "0", limit: string = "10" ) => {
+export const useFuels = ( url: string, usuario: string, desde: string | null, hasta: string | null, config: SWRConfiguration = {}, offset: string = "0", limit: string = "10" ) => {
 
     const { filterDispensers } = useContext( UiContext );
-    const { data, error, isLoading } = useSWR<Props>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api${ url }?offset=${ offset }&limit=${ limit }${ filterDispensers?'&pistola=' + filterDispensers.toString():'' }${ desde?'&desde=' + desde:'' }${ hasta?'&hasta=' + hasta:'' }`, config);
+    const { data, error, isLoading } = useSWR<Props>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api${ url }?id=${ usuario }&offset=${ offset }&limit=${ limit }${ filterDispensers?'&pistola=' + filterDispensers.toString():'' }${ desde?'&desde=' + desde:'' }${ hasta?'&hasta=' + hasta:'' }`, config);
 
     const fuels = data?.abastecimientos || [];
 

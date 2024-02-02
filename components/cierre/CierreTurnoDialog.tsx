@@ -23,7 +23,8 @@ type Props = {
 
 export const CierreTurnoDialog: React.FC<Props> = ({totalGalones, totales, gastos, depositos}) => {
 
-    
+    const { data: session, status } = useSession()
+    const idUsuario = session?.user.id?session?.user.id:'0'
     //cambios
     const [horaIngreso, setHoraIngreso] = useState("");
     const componentRef = useRef(null);
@@ -39,25 +40,29 @@ export const CierreTurnoDialog: React.FC<Props> = ({totalGalones, totales, gasto
             router.push("/");
         }
     });
-    const { fuels, isLoading, isError } = useFuels('/abastecimientos/count/total',null,null,{ refreshInterval: 3}, '0', '100')
+    const { fuels, isLoading, isError } = useFuels('/abastecimientos/count/total',idUsuario,null,null,{ refreshInterval: 3}, '0', '100')
 
     const handleAceptar = async () => {
-        if(totalGalones.length > 0){
-            const session = await getSession();
-            setHoraIngreso(session?.user.fecha_registro || "")
-            const { hasError, cierre, message, cantidad } = await createCierre(parseInt(session?.user.id?session?.user.id:"0"), new Date(formatDateSQL(value)), session?.user.jornada || '', session?.user.isla || '',totales.efectivo, totales.tarjeta, totales.yape);            
-            if(hasError){
-                showAlert({mensaje: message, severity: 'error'})
-            }else if (cantidad == 0){
-                showAlert({mensaje: "Ocurrió un error actualizando los comprobantes", severity: 'error'})
-            }else if (!cierre){
-                showAlert({mensaje: "Ocurrió un error generando el cierre de comprobantes", severity: 'error'})
+        if(fuels.length > 0){
+            showAlert({mensaje: `Tiene abastecimientos pendientes por liquidar: ${ fuels.length }, no puede cerrar turno`, severity: 'error'})
+        }else{        
+            if(totalGalones.length > 0){
+                const session = await getSession();
+                setHoraIngreso(session?.user.fecha_registro || "")
+                const { hasError, cierre, message, cantidad } = await createCierre(parseInt(session?.user.id?session?.user.id:"0"), new Date(formatDateSQL(value)), session?.user.jornada || '', session?.user.isla || '',totales.efectivo, totales.tarjeta, totales.yape);            
+                if(hasError){
+                    showAlert({mensaje: message, severity: 'error'})
+                }else if (cantidad == 0){
+                    showAlert({mensaje: "Ocurrió un error actualizando los comprobantes", severity: 'error'})
+                }else if (!cierre){
+                    showAlert({mensaje: "Ocurrió un error generando el cierre de comprobantes", severity: 'error'})
+                }else{
+                    handlePrint();                
+                    showAlert({mensaje: `Turno cerrado satisfactoriamente, ${cantidad} comprobantes`, severity: 'success'})                                
+                }
             }else{
-                handlePrint();                
-                showAlert({mensaje: `Turno cerrado satisfactoriamente, ${cantidad} comprobantes`, severity: 'success'})                                
-            }
-        }else{
-            showAlert({mensaje: 'No tiene cuenta por liquidar', severity: 'error'})
+                showAlert({mensaje: 'No tiene cuenta por liquidar', severity: 'error'})
+            }  
         }        
         // if(fuels.length > 0){
         //     showAlert({mensaje: `Tiene abastecimientos pendientes por liquidar: ${ fuels.length }, no puede cerrar turno`, severity: 'error'})

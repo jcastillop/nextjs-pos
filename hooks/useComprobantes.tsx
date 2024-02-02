@@ -8,9 +8,9 @@ interface Props {
     total: number;
 }
 
-export const useHistorico = ( idUsuario: string, config: SWRConfiguration = {} ) => {    
+export const useHistorico = ( idUsuario: string, config: SWRConfiguration = {}, offset: string = "0", limit: string = "10"  ) => {    
 
-    const { data, error, isLoading } = useSWR<Props>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/historico?idUsuario=${idUsuario}`, config);
+    const { data, error, isLoading } = useSWR<Props>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/historico?idUsuario=${idUsuario}&offset=${ offset }&limit=${ limit }`, config);
 
     return {
         hasError: error,
