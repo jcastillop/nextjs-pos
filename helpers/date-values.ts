@@ -16,6 +16,21 @@ export const getDatetimeFormat = (dateStringValue: Date) => {
     }  
 }
 
+export const getDateFormat = (dateStringValue: Date) => {
+
+    try {
+
+        const dateValue = new Date(dateStringValue)
+        const year = helperFormat(dateValue.getFullYear());
+        const month = helperFormat(dateValue.getMonth()+1);
+        const dt = helperFormat(dateValue.getDate());        
+   
+        return year + "-" + month + "-" + dt;   
+    } catch (error) {
+        return "Formato inválido"
+    }  
+}
+
 export const getDatetimeFormatFromString = (dateStringValue: string) => {
 
     try {
@@ -71,6 +86,19 @@ export const getTodayDatetime = () => {
         const minute = helperFormat(dateValue.getMinutes());     
         const second = helperFormat(dateValue.getSeconds());     
         return year + "-" + month + "-" + dt + " " + hour + ":" + minute + ":" + second;   
+    } catch (error) {
+        return "Formato inválido"
+    }  
+}
+
+export const getTodayDate = () => {
+
+    try {
+        const dateValue = new Date()
+        const year = helperFormat(dateValue.getFullYear());
+        const month = helperFormat(dateValue.getMonth()+1);
+        const dt = helperFormat(dateValue.getDate());           
+        return year + "-" + month + "-" + dt;   
     } catch (error) {
         return "Formato inválido"
     }  

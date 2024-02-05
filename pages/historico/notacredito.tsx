@@ -136,8 +136,8 @@ const NotaCreditoPage: NextPage = () => {
                 numeracion_documento_afectado: comprobante.comprobante.numeracion_comprobante,
                 fecha_documento_afectado: comprobante.comprobante.fecha_emision,
                 gravadas: +comprobante.comprobante.total_gravadas,
-                igv: +comprobante.comprobante.total_igv,
-                total: +comprobante.comprobante.total_venta,            
+                total_igv: +comprobante.comprobante.total_igv,
+                total_venta: +comprobante.comprobante.total_venta,            
                 prefijo: (comprobante.comprobante.tipo_comprobante || "") == Constantes.TipoComprobante.Boleta?"B":"F",
                 items: itAdm
             }))  

@@ -81,21 +81,21 @@ const PerfilPage: NextPage = () => {
                                 <ListItemIcon>
                                 <CalendarIcon />
                                 </ListItemIcon>
-                                <ListItemText primary="Diario" />
+                                <ListItemText primary="Rango de fechas" />
                             </ListItemButton>
-
-                            <ListItemButton sx={{ pl: 4 }} onClick={ ()=> {setTipoReporte({ tipo: 'turnos'})} }>
-                                <ListItemIcon>
-                                <PunchClock />
-                                </ListItemIcon>
-                                <ListItemText primary="Totalizado de turnos" />
-                            </ListItemButton>  
 
                             <ListItemButton sx={{ pl: 4 }} onClick={ ()=> {setTipoReporte({ tipo: 'cierres'})} }>
                                 <ListItemIcon>
                                 <PeopleAlt />
                                 </ListItemIcon>
-                                <ListItemText primary="Cierres diarios" />
+                                <ListItemText primary="Turnos cierres" />
+                            </ListItemButton>  
+
+                            <ListItemButton sx={{ pl: 4 }} onClick={ ()=> {setTipoReporte({ tipo: 'turnos'})} }>
+                                <ListItemIcon>
+                                <PunchClock />
+                                </ListItemIcon>
+                                <ListItemText primary="Turnos totales" />
                             </ListItemButton>  
                                                     
                             </List>

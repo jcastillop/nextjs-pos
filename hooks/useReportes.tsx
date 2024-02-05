@@ -10,19 +10,14 @@ interface IData {
     data: any;
 }
 
-export const ReporteProductoTurnos = async (  fecha: string, turnos: string, config: SWRConfiguration = {}  ) => {
+export const ReporteProductoTurnos = (  fecha: string, config: SWRConfiguration = {}  ) => {
   
-    const body = {
-        "fecha": fecha,
-        "turnos": turnos
-    }
-
-    const { data } = await posApi.post<IData>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/reporteproductoturnos`, body);
+    const { data, isLoading, error } = useSWR(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/reporteproductoturnos?fecha=${fecha}`);
 
     return {
-        hasError : data.hasError,
-        message: data.message,
-        data: data.data
+        hasError : false,
+        data: data?.data,
+        isLoading
     }
 
 }
@@ -34,7 +29,7 @@ export const ReporteProductoDias = async (  fecha_inicio: string, fecha_fin: str
         "fecha_fin": fecha_fin
     }
 
-    const { data } = await posApi.post<IData>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/reporteproducto`, body);
+    const { data } = await posApi.post<IData>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/reportediario`, body);
 
     return {
         hasError : data.hasError,
@@ -61,18 +56,14 @@ export const ReporteDeclaracionMensual = async (  month: string, year: string, c
 
 }
 
-export const ReporteCierresDiarios = async (  fecha: string, config: SWRConfiguration = {}  ) => {
+export const ReporteCierresDiarios = (  fecha: string, config: SWRConfiguration = {}  ) => {
   
-    const body = {
-        "fecha": fecha
-    }
-
-    const { data } = await posApi.post<IData>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/reportecierres`, body);
+    const { data, isLoading, error } = useSWR(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/reportecierres?fecha=${fecha}`);
 
     return {
-        hasError : data.hasError,
-        message: data.message,
-        data: data.data
+        hasError : false,
+        data: data?.data,
+        isLoading
     }
 
 }

@@ -117,7 +117,7 @@ const InvoicePage : NextPage = () => {
             showAlert({mensaje: respuesta, time: 1500})         
             await setTimeout(function(){      
                 handlePrint();
-            }, 2000);
+            }, 4000);
             
         }else{
             emptyOrder();
