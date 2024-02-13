@@ -1,6 +1,8 @@
 import { IFuel, IReceptor } from '@/interfaces';
 import { FuelState } from '.';
 import { IComprobante, IComprobanteAdminItem } from '@/interfaces/comprobante';
+import { initialComprobante } from '@/database/comprobante';
+import { initialReceptor } from '@/database/receptor';
 
 type FuelActionType = 
    | { type: '[Cart] - LoadCart fuel' } 
@@ -8,7 +10,7 @@ type FuelActionType =
    | { type: '[Cart] - Update products in cart', payload: IComprobanteAdminItem[] }
    | { type: '[Cart] - LoadCart from cookies | storage', payload: IComprobanteAdminItem[] } 
    | { 
-      type: '[Cart] - Update order summary', 
+      type: '[Fuel] - Update comprobante y receptor', 
       payload: {
          receptor: IReceptor;
          comprobante: IComprobante;
@@ -16,7 +18,6 @@ type FuelActionType =
    }
    | { type: '[Cart] - Fuel complete' }
    | { type: '[Cart] - Fuel processing' }
-   | { type: '[Cart] - Fuel clean' }
    | { type: '[Cart] - Change cart quantity', payload: IComprobanteAdminItem }
    | { type: '[Cart] - Cart complete' }
    | { 
@@ -29,17 +30,7 @@ type FuelActionType =
       }
    }   
 
-const RECEPTOR_INITIAL:IReceptor = {
-   id_receptor: 0,
-   tipo_documento: 0,
-   numero_documento: '',
-   razon_social: '',
-   direccion: '',
-   correo: '',
-   placa: ''
-}
-
-export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelState => {
+   export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelState => {
 
    switch (action.type) {
       case '[Cart] - LoadCart from cookies | storage':
@@ -52,7 +43,7 @@ export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelSta
             ...state,
             ...action.payload
          }
-      case '[Cart] - Update order summary':
+      case '[Fuel] - Update comprobante y receptor':
          return {
             ...state,
             ...action.payload
@@ -65,13 +56,10 @@ export const fuelReducer = ( state: FuelState, action: FuelActionType ): FuelSta
          case '[Cart] - Fuel complete':
             return {
                ...state,
-               isLoaded: false        
-            }
-         case '[Cart] - Fuel clean':
-            return {
-               ...state,
-               receptor: RECEPTOR_INITIAL        
-            }            
+               isLoaded: false,
+               receptor: initialReceptor,    
+               comprobante: initialComprobante    
+            }       
          case '[Cart] - Fuel processing':
             return {
                ...state,

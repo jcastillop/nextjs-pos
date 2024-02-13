@@ -15,7 +15,7 @@ export const CierreTurnoPage = () => {
     //cambios
     const { data: session, status } = useSession()
 
-    const { cierres, galonaje, totalsoles, gastos, depositos, isLoading, error } = useObtieneCierre(session?.user.id || "",{ refreshInterval: 0});
+    const { cierres, galonaje, productos, totalsoles, gastos, depositos, isLoading, error } = useObtieneCierre(session?.user.id || "",{ refreshInterval: 0});
 
     const [fechaActual, setFechaActual] = useState("")
 
@@ -69,7 +69,7 @@ export const CierreTurnoPage = () => {
                         <Card className='summary-card' sx={{ maxWidth: 600 , margin:1 }}>
                             <CardContent>
 
-                                <Typography component="div" sx={{ fontWeight: 'bold' }}>VENTA GALONES</Typography>
+                                <Typography component="div" sx={{ fontWeight: 'bold' }}>VENTA GALONES/CANTIDAD</Typography>
                                 <Grid container>
                                     <Grid item xs={6} sx={{ marginTop: 1, marginBottom: 0.5}}><Typography sx={{ fontWeight: 'bold' }}>PRODUCTO</Typography></Grid>
                                     <Grid item xs={2} display='flex' justifyContent='end'><Typography sx={{ fontWeight: 'bold' }}>TOTAL</Typography></Grid> 
@@ -93,6 +93,24 @@ export const CierreTurnoPage = () => {
                                                 </Grid>                             
                                         )):<></>
                                     }
+                                   {
+                                        productos? productos.map( galones => (
+                                                <Grid container key={ galones.producto }>
+                                                    <Grid item xs={6} >
+                                                        <Typography>{ galones.producto }</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={2} display='flex' justifyContent='end'>
+                                                        <Typography>{ galones.total_galones.toFixed(2) }</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={2} display='flex' justifyContent='end'>
+                                                        <Typography>{ (galones.despacho_galones?galones.despacho_galones:0).toFixed(2) }</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={2} display='flex' justifyContent='end'>
+                                                        <Typography>{ (galones.calibracion_galones?galones.calibracion_galones:0).toFixed(2) }</Typography>
+                                                    </Grid>                                                                                                
+                                                </Grid>                             
+                                        )):<></>
+                                    }                                    
                                 </Grid>     
                                 <Divider sx={{ my:1 }} />                                           
                                 <Typography component="div" sx={{ fontWeight: 'bold' }}>VENTA SOLES</Typography>
@@ -117,6 +135,24 @@ export const CierreTurnoPage = () => {
                                                         <Typography>S/ { (producto.calibracion_soles?producto.calibracion_soles:0).toFixed(2) }</Typography>
                                                     </Grid>                                                   
                                                 </Grid>                             
+                                        )):<></>
+                                    }
+                                    {
+                                        productos? productos.map( producto=> (
+                                            <Grid container key={ producto.producto }>
+                                                <Grid item xs={6} >
+                                                    <Typography>{ producto.producto }</Typography>
+                                                </Grid>
+                                                <Grid item xs={2} display='flex' justifyContent='end'>
+                                                    <Typography>S/ { (producto.total_soles?producto.total_soles:0).toFixed(2) }</Typography>
+                                                </Grid>
+                                                <Grid item xs={2} display='flex' justifyContent='end'>
+                                                    <Typography>S/ { (producto.despacho_soles?producto.despacho_soles:0).toFixed(2) }</Typography>
+                                                </Grid>
+                                                <Grid item xs={2} display='flex' justifyContent='end'>
+                                                    <Typography>S/ { (producto.calibracion_soles?producto.calibracion_soles:0).toFixed(2) }</Typography>
+                                                </Grid>                                                   
+                                            </Grid>  
                                         )):<></>
                                     }
                                 </Grid>                  

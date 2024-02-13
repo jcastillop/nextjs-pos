@@ -173,7 +173,7 @@ const CartPage: NextPage = () => {
             ruc: ''
         }))
 
-        const { hasError, respuesta, storage } = await createOrderAdministrador(comprobante, receptorForm, tipoComprobante, +(session?.user.id || 0)); 
+        const { hasError, respuesta, storage } = await createOrderAdministrador(comprobante, receptorForm, tipoComprobante, data.efectivo, data.tarjeta, data.yape, +(session?.user.id || 0)); 
 
         if(!hasError){
             setComprobante( current => ({

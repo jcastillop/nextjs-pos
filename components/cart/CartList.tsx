@@ -18,7 +18,7 @@ export const CartList: FC<Props> = ({ editable = false }) => {
     const { cart, removeCartProduct, updateCartQuantity } = useContext( FuelContext )
 
     const onNewCartQuantityValue = (product: IComprobanteAdminItem, newQuantityValue: number) => {
-        const vufix:number = product.medida == "GAL"?10:2
+        const vufix:number = product.medida == Constantes.GALONES?10:2
         product.cantidad = newQuantityValue;
         product.igv = +(newQuantityValue * product.valor * Constantes.IGV).toFixed(2);
         product.precio_venta = +(newQuantityValue * product.precio).toFixed(2);
@@ -27,7 +27,7 @@ export const CartList: FC<Props> = ({ editable = false }) => {
     }
 
     const onUpdateTotal = ( product: IComprobanteAdminItem, total: number ) => {
-        const vufix:number = product.medida == "GAL"?10:2
+        const vufix:number = product.medida == Constantes.GALONES?10:2
         product.precio_venta = total
         product.cantidad = +( total/product.precio ).toFixed(3)
         product.valor_venta = +( total/(1 + Constantes.IGV) ).toFixed(vufix)

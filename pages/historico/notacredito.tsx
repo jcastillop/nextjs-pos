@@ -116,7 +116,7 @@ const NotaCreditoPage: NextPage = () => {
         if(!isLoading){
             var itAdm: IComprobanteAdminItem[] = []
 
-            comprobante.comprobante.Items.map((item: { cantidad: string | number; precio_unitario: string | number; valor_unitario: string | number; igv: string | number; descripcion: any; codigo_producto: any; }) => (
+            comprobante.comprobante.Items.map((item: { cantidad: string | number; precio_unitario: string | number; valor_unitario: string | number; igv: string | number; descripcion: any; codigo_producto: any; medida: any; }) => (
                 itAdm.push({
                     cantidad: +item.cantidad,
                     precio: +item.precio_unitario,
@@ -126,7 +126,7 @@ const NotaCreditoPage: NextPage = () => {
                     precio_venta: (+item.precio_unitario * +item.cantidad),
                     descripcion: item.descripcion,
                     codigo_producto: item.codigo_producto,
-                    medida: ""                    
+                    medida: item.medida                    
                 })
             ))
             setComprobanteAdministrador( current => ({
@@ -158,7 +158,7 @@ const NotaCreditoPage: NextPage = () => {
 
         //const { hasError, respuesta } = await createOrder(constantes.TipoComprobante.NotaCredito, receptorForm, "", producto, 0, 0, 0, tipo_afectado, numeracion_afectado, fecha_afectado, prefijo, idAbastecimiento); 
 
-        const { hasError, respuesta, storage } = await createOrderAdministrador(comprobanteAdministrador, comprobanteAdministrador.Receptor, Constantes.TipoComprobante.NotaCredito, +(session?.user.id || 0));
+        const { hasError, respuesta, storage } = await createOrderAdministrador(comprobanteAdministrador, comprobanteAdministrador.Receptor, Constantes.TipoComprobante.NotaCredito, 0, 0, 0, +(session?.user.id || 0));
 
         if(!hasError){
             setComprobanteAdministrador( current => ({

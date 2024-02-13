@@ -11,7 +11,7 @@ interface ContextProps {
     total: number;    
     createOrder: (tipo: string, receptor: IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, yape: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, prefijo: string, id?:number) => Promise<{ hasError: boolean; respuesta: any; }>;
     modifyOrder: (correlativo: string, id_comprobante: string, tipo: string, receptor: IReceptor, comentario: string, producto: string, tarjeta: number, efectivo: number, tipo_afectado: string, numeracion_afectado: string, fecha_afectado: string, prefijo: string, id?:number) => Promise<{ hasError: boolean; respuesta: any; }>;
-    createOrderAdministrador: (comprobanteAdmin: IComprobanteAdmin, receptor: IReceptor, tipo: string, sesionid: number) => Promise<{ hasError: boolean; respuesta: any;  storage?: any; }>;
+    createOrderAdministrador: (comprobanteAdmin: IComprobanteAdmin, receptor: IReceptor, tipo: string, efectivo: number, tarjeta: number, yape: number, sesionid: number) => Promise<{ hasError: boolean; respuesta: any;  storage?: any; }>;
     emptyOrder: any;
     cleanOrder: any;
     emptyCart: () => void;

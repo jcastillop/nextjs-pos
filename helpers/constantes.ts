@@ -16,6 +16,8 @@ const constantes = Object.freeze({
         GLP:            "7"
     },
     IGV:0.18,
+    GALONES:            "GLL",
+    UNIDADES:           "NIU"
 });
 
 export default constantes;

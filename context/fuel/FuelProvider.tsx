@@ -45,15 +45,6 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
 
     const [state, dispatch] = useReducer( fuelReducer , CART_INITIAL_STATE );
 
-    // useEffect(() => {
-        
-    //     const numeroComprobante = state.numeroComprobante;
-    //     const orderSummary = {
-    //         numeroComprobante
-    //     }
-    //     dispatch({ type: '[Cart] - Update order summary', payload: orderSummary });
-    // }, [state.numeroComprobante]);
-
     useEffect(() => {
         try {
             const cookieProducts = Cookie.get('cart') ? JSON.parse( Cookie.get('cart')! ): []
@@ -68,7 +59,6 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
     }
     const cleanOrder = async() => {
         dispatch({ type: '[Cart] - Fuel complete' });
-        dispatch({ type: '[Cart] - Fuel clean' });
     }
     const emptyCart = async() => {
         dispatch({ type: '[Cart] - Cart complete' });
@@ -110,7 +100,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
                 comprobante: data.comprobante
             }
 
-            await dispatch({ type: '[Cart] - Update order summary', payload: orderSummary })
+            dispatch({ type: '[Fuel] - Update comprobante y receptor', payload: orderSummary })
             
             const comprobante: IComprobante = data.comprobante;
 
@@ -142,12 +132,15 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
 
     }
 
-    const createOrderAdministrador = async(comprobanteAdmin: IComprobanteAdmin, receptor: IReceptor, tipo: string, sesionid: number): Promise<{ hasError: boolean; respuesta: any; storage?: any; }> => {
+    const createOrderAdministrador = async(comprobanteAdmin: IComprobanteAdmin, receptor: IReceptor, tipo: string, efectivo: number, tarjeta: number, yape: number, sesionid: number): Promise<{ hasError: boolean; respuesta: any; storage?: any; }> => {
         dispatch({ type: '[Cart] - Fuel processing' });
             comprobanteAdmin.usuarioId = sesionid
             comprobanteAdmin.tipo_comprobante = tipo
             comprobanteAdmin.Receptor = receptor
             comprobanteAdmin.placa = receptor.placa
+            comprobanteAdmin.efectivo = efectivo
+            comprobanteAdmin.tarjeta = tarjeta
+            comprobanteAdmin.yape = yape
         try {
 
 
@@ -159,7 +152,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
                 comprobante: data.comprobante
             }
 
-            await dispatch({ type: '[Cart] - Update order summary', payload: orderSummary })
+            dispatch({ type: '[Fuel] - Update comprobante y receptor', payload: orderSummary })
             
             const comprobante: IComprobante = data.comprobante;
 
@@ -228,7 +221,7 @@ export const FuelProvider:FC<FuelState> = ({ children }: Props) => {
                 comprobante: data.comprobante
             }
 
-            await dispatch({ type: '[Cart] - Update order summary', payload: orderSummary })
+            dispatch({ type: '[Fuel] - Update comprobante y receptor', payload: orderSummary })
             
             const comprobante: IComprobante = data.comprobante;
 

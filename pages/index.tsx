@@ -21,14 +21,6 @@ const HomePage: NextPage = () => {
         <FuelLayout title={'Pos - Shop'} pageDescription={'Productos de POS'} imageFullUrl={''}>
              <Typography variant='h6' sx={{ mb:1 }}>{session?.user.grifo} - {session?.user.isla} - {session?.user.usuario} - {session?.user.jornada}</Typography>
             {
-              // session?.user.rol == 'USER_ROLE'?
-              // (isLoading
-              //  ? <FullScreenLoading/>
-              //  : <FuelList fuels={fuels}/>
-              // ):(isLoadingProduct
-              //  ? <FullScreenLoading/>
-              //  : <ProductList products={productos}/>
-              // )
               isLoading
               ? <FullScreenLoading/>
               : <FuelList fuels={fuels}/>             

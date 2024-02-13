@@ -114,11 +114,7 @@ const InvoicePage : NextPage = () => {
         const { hasError, respuesta } = await createOrder(tipoComprobante, receptorForm, data.comentario, fuel?.descripcionCombustible || "", data.tarjeta, data.efectivo, data.yape,"","","","", fuel?.idAbastecimiento); 
 
         if(!hasError){
-            showAlert({mensaje: respuesta, time: 1500})         
-            await setTimeout(function(){      
-                handlePrint();
-            }, 4000);
-            
+            showAlert({mensaje: respuesta, time: 1500})
         }else{
             emptyOrder();
             showAlert({mensaje: respuesta, severity: 'error', time: 7000})
@@ -175,6 +171,13 @@ const InvoicePage : NextPage = () => {
         }
 
     }
+    
+    useEffect(() => {
+        if(comprobante.id != 0 && receptor.id_receptor != 0){
+            handlePrint();
+        }
+    }, [comprobante, handlePrint, receptor])
+    
 
     // const handleTarjetaValueChange = (event: { target: { value: any; }; }) => {
     //     const newTarjetaValue = +event.target.value

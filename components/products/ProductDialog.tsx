@@ -7,6 +7,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import { IProduct } from '@/interfaces';
 import { UiContext } from '@/context';
 import { guardarProducto, actualizarProducto } from '@/hooks';
+import { Constantes } from '@/helpers';
 
 //export const FuelCard: FC<Props> = ({ fuel }) => {
 interface Props{
@@ -16,14 +17,15 @@ interface Props{
 
 export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
 
+    
     const currencies = [
         {
-          value: 'NIU',
-          label: 'NIU',
+          value: Constantes.UNIDADES,
+          label: Constantes.UNIDADES
         },
         {
-          value: 'GAL',
-          label: 'GAL',
+          value: Constantes.GALONES,
+          label: Constantes.GALONES
         }
       ];
 
@@ -53,6 +55,7 @@ export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
     const [open, setOpen] = useState(false);
     
     const handleClickOpen = () => {
+        console.log(product?.medida)
         setOpen(true);
     };
 
@@ -62,17 +65,17 @@ export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
 
     const handleEfectivoValueChange = (event: { target: { value: any; }; }) => {
         const newEfectivoValue = +event.target.value
-        setValue("valor", +((newEfectivoValue/1.18).toFixed(getValues("medida")=="GAL"?10:2)), { shouldValidate: true });
+        setValue("valor", +((newEfectivoValue/1.18).toFixed(getValues("medida")==Constantes.GALONES?10:2)), { shouldValidate: true });
     };      
 
     const isDecimalValid = () => {
         const arr = getValues("valor").toString().split(".")
         if(arr.length != 2) return true;
         const decimales = arr[1].length
-        if(getValues("medida") == "GAL"){
-            return decimales == 10? true: `El cantidad de decimales es incorrecta para ${getValues("medida")}, la cantidad requerida es 10`
+        if(getValues("medida") == Constantes.GALONES){
+            return decimales == 10? true: `El cantidad de decimales es incorrecta para ${getValues("medida")}, la cantidad requerida es 10, vuelva a escribir el precio`
         }else{
-            return decimales == 2? true: `El cantidad de decimales es incorrecta para ${getValues("medida")}, la cantidad requerida es 2`
+            return decimales == 2? true: `El cantidad de decimales es incorrecta para ${getValues("medida")}, la cantidad requerida es 2, vuelva a escribir el precio`
         }
     };
 
@@ -155,7 +158,7 @@ export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
                             label={'Medida'}
                             variant='standard' 
                             fullWidth
-                            defaultValue={ "NIU" }
+                            defaultValue={ (product?.medida)? product?.medida : "NIU" }
                             { ...register('medida', {
                                 required: 'Este campo es requerido'
                                 
@@ -166,7 +169,7 @@ export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
                         >
                             {
                                 currencies.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
+                                    <MenuItem key={option.value} value={option.value} selected={product?.medida==option.value}>
                                     {option.label}
                                     </MenuItem>
                                 ))
@@ -182,6 +185,7 @@ export const ProductDialog: FC<Props> = ({ product, newProduct }) => {
                                 required: 'Este campo es requerido'
                                 
                             })}
+                            type='number'
                             InputLabelProps={{ shrink: true }}
                             error={ !!errors.precio }
                             helperText={ errors.precio?.message }

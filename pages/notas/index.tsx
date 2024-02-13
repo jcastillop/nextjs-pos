@@ -279,7 +279,7 @@ const NotasDespachoPage: NextPage = () => {
             ruc: ''
         }))     
      
-        const { hasError, respuesta, storage } = await createOrderAdministrador(comprobante, receptorForm, '01', +(session?.user.id || 0)); 
+        const { hasError, respuesta, storage } = await createOrderAdministrador(comprobante, receptorForm, '01', data.efectivo, data.tarjeta, data.yape, +(session?.user.id || 0)); 
 
         if(!hasError){
             setComprobante( current => ({
