@@ -22,6 +22,23 @@ export const ReporteProductoTurnos = (  fecha: string, config: SWRConfiguration 
 
 }
 
+export const ReporteProductoTurnosExcel = async (  fecha: string, turnos: string, config: SWRConfiguration = {}  ) => {
+
+    const body = {
+        "fecha": fecha,
+        "turnos": turnos
+    }
+
+    const { data } = await posApi.post<IData>(`${process.env.NEXT_PUBLIC_URL_RESTSERVER}/api/comprobantes/reporteproductoturnostotalizados`, body);
+
+    return {
+        hasError : data.hasError,
+        message: data.message,
+        data: data.data
+    }
+
+}
+
 export const ReporteProductoDias = async (  fecha_inicio: string, fecha_fin: string, config: SWRConfiguration = {}  ) => {
   
     const body = {

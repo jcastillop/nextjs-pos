@@ -7,9 +7,10 @@ import { Storefront, ExpandLess, ExpandMore, PunchClock, PeopleAlt, Summarize, B
 import { CalendarIcon } from "@mui/x-date-pickers";
 import { useState } from "react";
 import { Cierres, DeclaracionMensual, Diario, Turnos } from "@/components/reports";
+import { TurnosExcel } from "@/components/reports/TurnosExcel";
 
 interface IReporte {
-    tipo: 'diario'|'turnos'|'declaracion_mensual'|'cierres'
+    tipo: 'diario'|'turnos'|'declaracion_mensual'|'cierres'|'turnosexcel'
 }
 
 const PerfilPage: NextPage = () => {
@@ -38,6 +39,10 @@ const PerfilPage: NextPage = () => {
                 return <>
                     <Turnos/>
                 </>
+            case 'turnosexcel':
+                return <>
+                    <TurnosExcel/>
+                </>                
             case 'declaracion_mensual':
                 return <>
                     <DeclaracionMensual/>
@@ -90,6 +95,14 @@ const PerfilPage: NextPage = () => {
                                 </ListItemIcon>
                                 <ListItemText primary="Turnos cierres" />
                             </ListItemButton>  
+
+
+                            <ListItemButton sx={{ pl: 4 }} onClick={ ()=> {setTipoReporte({ tipo: 'turnosexcel'})} }>
+                                <ListItemIcon>
+                                <PeopleAlt />
+                                </ListItemIcon>
+                                <ListItemText primary="Turnos cierres excel" />
+                            </ListItemButton>                              
 
                             <ListItemButton sx={{ pl: 4 }} onClick={ ()=> {setTipoReporte({ tipo: 'turnos'})} }>
                                 <ListItemIcon>

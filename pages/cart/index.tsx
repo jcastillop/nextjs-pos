@@ -4,7 +4,7 @@ import { Typography, Grid, Box, Button } from '@mui/material'
 import { FuelLayout } from '@/components/layouts'
 import { CartList, OrderSumaryAdministrator } from '@/components'
 import { IComprobanteAdmin } from '@/interfaces'
-import { FuelContext } from '@/context'
+import { FuelContext, UiContext } from '@/context'
 import { useRouter } from 'next/router'
 
 const initialComprobante: IComprobanteAdmin = {
@@ -62,6 +62,7 @@ export const CartPage = () => {
   const [comprobante, setComprobante] = useState<IComprobanteAdmin>(initialComprobante)
   const { cart } = useContext( FuelContext )
   const router = useRouter();
+  const { showAlert } = useContext( UiContext );
 
   useEffect(() => {
       const totalize = cart?.map(item => ({ igv: item.igv, total: item.precio_venta, gravadas: item.valor_venta })).reduce((a, b) => {
@@ -81,7 +82,11 @@ export const CartPage = () => {
   }, [cart])
 
   const invoiceProduct = () => {
-    router.push('/invoice');
+    if(comprobante.total_venta <= 0){
+        showAlert({mensaje: "Es necesario agregar la cantidad/monto del producto a vender", severity: 'error', time: 7000})
+    }else{
+        router.push('/invoice');
+    } 
 }  
 
   return (
